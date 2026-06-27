@@ -80,6 +80,7 @@
                     <th>Foto</th>
                     <th>Nama Barang</th>
                     <th>Qty</th>
+                    <th>Satuan</th>
                     <th>Qty Satuan</th>
                     <th>Stok saat ini</th>
                     <th>Tanggal Masuk</th>
@@ -97,7 +98,8 @@
                              style="border-radius:8px">
                     </td>
                     <td>Ban Bus</td>
-                    <td>Dus</td>
+                    <td>4</td>
+                    <td>dus</td>
                     <td>4 Pcs</td>
                     <td><b>3 Pcs</b></td>
                     <td>22-06-2026</td>
@@ -115,7 +117,8 @@
                              style="border-radius:8px">
                     </td>
                     <td>Baut Roda</td>
-                    <td>Lusin</td>
+                    <td>1</td>
+                    <td>lusin</td>
                     <td>12 Pcs</td>
                     <td><b>8 Pcs</b></td>
                     <td>22-06-2026</td>
@@ -133,6 +136,7 @@
                              style="border-radius:8px">
                     </td>
                     <td>Oli Mesin</td>
+                    <td>1</td>
                     <td>Dus</td>
                     <td>6 Botol</td>
                     <td><b>3 Botol</b></td>

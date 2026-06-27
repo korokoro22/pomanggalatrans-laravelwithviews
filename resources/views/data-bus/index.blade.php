@@ -12,7 +12,7 @@
 <div class="row mb-3">
     <div class="col-md-12">
 
-        <a href="#" class="btn btn-primary">
+        <a href="{{ route('data-bus.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Bus
         </a>
 

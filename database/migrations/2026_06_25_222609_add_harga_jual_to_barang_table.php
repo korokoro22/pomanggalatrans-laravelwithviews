@@ -6,22 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('barangs', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('barang', function (Blueprint $table) {
+            $table->decimal('harga_jual', 15, 2)->default(0)->after('stok_saat_ini');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('barangs');
+        Schema::table('barang', function (Blueprint $table) {
+            $table->dropColumn('harga_jual');
+        });
     }
 };

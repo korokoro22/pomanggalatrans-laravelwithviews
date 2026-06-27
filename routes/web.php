@@ -7,9 +7,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataBusController;
 use App\Http\Controllers\KeuanganArmadaController;
 use App\Http\Controllers\MasterBarangController;
+use App\Http\Controllers\PaketServiceController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
 Route::get('/masterbarang', function () {
@@ -34,7 +35,12 @@ Route::get('/keuanganarmada', function () {
 
 Route::resource('master-barang', MasterBarangController::class);
 Route::resource('dashboard', DashboardController::class);
+
 Route::resource('barang-masuk', BarangMasukController::class);
+Route::get('barang-masuk-export', [BarangMasukController::class, 'exportPdf'])->name('barang-masuk.export-pdf');
+Route::get('barang-masuk-export/{id}', [BarangMasukController::class, 'exportPdfShow'])->name('barang-masuk.export-pdf-show');
+
 Route::resource('barang-keluar', BarangKeluarController::class);
 Route::resource('data-bus', DataBusController::class);
 Route::resource('keuangan-armada', KeuanganArmadaController::class);
+Route::resource('paket-service', PaketServiceController::class);

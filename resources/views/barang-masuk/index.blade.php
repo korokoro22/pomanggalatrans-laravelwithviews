@@ -12,13 +12,13 @@
 <div class="row mb-3">
     <div class="col-md-12">
 
-        <a href="#" class="btn btn-primary">
+        <a href="{{ route('barang-masuk.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Data
         </a>
 
-        <button class="btn btn-success mr-2">
-            <i class="fas fa-file-export"></i> Export
-        </button>
+        <a href="{{ route('barang-masuk.export-pdf', request()->query()) }}" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </a>
 
     </div>
 </div>
@@ -27,48 +27,83 @@
 {{-- FILTER SECTION --}}
 <x-adminlte-card title="Filter Barang Masuk" theme="light" icon="fas fa-filter">
 
-    <div class="row">
+    <form action="{{ route('barang-masuk.index') }}" method="GET">
 
-        {{-- Filter Nama Barang --}}
-        <div class="col-md-6">
-            <label>Nama Barang</label>
-            <input type="text" class="form-control" placeholder="Cari nama barang...">
+        <div class="row">
+
+            <div class="col-md-3">
+                <label>No. Invoice</label>
+                <input type="text"
+                       name="no_invoice"
+                       class="form-control"
+                       placeholder="Cari no invoice..."
+                       value="{{ request('no_invoice') }}">
+            </div>
+
+            <div class="col-md-3">
+                <label>Supplier</label>
+                <input type="text"
+                       name="supplier"
+                       class="form-control"
+                       placeholder="Cari nama supplier..."
+                       value="{{ request('supplier') }}">
+            </div>
+
+            <div class="col-md-3">
+                <label>Bulan Masuk</label>
+                <select name="bulan" class="form-control">
+                    <option value="">-- Pilih Bulan --</option>
+                    <option value="1"  {{ request('bulan') == '1'  ? 'selected' : '' }}>Januari</option>
+                    <option value="2"  {{ request('bulan') == '2'  ? 'selected' : '' }}>Februari</option>
+                    <option value="3"  {{ request('bulan') == '3'  ? 'selected' : '' }}>Maret</option>
+                    <option value="4"  {{ request('bulan') == '4'  ? 'selected' : '' }}>April</option>
+                    <option value="5"  {{ request('bulan') == '5'  ? 'selected' : '' }}>Mei</option>
+                    <option value="6"  {{ request('bulan') == '6'  ? 'selected' : '' }}>Juni</option>
+                    <option value="7"  {{ request('bulan') == '7'  ? 'selected' : '' }}>Juli</option>
+                    <option value="8"  {{ request('bulan') == '8'  ? 'selected' : '' }}>Agustus</option>
+                    <option value="9"  {{ request('bulan') == '9'  ? 'selected' : '' }}>September</option>
+                    <option value="10" {{ request('bulan') == '10' ? 'selected' : '' }}>Oktober</option>
+                    <option value="11" {{ request('bulan') == '11' ? 'selected' : '' }}>November</option>
+                    <option value="12" {{ request('bulan') == '12' ? 'selected' : '' }}>Desember</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Tahun Masuk</label>
+                <select name="tahun" class="form-control">
+                    <option value="">-- Pilih Tahun --</option>
+                    @for ($i = now()->year; $i >= now()->year - 5; $i--)
+                        <option value="{{ $i }}" {{ request('tahun') == $i ? 'selected' : '' }}>
+                            {{ $i }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+
         </div>
 
-        {{-- Filter Bulan --}}
-        <div class="col-md-6">
-            <label>Bulan Masuk</label>
-            <select class="form-control">
-                <option>-- Pilih Bulan --</option>
-                <option>Januari</option>
-                <option>Februari</option>
-                <option>Maret</option>
-                <option>April</option>
-                <option>Mei</option>
-                <option>Juni</option>
-                <option>Juli</option>
-                <option>Agustus</option>
-                <option>September</option>
-                <option>Oktober</option>
-                <option>November</option>
-                <option>Desember</option>
-            </select>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filter
+            </button>
+            <a href="{{ route('barang-masuk.index') }}" class="btn btn-secondary">
+                Reset
+            </a>
         </div>
 
-    </div>
-
-    <div class="mt-3">
-        <button class="btn btn-primary">
-            <i class="fas fa-search"></i> Filter
-        </button>
-
-        <button class="btn btn-secondary">
-            Reset
-        </button>
-    </div>
+    </form>
 
 </x-adminlte-card>
 
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+@endif
+{{-- <x-adminlte-card>hai</x-adminlte-card> --}}
 
 {{-- TABLE SECTION --}}
 <x-adminlte-card title="Log Barang Masuk" theme="success" icon="fas fa-arrow-down">
@@ -77,74 +112,92 @@
 
         <thead class="text-center">
             <tr>
-                <th>No</th>
+                <th width="5%">No</th>
                 <th>Tanggal Masuk</th>
                 <th>No Invoice</th>
                 <th>Supplier</th>
-                <th>Nama Barang</th>
                 <th>Bukti Nota</th>
-                <th>Qty</th>
-                <th>Total (Pcs)</th>
-                <th>Nominal</th>
                 <th>Penerima</th>
+                <th>Item Barang</th>
+                <th width="15%">Aksi</th>
             </tr>
         </thead>
 
         <tbody>
 
+            @forelse ($barangMasuks as $index => $barangMasuk)
             <tr>
-                <td>1</td>
-                <td>23-06-2026</td>
-                <td>INV-001</td>
-                <td>Toko ABC</td>
-                <td>Ban Bus</td>
-
+                <td>{{ $index + 1 }}</td>
+                <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y') }}</td>
+                <td>{{ $barangMasuk->no_invoice }}</td>
+                <td>{{ $barangMasuk->supplier }}</td>
                 <td>
-                    <img src="https://via.placeholder.com/60"
-                         style="border-radius:5px">
+                    @if ($barangMasuk->bukti_nota)
+                        <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
+                             width="60"
+                             style="border-radius:5px; cursor:pointer"
+                             data-toggle="modal"
+                             data-target="#modalNota{{ $barangMasuk->id }}">
+                    @else
+                        <span class="text-muted">-</span>
+                    @endif
                 </td>
-
-                <td>2 Dus</td>
-                <td><b>8 Pcs</b></td>
-                <td>Rp 2.000.000</td>
-                <td>Andi</td>
+                <td>{{ $barangMasuk->penerima }}</td>
+                <td>
+                    @forelse ($barangMasuk->details as $detail)
+                        <span class="badge badge-info">{{ $detail->nama_barang }}</span>
+                    @empty
+                        <span class="text-muted">-</span>
+                    @endforelse
+                </td>
+                <td class="text-center">
+                    <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
+                       class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
+                       class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
+                          method="POST"
+                          style="display:inline"
+                          onsubmit="return confirm('Yakin ingin hapus data ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
 
+            {{-- Modal Bukti Nota --}}
+            @if ($barangMasuk->bukti_nota)
+            <div class="modal fade" id="modalNota{{ $barangMasuk->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Bukti Nota — {{ $barangMasuk->no_invoice }}</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
+                                 class="img-fluid"
+                                 style="border-radius:5px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @empty
             <tr>
-                <td>2</td>
-                <td>22-06-2026</td>
-                <td>INV-002</td>
-                <td>Toko XYZ</td>
-                <td>Baut Roda</td>
-
-                <td>
-                    <img src="https://via.placeholder.com/60"
-                         style="border-radius:5px">
-                </td>
-
-                <td>1 Lusin</td>
-                <td><b>12 Pcs</b></td>
-                <td>Rp 150.000</td>
-                <td>Budi</td>
+                <td colspan="8" class="text-center">Belum ada data barang masuk</td>
             </tr>
-
-            <tr>
-                <td>3</td>
-                <td>21-06-2026</td>
-                <td>INV-003</td>
-                <td>Toko DEF</td>
-                <td>Oli Mesin</td>
-
-                <td>
-                    <img src="https://via.placeholder.com/60"
-                         style="border-radius:5px">
-                </td>
-
-                <td>3 Dus</td>
-                <td><b>18 Botol</b></td>
-                <td>Rp 1.500.000</td>
-                <td>Rizky</td>
-            </tr>
+            @endforelse
 
         </tbody>
 
