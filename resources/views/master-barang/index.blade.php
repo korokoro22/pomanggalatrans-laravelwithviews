@@ -8,17 +8,22 @@
 
 @section('content')
 
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+@endif
+
 {{-- ACTION BUTTONS --}}
 <div class="row mb-3">
     <div class="col-md-12">
 
-        {{-- <a href="#" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Barang
-        </a> --}}
-
-        <button class="btn btn-success mr-2">
-            <i class="fas fa-file-export"></i> Export
-        </button>
+        <a href="{{ route('master-barang.export-pdf', request()->query()) }}" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </a>
 
         <button class="btn btn-dark" data-toggle="modal" data-target="#modal-scan-qr">
             <i class="fas fa-qrcode"></i> Scan QR Code
@@ -30,39 +35,62 @@
 {{-- FILTER SECTION --}}
 <x-adminlte-card title="Filter Data Barang" theme="light" icon="fas fa-filter">
 
-    <div class="row">
+    <form action="{{ route('master-barang.index') }}" method="GET">
 
-        {{-- Search Nama Barang --}}
-        <div class="col-md-4">
-            <label>Nama Barang</label>
-            <input type="text" class="form-control" placeholder="Cari nama barang...">
+        <div class="row">
+
+            <div class="col-md-4">
+                <label>Nama Barang</label>
+                <input type="text"
+                       name="nama_barang"
+                       class="form-control"
+                       placeholder="Cari nama barang..."
+                       value="{{ request('nama_barang') }}">
+            </div>
+
+            <div class="col-md-4">
+                <label>Bulan Masuk</label>
+                <select name="bulan" class="form-control">
+                    <option value="">-- Pilih Bulan --</option>
+                    <option value="1"  {{ request('bulan') == '1'  ? 'selected' : '' }}>Januari</option>
+                    <option value="2"  {{ request('bulan') == '2'  ? 'selected' : '' }}>Februari</option>
+                    <option value="3"  {{ request('bulan') == '3'  ? 'selected' : '' }}>Maret</option>
+                    <option value="4"  {{ request('bulan') == '4'  ? 'selected' : '' }}>April</option>
+                    <option value="5"  {{ request('bulan') == '5'  ? 'selected' : '' }}>Mei</option>
+                    <option value="6"  {{ request('bulan') == '6'  ? 'selected' : '' }}>Juni</option>
+                    <option value="7"  {{ request('bulan') == '7'  ? 'selected' : '' }}>Juli</option>
+                    <option value="8"  {{ request('bulan') == '8'  ? 'selected' : '' }}>Agustus</option>
+                    <option value="9"  {{ request('bulan') == '9'  ? 'selected' : '' }}>September</option>
+                    <option value="10" {{ request('bulan') == '10' ? 'selected' : '' }}>Oktober</option>
+                    <option value="11" {{ request('bulan') == '11' ? 'selected' : '' }}>November</option>
+                    <option value="12" {{ request('bulan') == '12' ? 'selected' : '' }}>Desember</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label>Tahun Masuk</label>
+                <select name="tahun" class="form-control">
+                    <option value="">-- Pilih Tahun --</option>
+                    @for ($i = now()->year; $i >= now()->year - 5; $i--)
+                        <option value="{{ $i }}" {{ request('tahun') == $i ? 'selected' : '' }}>
+                            {{ $i }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+
         </div>
 
-        {{-- Filter Bulan --}}
-        <div class="col-md-4">
-            <label>Bulan Masuk</label>
-            <select class="form-control">
-                <option>-- Pilih Bulan --</option>
-                <option>Januari</option>
-                <option>Februari</option>
-                <option>Maret</option>
-                <option>April</option>
-                <option>Mei</option>
-                <option>Juni</option>
-            </select>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filter
+            </button>
+            <a href="{{ route('master-barang.index') }}" class="btn btn-secondary">
+                Reset
+            </a>
         </div>
 
-    </div>
-
-    <div class="mt-3">
-        <button class="btn btn-primary">
-            <i class="fas fa-search"></i> Filter
-        </button>
-
-        <button class="btn btn-secondary">
-            Reset
-        </button>
-    </div>
+    </form>
 
 </x-adminlte-card>
 
@@ -76,76 +104,114 @@
             <thead class="text-center">
                 <tr>
                     <th>No</th>
-                    <th>ID Barang</th>
+                    <th>Kode Barang</th>
                     <th>Foto</th>
                     <th>Nama Barang</th>
+                    <th>Kategori</th>
                     <th>Qty</th>
                     <th>Satuan</th>
                     <th>Qty Satuan</th>
-                    <th>Stok saat ini</th>
+                    <th>Stok Saat Ini</th>
+                    <th>Harga Jual</th>
                     <th>Tanggal Masuk</th>
                     <th>QR Code</th>
+                    <th width="10%">Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
 
+                @forelse ($barangs as $index => $barang)
                 <tr>
-                    <td class="text-center">1</td>
-                    <td>BRG-001</td>
-                    <td>
-                        <img src="https://via.placeholder.com/50"
-                             style="border-radius:8px">
-                    </td>
-                    <td>Ban Bus</td>
-                    <td>4</td>
-                    <td>dus</td>
-                    <td>4 Pcs</td>
-                    <td><b>3 Pcs</b></td>
-                    <td>22-06-2026</td>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $barang->kode_barang }}</td>
                     <td class="text-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=BRG-001"
-                             alt="QR BRG-001" style="border-radius:4px">
+                        @if ($barang->foto)
+                            <img src="{{ asset('storage/' . $barang->foto) }}"
+                                 width="50"
+                                 style="border-radius:8px">
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+                    <td>{{ $barang->nama_barang }}</td>
+                    <td class="text-center">
+                        @if ($barang->kategori == 'oli_mesin')
+                            <span class="badge badge-warning">Oli Mesin</span>
+                        @elseif ($barang->kategori == 'filter_solar')
+                            <span class="badge badge-info">Filter Solar</span>
+                        @else
+                            <span class="badge badge-secondary">Item Bebas</span>
+                        @endif
+                    </td>
+                    <td class="text-center">{{ $barang->qty }}</td>
+                    <td class="text-center">{{ $barang->satuan }}</td>
+                    <td class="text-center">{{ number_format($barang->qty_satuan) }} Pcs</td>
+                    <td class="text-center">
+                        <span class="{{ $barang->stok_saat_ini <= 5 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold' }}">
+                            {{ number_format($barang->stok_saat_ini) }} Pcs
+                        </span>
+                        @if ($barang->stok_saat_ini <= 5)
+                            <span class="badge badge-danger">Menipis</span>
+                        @endif
+                    </td>
+                    <td class="text-right">
+                        Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}
+                    </td>
+                    <td class="text-center">
+                        {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y') }}
+                    </td>
+                    <td class="text-center">
+                        @if ($barang->qr_code)
+                            <img src="{{ asset('storage/' . $barang->qr_code) }}"
+                                 width="60"
+                                 style="border-radius:4px; cursor:pointer"
+                                 data-toggle="modal"
+                                 data-target="#modalQr{{ $barang->id }}">
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ route('master-barang.show', $barang->id) }}"
+                           class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
                     </td>
                 </tr>
 
-                <tr>
-                    <td class="text-center">2</td>
-                    <td>BRG-002</td>
-                    <td>
-                        <img src="https://via.placeholder.com/50"
-                             style="border-radius:8px">
-                    </td>
-                    <td>Baut Roda</td>
-                    <td>1</td>
-                    <td>lusin</td>
-                    <td>12 Pcs</td>
-                    <td><b>8 Pcs</b></td>
-                    <td>22-06-2026</td>
-                    <td class="text-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=BRG-002"
-                             alt="QR BRG-002" style="border-radius:4px">
-                    </td>
-                </tr>
+                {{-- Modal QR per barang --}}
+                @if ($barang->qr_code)
+                <div class="modal fade" id="modalQr{{ $barang->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">QR Code — {{ $barang->nama_barang }}</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="{{ asset('storage/' . $barang->qr_code) }}"
+                                     class="img-fluid"
+                                     style="max-width:250px">
+                                <p class="mt-2 text-muted">{{ $barang->kode_barang }} — {{ $barang->nama_barang }}</p>
+                                <a href="{{ asset('storage/' . $barang->qr_code) }}"
+                                   download="qrcode-{{ $barang->kode_barang }}.svg"
+                                   class="btn btn-outline-primary btn-sm mt-2">
+                                    <i class="fas fa-download"></i> Download QR
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
+                @empty
                 <tr>
-                    <td class="text-center">3</td>
-                    <td>BRG-003</td>
-                    <td>
-                        <img src="https://via.placeholder.com/50"
-                             style="border-radius:8px">
-                    </td>
-                    <td>Oli Mesin</td>
-                    <td>1</td>
-                    <td>Dus</td>
-                    <td>6 Botol</td>
-                    <td><b>3 Botol</b></td>
-                    <td>22-06-2026</td>
-                    <td class="text-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=BRG-003"
-                             alt="QR BRG-003" style="border-radius:4px">
-                    </td>
+                    <td colspan="13" class="text-center">Belum ada data barang</td>
                 </tr>
+                @endforelse
 
             </tbody>
 
@@ -155,28 +221,24 @@
 </x-adminlte-card>
 
 
-{{-- MODAL: SCAN QR CODE (UI only, belum ada logic) --}}
+{{-- MODAL: SCAN QR CODE --}}
 <div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fas fa-qrcode mr-1"></i> Scan QR Code
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                    <span aria-hidden="true">&times;</span>
+                    <span>&times;</span>
                 </button>
             </div>
-
             <div class="modal-body text-center">
                 <p class="text-muted">Fitur scan QR Code akan segera tersedia.</p>
             </div>
-
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
-
         </div>
     </div>
 </div>

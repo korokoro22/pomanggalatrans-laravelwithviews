@@ -10,8 +10,7 @@
 
 <x-adminlte-card title="Form Tambah Bus" theme="info" icon="fas fa-bus">
 
-    {{-- <form action="{{ route('bus.store') }}" method="POST"> --}}
-        <form action="" method="POST">
+    <form action="{{ route('data-bus.store') }}" method="POST">
         @csrf
 
         <div class="row">

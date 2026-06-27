@@ -14,7 +14,6 @@ class Barang_masuk_detail extends Model
     protected $fillable = [
         'barang_masuk_id',
         'barang_id',
-        'kategori',
         'nama_barang',
         'foto',
         'qty',

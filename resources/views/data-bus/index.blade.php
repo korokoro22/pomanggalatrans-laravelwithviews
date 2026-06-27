@@ -8,55 +8,67 @@
 
 @section('content')
 
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+@endif
+
 {{-- ACTION BUTTON --}}
 <div class="row mb-3">
     <div class="col-md-12">
-
         <a href="{{ route('data-bus.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Bus
         </a>
-
+        <a href="{{ route('data-bus.export-pdf', request()->query()) }}" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </a>
     </div>
+    
 </div>
-
 
 {{-- FILTER --}}
 <x-adminlte-card title="Filter Data Bus" theme="light" icon="fas fa-filter">
 
-    <div class="row">
+    <form action="{{ route('data-bus.index') }}" method="GET">
 
-        {{-- Nama Bus --}}
-        <div class="col-md-6">
-            <label>Nama Bus</label>
-            <input type="text"
-                   class="form-control"
-                   placeholder="Cari nama bus atau nomor pintu...">
+        <div class="row">
+
+            <div class="col-md-6">
+                <label>Nama Bus</label>
+                <input type="text"
+                       name="nama_bus"
+                       class="form-control"
+                       placeholder="Cari nama bus..."
+                       value="{{ request('nama_bus') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label>Plat Nomor</label>
+                <input type="text"
+                       name="plat_nomor"
+                       class="form-control"
+                       placeholder="Cari plat nomor..."
+                       value="{{ request('plat_nomor') }}">
+            </div>
+
         </div>
 
-        {{-- Plat Nomor --}}
-        <div class="col-md-6">
-            <label>Plat Nomor</label>
-            <input type="text"
-                   class="form-control"
-                   placeholder="Cari plat nomor...">
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filter
+            </button>
+            <a href="{{ route('data-bus.index') }}" class="btn btn-secondary">
+                Reset
+            </a>
         </div>
 
-    </div>
-
-    <div class="mt-3">
-
-        <button class="btn btn-primary">
-            <i class="fas fa-search"></i> Filter
-        </button>
-
-        <button class="btn btn-secondary">
-            Reset
-        </button>
-
-    </div>
+    </form>
 
 </x-adminlte-card>
-
 
 {{-- TABLE --}}
 <x-adminlte-card title="Daftar Bus" theme="info" icon="fas fa-bus">
@@ -76,77 +88,39 @@
 
         <tbody>
 
+            @forelse ($buses as $index => $bus)
             <tr>
-                <td>1</td>
-                <td>Bus 01</td>
-                <td>DD 1234 AB</td>
-                <td>Makassar - Parepare</td>
-                <td>Andi Pratama</td>
-
+                <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $bus->nama_bus }}</td>
+                <td>{{ $bus->plat_nomor }}</td>
+                <td>{{ $bus->rute_trayek ?? '-' }}</td>
+                <td>{{ $bus->nama_driver }}</td>
                 <td class="text-center">
-
-                    <button class="btn btn-info btn-sm">
+                    <a href="{{ route('data-bus.show', $bus->id) }}"
+                       class="btn btn-info btn-sm">
                         <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button class="btn btn-warning btn-sm">
+                    </a>
+                    <a href="{{ route('data-bus.edit', $bus->id) }}"
+                       class="btn btn-warning btn-sm">
                         <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </button>
-
+                    </a>
+                    <form action="{{ route('data-bus.destroy', $bus->id) }}"
+                          method="POST"
+                          style="display:inline"
+                          onsubmit="return confirm('Yakin ingin hapus data bus ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
                 </td>
             </tr>
-
+            @empty
             <tr>
-                <td>2</td>
-                <td>Bus 07</td>
-                <td>DD 5678 XY</td>
-                <td>Makassar - Palopo</td>
-                <td>Budi Santoso</td>
-
-                <td class="text-center">
-
-                    <button class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </button>
-
-                </td>
+                <td colspan="6" class="text-center">Belum ada data bus</td>
             </tr>
-
-            <tr>
-                <td>3</td>
-                <td>Bus 12</td>
-                <td>DD 9012 ZZ</td>
-                <td>Makassar - Toraja</td>
-                <td>Rizky Maulana</td>
-
-                <td class="text-center">
-
-                    <button class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </button>
-
-                </td>
-            </tr>
+            @endforelse
 
         </tbody>
 

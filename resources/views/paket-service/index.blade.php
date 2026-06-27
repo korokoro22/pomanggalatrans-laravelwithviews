@@ -8,14 +8,72 @@
 
 @section('content')
 
-<x-adminlte-card title="Daftar Paket Service" theme="primary" icon="fas fa-list">
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+@endif
 
-    <div class="mb-3">
+{{-- ACTION BUTTON --}}
+<div class="row mb-3">
+    <div class="col-md-12">
         <a href="{{ route('paket-service.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            Tambah Paket Service
+            <i class="fas fa-plus"></i> Tambah Paket Service
+        </a>
+        <a href="{{ route('paket-service.export-pdf', request()->query()) }}" class="btn btn-success">
+            <i class="fas fa-file-pdf"></i> Export PDF
         </a>
     </div>
+</div>
+
+{{-- FILTER --}}
+<x-adminlte-card title="Filter Paket Service" theme="light" icon="fas fa-filter">
+
+    <form action="{{ route('paket-service.index') }}" method="GET">
+
+        <div class="row">
+
+            <div class="col-md-6">
+                <label>Nama Paket</label>
+                <input type="text"
+                       name="nama_paket"
+                       class="form-control"
+                       placeholder="Cari nama paket..."
+                       value="{{ request('nama_paket') }}">
+            </div>
+
+            <div class="col-md-6">
+                <label>Bus</label>
+                <select name="bus_id" class="form-control">
+                    <option value="">-- Pilih Bus --</option>
+                    @foreach ($buses as $bus)
+                        <option value="{{ $bus->id }}" {{ request('bus_id') == $bus->id ? 'selected' : '' }}>
+                            {{ $bus->nama_bus }} - {{ $bus->plat_nomor }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filter
+            </button>
+            <a href="{{ route('paket-service.index') }}" class="btn btn-secondary">
+                Reset
+            </a>
+        </div>
+
+    </form>
+
+</x-adminlte-card>
+
+{{-- TABLE --}}
+<x-adminlte-card title="Daftar Paket Service" theme="primary" icon="fas fa-list">
 
     <table class="table table-bordered table-hover">
         <thead>
@@ -30,68 +88,50 @@
             </tr>
         </thead>
         <tbody>
+            @forelse ($paketServices as $index => $paket)
             <tr>
-                <td>1</td>
-                <td>Bus Scania A</td>
-                <td>AA 1234 BB</td>
-                <td>Paket Service Ringan</td>
-                <td>Rp 150.000</td>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $paket->bus->nama_bus }}</td>
+                <td>{{ $paket->bus->plat_nomor }}</td>
+                <td>{{ $paket->nama_paket }}</td>
+                <td>Rp {{ number_format($paket->harga, 0, ',', '.') }}</td>
                 <td>
-                    <span class="badge badge-info">Oli Mesin Shell (1 liter)</span>
-                    <span class="badge badge-info">Filter Solar (1 pcs)</span>
+                    @forelse ($paket->paketServiceItem as $item)
+                        <span class="badge badge-info">
+                            {{ $item->barang->nama_barang }} ({{ $item->qty }} {{ $item->barang->satuan }})
+                        </span>
+                    @empty
+                        <span class="text-muted">-</span>
+                    @endforelse
                 </td>
                 <td>
-                    <a href="#" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                        Edit
-                    </a>
-                    <button type="button" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                        Hapus
-                    </button>
+                    <td>
+                        <a href="{{ route('paket-service.show', $paket->id) }}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('paket-service.edit', $paket->id) }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </a>
+                        <form action="{{ route('paket-service.destroy', $paket->id) }}"
+                            method="POST"
+                            style="display:inline"
+                            onsubmit="return confirm('Yakin ingin hapus paket ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                                Hapus
+                            </button>
+                        </form>
+                    </td>
                 </td>
             </tr>
+            @empty
             <tr>
-                <td>2</td>
-                <td>Bus Scania A</td>
-                <td>AA 1234 BB</td>
-                <td>Paket Service Berat</td>
-                <td>Rp 300.000</td>
-                <td>
-                    <span class="badge badge-info">Oli Mesin Pertamina (2 liter)</span>
-                    <span class="badge badge-info">Filter Solar (2 pcs)</span>
-                </td>
-                <td>
-                    <a href="#" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                        Edit
-                    </a>
-                    <button type="button" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                        Hapus
-                    </button>
-                </td>
+                <td colspan="7" class="text-center">Belum ada data paket service</td>
             </tr>
-            <tr>
-                <td>3</td>
-                <td>Bus Mercedez B</td>
-                <td>BB 5678 CC</td>
-                <td>Paket Service Ringan</td>
-                <td>Rp 175.000</td>
-                <td>
-                    <span class="badge badge-info">Oli Mesin Shell (1 liter)</span>
-                </td>
-                <td>
-                    <a href="#" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                        Edit
-                    </a>
-                    <button type="button" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                        Hapus
-                    </button>
-                </td>
-            </tr>
+            @endforelse
         </tbody>
     </table>
 

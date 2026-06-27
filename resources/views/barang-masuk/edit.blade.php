@@ -143,9 +143,9 @@
                             <label>Kategori</label>
                             <select name="items[{{ $index }}][kategori]" class="form-control" required>
                                 <option value="">-- Pilih Kategori --</option>
-                                <option value="oli_mesin"   {{ old('items.' . $index . '.kategori', $detail->kategori) == 'oli_mesin'   ? 'selected' : '' }}>Oli Mesin</option>
-                                <option value="filter_solar" {{ old('items.' . $index . '.kategori', $detail->kategori) == 'filter_solar' ? 'selected' : '' }}>Filter Solar</option>
-                                <option value="item_bebas"  {{ old('items.' . $index . '.kategori', $detail->kategori) == 'item_bebas'  ? 'selected' : '' }}>Item Bebas</option>
+                                <option value="oli_mesin"    {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'oli_mesin'    ? 'selected' : '' }}>Oli Mesin</option>
+                                <option value="filter_solar" {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'filter_solar' ? 'selected' : '' }}>Filter Solar</option>
+                                <option value="item_bebas"   {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'item_bebas'   ? 'selected' : '' }}>Item Bebas</option>
                             </select>
                         </div>
                     </div>

@@ -13,7 +13,24 @@
     {{-- KOLOM KIRI — Info Barang --}}
     <div class="col-md-8">
 
-        <x-adminlte-card title="Informasi Barang" theme="primary" icon="fas fa-box">
+        <x-adminlte-card title="Informasi Barang" theme="lightblue" icon="fas fa-box">
+
+            <div class="mb-3">
+                <a href="{{ route('master-barang.export-pdf-show', $barang->id) }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </a>
+            </div>
+
+            {{-- tambahkan setelah tabel info barang --}}
+            @if ($barang->barangMasukDetail->first() && $barang->barangMasukDetail->first()->barangMasuk)
+                <div class="mt-3">
+                    <a href="{{ route('barang-masuk.show', $barang->barangMasukDetail->first()->barangMasuk->id) }}"
+                    class="btn btn-info btn-sm">
+                        <i class="fas fa-file-invoice"></i>
+                        Lihat Nota Barang Masuk
+                    </a>
+                </div>
+            @endif
 
             <table class="table table-borderless">
                 <tr>
@@ -73,7 +90,7 @@
             <table class="table table-bordered table-striped">
                 <thead class="text-center">
                     <tr>
-                        <th>No</th>
+                        <th width="5%">No</th>
                         <th>Tanggal</th>
                         <th>Bus</th>
                         <th>Plat Nomor</th>
@@ -83,11 +100,11 @@
                 <tbody>
                     @forelse ($barang->transaksiKeluarDetail as $index => $detail)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td class="text-center">{{ $index + 1 }}</td>
                         <td>{{ \Carbon\Carbon::parse($detail->transaksiKeluar->tanggal)->format('d-m-Y') }}</td>
                         <td>{{ $detail->transaksiKeluar->bus->nama_bus }}</td>
                         <td>{{ $detail->transaksiKeluar->bus->plat_nomor }}</td>
-                        <td>{{ $detail->qty }} Pcs</td>
+                        <td class="text-center">{{ $detail->qty }} Pcs</td>
                     </tr>
                     @empty
                     <tr>
@@ -105,7 +122,7 @@
     <div class="col-md-4">
 
         {{-- Foto Barang --}}
-        <x-adminlte-card title="Foto Barang" theme="primary" icon="fas fa-image">
+        <x-adminlte-card title="Foto Barang" theme="lightblue" icon="fas fa-image">
             @if ($barang->foto)
                 <img src="{{ asset('storage/' . $barang->foto) }}"
                      class="img-fluid"
@@ -119,7 +136,7 @@
         </x-adminlte-card>
 
         {{-- QR Code --}}
-        <x-adminlte-card title="QR Code" theme="primary" icon="fas fa-qrcode">
+        <x-adminlte-card title="QR Code" theme="lightblue" icon="fas fa-qrcode">
             @if ($barang->qr_code)
                 <div class="text-center">
                     <img src="{{ asset('storage/' . $barang->qr_code) }}"
@@ -129,7 +146,7 @@
                         <small>Scan untuk buka halaman ini</small>
                     </p>
                     <a href="{{ asset('storage/' . $barang->qr_code) }}"
-                       download="qrcode-{{ $barang->kode_barang }}.png"
+                       download="qrcode-{{ $barang->kode_barang }}.svg"
                        class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-download"></i> Download QR
                     </a>
@@ -146,7 +163,7 @@
 
 </div>
 
-<a href="{{ route('barang.index') }}" class="btn btn-secondary mb-3">
+<a href="{{ route('master-barang.index') }}" class="btn btn-secondary mb-3">
     <i class="fas fa-arrow-left"></i>
     Kembali
 </a>

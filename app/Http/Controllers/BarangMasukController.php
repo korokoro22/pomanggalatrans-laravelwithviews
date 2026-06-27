@@ -83,14 +83,15 @@ class BarangMasukController extends Controller {
             ]);
 
             // Langkah 3 — loop tiap item
-            foreach ($request->items as $item) {
+            foreach ($request->items as $index => $item) {
 
                 // Upload foto barang dengan nama deskriptif
                 $fotoPath = null;
-                if (isset($item['foto']) && $item['foto']->isValid()) {
-                    $ext      = $item['foto']->extension();
+                $fotoFile = $request->file("items.{$index}.foto");
+                if ($fotoFile && $fotoFile->isValid()) {
+                    $ext      = $fotoFile->extension();
                     $namaFoto = 'barang-' . Str::slug($item['nama_barang']) . '-' . time() . '.' . $ext;
-                    $fotoPath = $item['foto']->storeAs('barang', $namaFoto, 'public');
+                    $fotoPath = $fotoFile->storeAs('barang', $namaFoto, 'public');
                 }
 
                 // Langkah 4 — buat baris baru di tabel barang
@@ -132,7 +133,6 @@ class BarangMasukController extends Controller {
                 Barang_masuk_detail::create([
                     'barang_masuk_id' => $barangMasuk->id,
                     'barang_id'       => $barang->id,
-                    'kategori'        => $item['kategori'],
                     'nama_barang'     => $item['nama_barang'],
                     'foto'            => $fotoPath,
                     'qty'             => $item['qty'],
@@ -206,34 +206,40 @@ class BarangMasukController extends Controller {
                 'bukti_nota'    => $buktiNotaPath,
             ]);
 
-            // Hapus detail lama beserta barang dan file terkait
+            // Simpan foto lama sebelum hapus apapun
+            $fotoLama = [];
+            foreach ($barangMasuk->details as $index => $detail) {
+                $fotoLama[$index] = $detail->foto;
+            }
+
+            // Hapus detail lama beserta barang dan qr code
+            // TIDAK hapus foto disini
             foreach ($barangMasuk->details as $detail) {
-
-                // Hapus foto barang lama
-                if ($detail->foto) {
-                    Storage::disk('public')->delete($detail->foto);
-                }
-
-                // Hapus qr code dan barang lama
                 if ($detail->barang) {
                     if ($detail->barang->qr_code) {
                         Storage::disk('public')->delete($detail->barang->qr_code);
                     }
                     $detail->barang->delete();
                 }
-
-                // Hapus detail
                 $detail->delete();
             }
 
             // Insert detail baru
-            foreach ($request->items as $item) {
+            foreach ($request->items as $index => $item) {
 
-                $fotoPath = null;
-                if (isset($item['foto']) && $item['foto']->isValid()) {
-                    $ext      = $item['foto']->extension();
+                $fotoFile = $request->file("items.{$index}.foto");
+
+                if ($fotoFile && $fotoFile->isValid()) {
+                    // Ada foto baru — hapus foto lama dulu baru upload baru
+                    if (isset($fotoLama[$index]) && $fotoLama[$index]) {
+                        Storage::disk('public')->delete($fotoLama[$index]);
+                    }
+                    $ext      = $fotoFile->extension();
                     $namaFoto = 'barang-' . Str::slug($item['nama_barang']) . '-' . time() . '.' . $ext;
-                    $fotoPath = $item['foto']->storeAs('barang', $namaFoto, 'public');
+                    $fotoPath = $fotoFile->storeAs('barang', $namaFoto, 'public');
+                } else {
+                    // Tidak ada foto baru — pakai foto lama
+                    $fotoPath = $fotoLama[$index] ?? null;
                 }
 
                 $barang = Barang::create([
@@ -250,7 +256,6 @@ class BarangMasukController extends Controller {
                     'qr_code'       => null,
                 ]);
 
-                // Generate QR code baru
                 $qrData = route('master-barang.show', $barang->id);
 
                 $qrFolder = storage_path('app/public/qrcode');
@@ -272,7 +277,6 @@ class BarangMasukController extends Controller {
                 Barang_masuk_detail::create([
                     'barang_masuk_id' => $barangMasuk->id,
                     'barang_id'       => $barang->id,
-                    'kategori'        => $item['kategori'],
                     'nama_barang'     => $item['nama_barang'],
                     'foto'            => $fotoPath,
                     'qty'             => $item['qty'],
