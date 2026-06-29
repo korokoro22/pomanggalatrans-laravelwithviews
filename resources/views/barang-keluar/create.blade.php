@@ -43,8 +43,15 @@
 
         <hr>
 
-        <h5><i class="fas fa-list"></i> Item Transaksi</h5>
-        <small class="text-muted">Tambahkan item transaksi, bisa lebih dari satu dalam satu transaksi</small>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h5 class="mb-0"><i class="fas fa-list"></i> Item Transaksi</h5>
+                <small class="text-muted">Tambahkan item transaksi, bisa lebih dari satu dalam satu transaksi</small>
+            </div>
+            <button type="button" class="btn btn-info btn-sm" id="btn-scan-qr">
+                <i class="fas fa-qrcode"></i> Scan QR Barang
+            </button>
+        </div>
 
         <div class="mt-3" id="item-container">
 
@@ -217,13 +224,91 @@
 
 </x-adminlte-card>
 
+{{-- Modal Scanner --}}
+<div class="modal fade" id="modal-scanner" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-qrcode"></i> Scan QR Code Barang</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="qr-reader" style="width:100%"></div>
+                <div id="qr-scan-status" class="mt-2 text-muted small">
+                    Arahkan kamera ke QR code barang...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Konfirmasi Barang --}}
+<div class="modal fade" id="modal-konfirmasi-barang" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title text-white"><i class="fas fa-box"></i> Hasil Scan Barang</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <img id="konfirmasi-foto" src="" alt="Foto Barang"
+                         style="max-height:150px; object-fit:contain; display:none"
+                         class="img-thumbnail">
+                    <div id="konfirmasi-no-foto" class="text-muted small" style="display:none">
+                        <i class="fas fa-image fa-2x"></i><br>Tidak ada foto
+                    </div>
+                </div>
+                <table class="table table-sm table-bordered">
+                    <tr>
+                        <th width="40%">Kode Barang</th>
+                        <td id="konfirmasi-kode"></td>
+                    </tr>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <td id="konfirmasi-nama"></td>
+                    </tr>
+                    <tr>
+                        <th>Kategori</th>
+                        <td id="konfirmasi-kategori"></td>
+                    </tr>
+                    <tr>
+                        <th>Harga Satuan</th>
+                        <td id="konfirmasi-harga"></td>
+                    </tr>
+                    <tr>
+                        <th>Stok Saat Ini</th>
+                        <td id="konfirmasi-stok"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <a href="#" id="btn-lihat-detail" class="btn btn-info" target="_blank">
+                    <i class="fas fa-eye"></i> Lihat Detail
+                </a>
+                <button type="button" class="btn btn-primary" id="btn-tambah-ke-form">
+                    <i class="fas fa-plus"></i> Tambahkan ke Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section('js')
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
     let itemIndex = 1;
     let paketList = [];
 
-    const ajaxUrl = "{{ route('barang-keluar.paket-by-bus', ':busId') }}";
-    const barangs = @json($barangs->keyBy('id'));
+    const ajaxUrl   = "{{ route('barang-keluar.paket-by-bus', ':busId') }}";
+    const jsonUrl   = "{{ route('master-barang.json', ':id') }}";
+    const detailUrl = "{{ route('master-barang.show', ':id') }}";
+    const barangs   = @json($barangs->keyBy('id'));
 
     // ========== AJAX: Load paket saat bus dipilih ==========
     document.getElementById('bus-select').addEventListener('change', function () {
@@ -269,7 +354,6 @@
         return `
         <div class="card card-outline card-secondary mb-3 item-row">
             <div class="card-body">
-
                 <div class="row mb-2">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -359,7 +443,6 @@
                 <button type="button" class="btn btn-danger btn-sm btn-remove-item">
                     <i class="fas fa-trash"></i> Hapus Item
                 </button>
-
             </div>
         </div>`;
     }
@@ -369,7 +452,6 @@
         const row = e.target.closest('.item-row');
         if (!row) return;
 
-        // Toggle tipe
         if (e.target.classList.contains('tipe-radio')) {
             const sectionPaket = row.querySelector('.section-paket-service');
             const sectionItem  = row.querySelector('.section-per-item');
@@ -383,7 +465,6 @@
             resetSubtotal(row);
         }
 
-        // Pilih paket → isi harga & subtotal
         if (e.target.classList.contains('select-paket')) {
             const harga = e.target.selectedOptions[0]?.dataset.harga || 0;
             row.querySelector('.input-harga-paket').value = harga;
@@ -392,7 +473,6 @@
             hitungTotal();
         }
 
-        // Pilih barang → isi harga satuan & satuan, reset qty & subtotal
         if (e.target.classList.contains('select-barang')) {
             const opt    = e.target.selectedOptions[0];
             const harga  = opt?.dataset.harga || 0;
@@ -466,6 +546,126 @@
             row.querySelector('.btn-remove-item').disabled = rows.length === 1;
         });
     }
+
+    // ========== QR SCANNER ==========
+    let html5QrCode  = null;
+    let scannedBarang = null;
+
+    document.getElementById('btn-scan-qr').addEventListener('click', function () {
+        $('#modal-scanner').modal('show');
+    });
+
+    $('#modal-scanner').on('shown.bs.modal', function () {
+        html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            function (decodedText) {
+                // Stop scanner
+                html5QrCode.stop().then(() => {
+                    $('#modal-scanner').modal('hide');
+                });
+
+                // Handle QR lama (URL) dan baru (angka murni)
+                const id = decodedText.includes('/')
+                    ? decodedText.split('/').pop()
+                    : decodedText;
+
+                // Fetch data barang
+                fetch(jsonUrl.replace(':id', id))
+                    .then(res => {
+                        if (!res.ok) throw new Error('Barang tidak ditemukan');
+                        return res.json();
+                    })
+                    .then(data => {
+                        scannedBarang = data;
+
+                        // Isi modal konfirmasi
+                        document.getElementById('konfirmasi-kode').textContent     = data.kode_barang;
+                        document.getElementById('konfirmasi-nama').textContent     = data.nama_barang;
+                        document.getElementById('konfirmasi-kategori').textContent = data.kategori;
+                        document.getElementById('konfirmasi-harga').textContent    = 'Rp ' + Number(data.harga_jual).toLocaleString('id-ID');
+                        document.getElementById('konfirmasi-stok').textContent     = data.stok_saat_ini + ' ' + data.satuan;
+
+                        // Foto
+                        const fotoEl    = document.getElementById('konfirmasi-foto');
+                        const noFotoEl  = document.getElementById('konfirmasi-no-foto');
+                        if (data.foto) {
+                            fotoEl.src           = data.foto;
+                            fotoEl.style.display  = 'block';
+                            noFotoEl.style.display = 'none';
+                        } else {
+                            fotoEl.style.display  = 'none';
+                            noFotoEl.style.display = 'block';
+                        }
+
+                        // Link detail
+                        document.getElementById('btn-lihat-detail').href =
+                            detailUrl.replace(':id', data.id);
+
+                        $('#modal-konfirmasi-barang').modal('show');
+                    })
+                    .catch(err => {
+                        alert('Gagal memuat data: ' + err.message);
+                    });
+            },
+            function (error) {
+                // scan error diabaikan
+            }
+        ).catch(err => {
+            document.getElementById('qr-scan-status').textContent = 'Kamera tidak bisa diakses: ' + err;
+        });
+    });
+
+    $('#modal-scanner').on('hidden.bs.modal', function () {
+        if (html5QrCode) {
+            html5QrCode.stop().catch(() => {});
+        }
+    });
+
+    // ========== TAMBAHKAN KE FORM ==========
+    document.getElementById('btn-tambah-ke-form').addEventListener('click', function () {
+        if (!scannedBarang) return;
+
+        // Cari row per item yang kosong (belum pilih barang)
+        let targetRow = null;
+        document.querySelectorAll('.item-row').forEach(row => {
+            if (targetRow) return;
+            const tipeChecked = row.querySelector('.tipe-radio:checked')?.value;
+            const barangId    = row.querySelector('.select-barang')?.value;
+            if (tipeChecked === 'per_item' && !barangId) {
+                targetRow = row;
+            }
+        });
+
+        // Kalau tidak ada row per item kosong, buat row baru
+        if (!targetRow) {
+            document.getElementById('item-container')
+                    .insertAdjacentHTML('beforeend', buildItemRow(itemIndex));
+            itemIndex++;
+            updateRemoveButtons();
+            const rows = document.querySelectorAll('.item-row');
+            targetRow  = rows[rows.length - 1];
+        }
+
+        // Switch ke tipe per_item
+        const radioPerItem       = targetRow.querySelector('.tipe-radio[value="per_item"]');
+        radioPerItem.checked     = true;
+        targetRow.querySelector('.section-paket-service').style.display = 'none';
+        targetRow.querySelector('.section-per-item').style.display      = 'block';
+
+        // Isi select barang
+        const selectBarang   = targetRow.querySelector('.select-barang');
+        selectBarang.value   = scannedBarang.id;
+
+        // Isi field lainnya
+        targetRow.querySelector('.input-harga-satuan').value = scannedBarang.harga_jual;
+        targetRow.querySelector('.input-satuan').value       = scannedBarang.satuan;
+        targetRow.querySelector('.input-qty').value          = '';
+
+        $('#modal-konfirmasi-barang').modal('hide');
+        scannedBarang = null;
+    });
 </script>
 @stop
 

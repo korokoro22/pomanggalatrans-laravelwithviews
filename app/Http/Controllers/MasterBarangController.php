@@ -72,4 +72,20 @@ class MasterBarangController extends Controller {
 
         return $pdf->download('barang-' . $barang->kode_barang . '.pdf');
     }
+
+    public function getJson($id)
+    {
+        $barang = Barang::findOrFail($id);
+
+        return response()->json([
+            'id'          => $barang->id,
+            'kode_barang' => $barang->kode_barang,
+            'nama_barang' => $barang->nama_barang,
+            'kategori'    => $barang->kategori,
+            'harga_jual'  => $barang->harga_jual,
+            'satuan'      => $barang->satuan,
+            'stok_saat_ini' => $barang->stok_saat_ini,
+            'foto'        => $barang->foto ? asset('storage/' . $barang->foto) : null,
+        ]);
+    }
 }

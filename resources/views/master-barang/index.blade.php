@@ -245,6 +245,29 @@
 </div> --}}
 
 {{-- MODAL: SCAN QR CODE --}}
+{{-- <div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-qrcode mr-1"></i> Scan QR Code
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qr-reader" style="width:100%"></div>
+                <div id="qr-result" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div> --}}
+
+{{-- MODAL: SCAN QR CODE --}}
 <div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -270,8 +293,7 @@
 @stop
 
 @section('js')
-{{-- <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> --}}
-<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
     let html5QrCode = null;
 
@@ -287,7 +309,6 @@
             },
             function (decodedText, decodedResult) {
                 // Berhasil scan — stop kamera lalu redirect
-                console.log('Scan berhasil:', decodedText);
                 html5QrCode.stop().then(() => {
                     $('#modal-scan-qr').modal('hide');
                     window.location.href = decodedText;

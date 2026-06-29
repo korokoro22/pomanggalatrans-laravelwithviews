@@ -36,6 +36,7 @@ Route::get('/keuanganarmada', function () {
 Route::resource('master-barang', MasterBarangController::class);
 Route::get('master-barang-export', [MasterBarangController::class, 'exportPdf'])->name('master-barang.export-pdf');
 Route::get('master-barang-export/{id}', [MasterBarangController::class, 'exportPdfShow'])->name('master-barang.export-pdf-show');
+Route::get('master-barang-json/{id}', [MasterBarangController::class, 'getJson'])->name('master-barang.json');
 
 Route::resource('dashboard', DashboardController::class);
 
