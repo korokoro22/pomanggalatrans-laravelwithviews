@@ -223,7 +223,7 @@
 
 
 {{-- MODAL: SCAN QR CODE --}}
-<div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
+{{-- <div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -242,6 +242,73 @@
             </div>
         </div>
     </div>
+</div> --}}
+
+{{-- MODAL: SCAN QR CODE --}}
+<div class="modal fade" id="modal-scan-qr" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-qrcode mr-1"></i> Scan QR Code
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qr-reader" style="width:100%"></div>
+                <div id="qr-result" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
 </div>
 
+@stop
+
+@section('js')
+{{-- <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> --}}
+<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
+<script>
+    let html5QrCode = null;
+
+    // Saat modal dibuka → start kamera
+    $('#modal-scan-qr').on('shown.bs.modal', function () {
+        html5QrCode = new Html5Qrcode("qr-reader");
+
+        html5QrCode.start(
+            { facingMode: "environment" }, // kamera belakang
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            },
+            function (decodedText, decodedResult) {
+                // Berhasil scan — stop kamera lalu redirect
+                console.log('Scan berhasil:', decodedText);
+                html5QrCode.stop().then(() => {
+                    $('#modal-scan-qr').modal('hide');
+                    window.location.href = decodedText;
+                });
+            },
+            function (errorMessage) {
+                // Tidak perlu ditampilkan — ini terpanggil tiap frame gagal scan
+            }
+        ).catch(function (err) {
+            $('#qr-result').html(
+                '<div class="alert alert-danger">Tidak bisa mengakses kamera: ' + err + '</div>'
+            );
+        });
+    });
+
+    // Saat modal ditutup → stop kamera
+    $('#modal-scan-qr').on('hidden.bs.modal', function () {
+        if (html5QrCode) {
+            html5QrCode.stop().catch(() => {});
+            html5QrCode = null;
+        }
+    });
+</script>
 @stop
