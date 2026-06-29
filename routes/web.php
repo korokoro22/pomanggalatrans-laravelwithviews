@@ -44,12 +44,17 @@ Route::get('barang-masuk-export', [BarangMasukController::class, 'exportPdf'])->
 Route::get('barang-masuk-export/{id}', [BarangMasukController::class, 'exportPdfShow'])->name('barang-masuk.export-pdf-show');
 
 Route::resource('barang-keluar', BarangKeluarController::class);
+Route::get('barang-keluar-export-pdf', [BarangKeluarController::class, 'exportPdf'])->name('barang-keluar.export-pdf');
+Route::get('barang-keluar-export-pdf/{id}', [BarangKeluarController::class, 'exportPdfShow'])->name('barang-keluar.export-pdf-show');
+Route::get('barang-keluar/paket-by-bus/{busId}', [BarangKeluarController::class, 'getPaketByBus'])->name('barang-keluar.paket-by-bus');
 
 Route::resource('data-bus', DataBusController::class);
 Route::get('data-bus-export', [DataBusController::class, 'exportPdf'])->name('data-bus.export-pdf');
 Route::get('data-bus-export/{id}', [DataBusController::class, 'exportPdfShow'])->name('data-bus.export-pdf-show');
 
 Route::resource('keuangan-armada', KeuanganArmadaController::class);
+Route::get('keuangan-armada-export', [KeuanganArmadaController::class, 'exportPdf'])->name('keuangan-armada.export-pdf');
+Route::get('keuangan-armada-export/{id}', [KeuanganArmadaController::class, 'exportPdfShow'])->name('keuangan-armada.export-pdf-show');
 
 Route::resource('paket-service', PaketServiceController::class);
 Route::get('paket-service-export', [PaketServiceController::class, 'exportPdf'])->name('paket-service.export-pdf');

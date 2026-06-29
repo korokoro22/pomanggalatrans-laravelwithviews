@@ -107,7 +107,7 @@
                     <th>Kode Barang</th>
                     <th>Foto</th>
                     <th>Nama Barang</th>
-                    <th>Kategori</th>
+                    {{-- <th>Kategori</th> --}}
                     <th>Qty</th>
                     <th>Satuan</th>
                     <th>Qty Satuan</th>
@@ -135,7 +135,7 @@
                         @endif
                     </td>
                     <td>{{ $barang->nama_barang }}</td>
-                    <td class="text-center">
+                    {{-- <td class="text-center">
                         @if ($barang->kategori == 'oli_mesin')
                             <span class="badge badge-warning">Oli Mesin</span>
                         @elseif ($barang->kategori == 'filter_solar')
@@ -143,17 +143,18 @@
                         @else
                             <span class="badge badge-secondary">Item Bebas</span>
                         @endif
-                    </td>
+                    </td> --}}
                     <td class="text-center">{{ $barang->qty }}</td>
                     <td class="text-center">{{ $barang->satuan }}</td>
                     <td class="text-center">{{ number_format($barang->qty_satuan) }} Pcs</td>
                     <td class="text-center">
-                        <span class="{{ $barang->stok_saat_ini <= 5 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold' }}">
+                        {{-- <span class="{{ $barang->stok_saat_ini <= 5 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold' }}">
                             {{ number_format($barang->stok_saat_ini) }} Pcs
                         </span>
                         @if ($barang->stok_saat_ini <= 5)
                             <span class="badge badge-danger">Menipis</span>
-                        @endif
+                        @endif --}}
+                        {{ number_format($barang->stok_saat_ini) }} Pcs
                     </td>
                     <td class="text-right">
                         Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}

@@ -69,7 +69,7 @@
                 </td>
                 <td>Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</td>
                 <td class="text-center">
-                    <a href="{{ route('transaksi-keluar.show', $transaksi->id) }}"
+                    <a href="{{ route('barang-keluar.show', $transaksi->id) }}"
                        class="btn btn-info btn-sm">
                         <i class="fas fa-eye"></i>
                     </a>
