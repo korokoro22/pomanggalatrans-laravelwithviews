@@ -45,6 +45,16 @@
                     <td>: {{ $barangMasuk->penerima }}</td>
                 </tr>
                 <tr>
+                    <th>Kategori Nota</th>
+                    <td>
+                        @if($barangMasuk->kategori_nota === 'nota_jalan')
+                            <span class="badge badge-warning">Nota Jalan</span>
+                        @else
+                            <span class="badge badge-primary">Nota Bengkel</span>
+                        @endif
+                    </td>
+                </tr>
+                <tr>
                     <td><strong>Bukti Nota</strong></td>
                     <td>
                         @if($barangMasuk->bukti_nota)

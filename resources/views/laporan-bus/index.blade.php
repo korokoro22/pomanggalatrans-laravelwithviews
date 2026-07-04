@@ -1,35 +1,33 @@
 @extends('adminlte::page')
 
-@section('title', 'Keuangan Armada')
+@section('title', 'Laporan Bus')
 
 @section('content_header')
-    <h1>Keuangan Armada</h1>
+    <h1>Laporan Bus</h1>
 @stop
 
 @section('content')
 
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    </div>
 @endif
 
 {{-- ACTION BUTTON --}}
 <div class="row mb-3">
     <div class="col-md-12">
-        <a href="{{ route('keuangan-armada.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Pemasukan Bus
-        </a>
-        <a href="{{ route('keuangan-armada.export-pdf', request()->query()) }}" class="btn btn-success">
+        <a href="{{ route('laporan-bus.export-pdf', request()->query()) }}" class="btn btn-success">
             <i class="fas fa-file-pdf"></i> Export PDF
         </a>
     </div>
 </div>
 
 {{-- FILTER --}}
-<x-adminlte-card title="Filter Data Keuangan Armada" theme="light" icon="fas fa-filter">
-    <form method="GET" action="{{ route('keuangan-armada.index') }}">
+<x-adminlte-card title="Filter Laporan Bus" theme="light" icon="fas fa-filter">
+
+    <form method="GET" action="{{ route('laporan-bus.index') }}">
         <div class="row">
 
             <div class="col-md-4">
@@ -77,76 +75,72 @@
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-search"></i> Filter
             </button>
-            <a href="{{ route('keuangan-armada.index') }}" class="btn btn-secondary">Reset</a>
+            <a href="{{ route('laporan-bus.index') }}" class="btn btn-secondary">Reset</a>
         </div>
     </form>
+
 </x-adminlte-card>
 
 {{-- TABLE --}}
-<x-adminlte-card title="Keuangan Armada Bus" theme="success" icon="fas fa-money-bill-wave">
+<x-adminlte-card title="Daftar Pengeluaran Bus" theme="danger" icon="fas fa-bus">
 
     <table class="table table-bordered table-striped">
         <thead class="text-center">
             <tr>
                 <th width="5%">No</th>
-                <th>Periode</th>
+                <th>Tanggal</th>
                 <th>Nama Bus</th>
                 <th>Plat Nomor</th>
                 <th>Driver</th>
-                <th>Pemasukan</th>
-                <th>Pengeluaran</th>
-                <th>Pendapatan Bersih</th>
-                <th width="140">Aksi</th>
+                <th>Item Transaksi</th>
+                <th>Total</th>
+                <th width="12%">Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($data as $index => $row)
+            @forelse ($transaksis as $index => $transaksi)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td class="text-center">
-                    {{ \Carbon\Carbon::createFromDate($row['periode_tahun'], $row['periode_bulan'], 1)->translatedFormat('F Y') }}
-                </td>
-                <td>{{ $row['bus']->nama_bus }}</td>
-                <td>{{ $row['bus']->plat_nomor }}</td>
-                <td>{{ $row['bus']->nama_driver }}</td>
-                <td class="text-right text-success">
-                    Rp {{ number_format($row['pemasukan'], 0, ',', '.') }}
-                </td>
-                <td class="text-right text-danger">
-                    Rp {{ number_format($row['pengeluaran'], 0, ',', '.') }}
+                <td>{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
+                <td>{{ $transaksi->bus->nama_bus }}</td>
+                <td>{{ $transaksi->bus->plat_nomor }}</td>
+                <td>{{ $transaksi->bus->nama_driver }}</td>
+                <td>
+                    @forelse ($transaksi->details as $detail)
+                        <span class="badge badge-light border text-dark">{{ $detail->nama_item }}</span>
+                    @empty
+                        <span class="text-muted">-</span>
+                    @endforelse
                 </td>
                 <td class="text-right">
-                    <strong class="{{ $row['bersih'] >= 0 ? 'text-success' : 'text-danger' }}">
-                        Rp {{ number_format($row['bersih'], 0, ',', '.') }}
-                    </strong>
+                    Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>
                 <td class="text-center">
-                    <a href="{{ route('keuangan-armada.show', $row['bus']->id) }}"
+                    <a href="{{ route('laporan-bus.show', $transaksi->bus->id) }}"
                        class="btn btn-info btn-sm">
                         <i class="fas fa-eye"></i>
                     </a>
-                    <a href="{{ route('keuangan-armada.edit', $row['keuangan_id']) }}"
+                    <a href="{{ route('barang-keluar.edit', $transaksi->id) }}"
                        class="btn btn-warning btn-sm">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <form action="{{ route('keuangan-armada.destroy', $row['keuangan_id']) }}"
-                          method="POST"
-                          style="display:inline"
-                          onsubmit="return confirm('Yakin hapus data pemasukan ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="9" class="text-center text-muted">Belum ada data keuangan armada</td>
+                <td colspan="8" class="text-center text-muted">Belum ada data pengeluaran</td>
             </tr>
             @endforelse
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" class="text-right"><strong>Total Keseluruhan</strong></td>
+                <td class="text-right">
+                    <strong>Rp {{ number_format($transaksis->sum('total_transaksi'), 0, ',', '.') }}</strong>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
     </table>
 
 </x-adminlte-card>

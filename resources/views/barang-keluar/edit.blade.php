@@ -1,6 +1,72 @@
+{{-- view edit.blade.php --}}
+
 @extends('adminlte::page')
 
 @section('title', 'Edit Transaksi Keluar')
+
+@section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+    .select2-container { width: 100% !important; }
+    .select2-barang-option { 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        padding: 6px 4px; 
+    }
+    .select2-barang-foto { 
+        width: 60px; 
+        height: 60px; 
+        object-fit: cover; 
+        border-radius: 5px; 
+        flex-shrink: 0; 
+    }
+    .select2-barang-foto-placeholder { 
+        width: 60px; 
+        height: 60px; 
+        background: #f0f0f0; 
+        border-radius: 5px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        flex-shrink: 0; 
+        color: #aaa; 
+        font-size: 20px;
+    }
+    .select2-barang-info { flex: 1; }
+    .select2-barang-info .nama { 
+        font-weight: bold; 
+        font-size: 13px; 
+        margin-bottom: 2px;
+    }
+    .select2-barang-info .baris-dua {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+        color: #555;
+        margin-bottom: 2px;
+    }
+    .select2-barang-info .baris-tiga {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+    }
+    .stok-ada { color: #28a745; font-weight: bold; }
+    .stok-habis { color: #dc3545; font-weight: bold; }
+    .select2-results__option { padding: 4px 6px; }
+    .select2-selection--single {
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    .select2-selection__rendered {
+        line-height: 38px !important;
+    }
+    .select2-selection__arrow {
+        height: 38px !important;
+    }
+</style>
+@stop
 
 @section('content_header')
     <h1>Edit Transaksi Keluar</h1>
@@ -38,7 +104,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Tanggal</label>
-                    <input type="date"
+                    <input type="datetime-local"
                            name="tanggal"
                            class="form-control"
                            value="{{ $transaksi->tanggal }}"
@@ -63,15 +129,8 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Tipe Item</label>
+                                
                                 <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input tipe-radio"
-                                               type="radio"
-                                               name="items[{{ $index }}][tipe]"
-                                               value="paket_service"
-                                               {{ $detail->tipe === 'paket_service' ? 'checked' : '' }}>
-                                        <label class="form-check-label">Paket Service</label>
-                                    </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input tipe-radio"
                                                type="radio"
@@ -80,6 +139,15 @@
                                                {{ $detail->tipe === 'per_item' ? 'checked' : '' }}>
                                         <label class="form-check-label">Per Item</label>
                                     </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input tipe-radio"
+                                               type="radio"
+                                               name="items[{{ $index }}][tipe]"
+                                               value="paket_service"
+                                               {{ $detail->tipe === 'paket_service' ? 'checked' : '' }}>
+                                        <label class="form-check-label">Paket Service</label>
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -127,25 +195,19 @@
 
                     {{-- Section Per Item --}}
                     <div class="section-per-item" style="{{ $detail->tipe === 'per_item' ? '' : 'display:none' }}">
+                        <div class="form-group">
+                            <label>Pilih Barang</label>
+                            <select name="items[{{ $index }}][barang_id]" class="form-control select-barang">
+                                <option value="">-- Cari nama barang atau kode barang --</option>
+                                @foreach($barangs as $barang)
+                                    <option value="{{ $barang['id'] }}" {{ $detail->barang_id == $barang['id'] ? 'selected' : '' }}>
+                                        {{ $barang['nama_barang'] }} {{ $barang['kode_barang'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label>Barang</label>
-                                    <select name="items[{{ $index }}][barang_id]"
-                                            class="form-control select-barang">
-                                        <option value="">-- Pilih Barang --</option>
-                                        @foreach($barangs as $barang)
-                                            <option value="{{ $barang->id }}"
-                                                    data-harga="{{ $barang->harga_jual }}"
-                                                    data-satuan="{{ $barang->satuan }}"
-                                                    data-stok="{{ $barang->stok_saat_ini }}"
-                                                    {{ $detail->barang_id == $barang->id ? 'selected' : '' }}>
-                                                {{ $barang->nama_barang }} — Stok: {{ $barang->stok_saat_ini }} {{ $barang->satuan }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Satuan</label>
@@ -153,11 +215,10 @@
                                            name="items[{{ $index }}][satuan]"
                                            class="form-control input-satuan"
                                            value="{{ $detail->satuan }}"
+                                           placeholder="Otomatis terisi"
                                            readonly>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Harga Satuan</label>
@@ -165,7 +226,8 @@
                                            name="items[{{ $index }}][harga_satuan]"
                                            class="form-control input-harga-satuan"
                                            value="{{ $detail->harga_satuan }}"
-                                           readonly>
+                                           placeholder="Otomatis terisi"
+                                           min="0">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -175,9 +237,12 @@
                                            name="items[{{ $index }}][qty]"
                                            class="form-control input-qty"
                                            value="{{ $detail->qty }}"
+                                           placeholder="Masukkan qty"
                                            min="1">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Subtotal</label>
@@ -185,6 +250,7 @@
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            value="{{ $detail->tipe === 'per_item' ? $detail->subtotal : '' }}"
+                                           placeholder="Otomatis terisi"
                                            readonly>
                                 </div>
                             </div>
@@ -213,6 +279,7 @@
                     <label><strong>Total Transaksi</strong></label>
                     <input type="number"
                            id="total-transaksi"
+                           name="total_transaksi"
                            class="form-control"
                            value="{{ $transaksi->total_transaksi }}"
                            readonly>
@@ -232,17 +299,108 @@
 </x-adminlte-card>
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     let itemIndex = {{ $transaksi->details->count() }};
     let paketList = [];
 
     const ajaxUrl  = "{{ route('barang-keluar.paket-by-bus', ':busId') }}";
-    const barangs  = @json($barangs->keyBy('id'));
+    const barangs  = @json($barangs);
     const currentBusId = {{ $transaksi->bus_id }};
 
-    // Load paket untuk bus yang sudah dipilih saat halaman dibuka
+    // ========== Init Select2 Custom ==========
+    function initSelect2Barang(row) {
+    const select = $(row).find('.select-barang');
+
+    select.select2({
+        dropdownParent: $(row),
+        placeholder: '-- Cari nama barang atau kode barang --',
+        allowClear: true,
+        width: '100%',
+        templateResult: function (option) {
+            if (!option.id || option.id === '') return option.text;
+
+            const b = barangs[option.id] || barangs[parseInt(option.id)];
+
+            if (!b) return option.text;
+
+            const foto = b.foto
+                ? `<img src="${b.foto}" class="select2-barang-foto">`
+                : `<div class="select2-barang-foto-placeholder"><i class="fas fa-image"></i></div>`;
+
+            const stokClass = b.stok_saat_ini > 0 ? 'stok-ada' : 'stok-habis';
+            const stokText  = b.stok_saat_ini > 0
+                ? `Stok: ${b.stok_saat_ini} ${b.satuan}`
+                : 'Stok Habis';
+
+            const harga = Number(b.harga_jual).toLocaleString('id-ID');
+            
+            // Format text gudang (gudang_utama -> Gudang Utama)
+            let gudangText = b.gudang ? b.gudang.replace(/_/g, ' ') : '-';
+            gudangText = gudangText.replace(/\b\w/g, l => l.toUpperCase());
+
+            return $(`
+                <div class="select2-barang-option">
+                    ${foto}
+                    <div class="select2-barang-info">
+                        <div class="nama">${b.nama_barang}</div>
+                        <div class="baris-dua">
+                            <span><i class="fas fa-barcode"></i> ${b.kode_barang}</span>
+                            <span class="${stokClass}"><i class="fas fa-boxes"></i> ${stokText}</span>
+                            <span><i class="fas fa-warehouse"></i> ${gudangText}</span>
+                        </div>
+                        <div class="baris-tiga">
+                            <span><i class="fas fa-tag"></i> Rp ${harga} / pcs</span>
+                            <span><i class="fas fa-calendar"></i> ${b.tanggal_masuk}</span>
+                        </div>
+                    </div>
+                </div>
+            `);
+        },
+        templateSelection: function (option) {
+            if (!option.id) return option.text;
+            
+            const b = barangs[option.id] || barangs[parseInt(option.id)];
+            
+            if (!b) return option.text;
+            return `${b.nama_barang} (${b.kode_barang})`;
+        }
+    });
+
+    select.on('change', function () {
+        const barangId = $(this).val();
+        const b        = barangs[parseInt(barangId)] || barangs[barangId];
+        const r        = $(this).closest('.item-row')[0];
+
+        if (b) {
+            r.querySelector('.input-harga-satuan').value = b.harga_jual;
+            r.querySelector('.input-satuan').value       = b.satuan;
+        } else {
+            r.querySelector('.input-harga-satuan').value = '';
+            r.querySelector('.input-satuan').value       = '';
+        }
+
+        // Jika bukan data awal yg diload (inputan baru), reset qty dan subtotal
+        if ($(this).data('loaded') !== true) {
+            r.querySelector('.input-qty').value = '';
+            r.querySelector('.section-per-item .input-subtotal').value       = 0;
+            r.querySelector('.section-per-item .input-subtotal-value').value = 0;
+        } else {
+            $(this).data('loaded', false); 
+        }
+        hitungTotal();
+    });
+}
+
+    // ========== Eksekusi saat halaman diload ==========
     window.addEventListener('DOMContentLoaded', function () {
         loadPaket(currentBusId, false);
+
+        document.querySelectorAll('.item-row').forEach(row => {
+            const select = $(row).find('.select-barang');
+            select.data('loaded', true); 
+            initSelect2Barang(row);
+        });
     });
 
     function loadPaket(busId, resetDropdown = true) {
@@ -278,9 +436,7 @@
     // Build item row baru
     function buildItemRow(index) {
         const barangOptions = Object.values(barangs).map(b =>
-            `<option value="${b.id}" data-harga="${b.harga_jual}" data-satuan="${b.satuan}" data-stok="${b.stok_saat_ini}">
-                ${b.nama_barang} — Stok: ${b.stok_saat_ini} ${b.satuan}
-            </option>`
+            `<option value="${b.id}">${b.nama_barang} ${b.kode_barang}</option>`
         ).join('');
 
         const paketOptions = paketList.length
@@ -296,19 +452,58 @@
                             <label>Tipe Item</label>
                             <div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="paket_service" checked>
-                                    <label class="form-check-label">Paket Service</label>
+                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="per_item" checked>
+                                    <label class="form-check-label">Per Item</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="per_item">
-                                    <label class="form-check-label">Per Item</label>
+                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="paket_service">
+                                    <label class="form-check-label">Paket Service</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-paket-service">
+                <div class="section-per-item">
+                    <div class="form-group">
+                        <label>Pilih Barang</label>
+                        <select name="items[${index}][barang_id]" class="form-control select-barang">
+                            <option value="">-- Cari nama barang atau kode barang --</option>
+                            ${barangOptions}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Satuan</label>
+                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Harga Satuan</label>
+                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Otomatis terisi" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Qty</label>
+                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Subtotal</label>
+                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-paket-service" style="display:none">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -326,47 +521,6 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Subtotal</label>
-                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
-                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-per-item" style="display:none">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Barang</label>
-                                <select name="items[${index}][barang_id]" class="form-control select-barang">
-                                    <option value="">-- Pilih Barang --</option>
-                                    ${barangOptions}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Satuan</label>
-                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" readonly>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Harga Satuan</label>
-                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Otomatis terisi" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Qty</label>
-                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="form-group">
                                 <label>Subtotal</label>
                                 <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
@@ -408,27 +562,15 @@
             row.querySelector('.section-paket-service .input-subtotal-value').value = harga;
             hitungTotal();
         }
-
-        if (e.target.classList.contains('select-barang')) {
-            const opt    = e.target.selectedOptions[0];
-            const harga  = opt?.dataset.harga || 0;
-            const satuan = opt?.dataset.satuan || '';
-            row.querySelector('.input-harga-satuan').value = harga;
-            row.querySelector('.input-satuan').value       = satuan;
-            row.querySelector('.input-qty').value          = '';
-            row.querySelector('.section-per-item .input-subtotal').value       = 0;
-            row.querySelector('.section-per-item .input-subtotal-value').value = 0;
-            hitungTotal();
-        }
     });
 
-    // Event: input qty
+    // Event: input qty & harga satuan
     document.getElementById('item-container').addEventListener('input', function (e) {
         const row = e.target.closest('.item-row');
         if (!row) return;
 
-        if (e.target.classList.contains('input-qty')) {
-            const qty      = parseInt(e.target.value) || 0;
+        if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-harga-satuan')) {
+            const qty      = parseInt(row.querySelector('.input-qty').value) || 0;
             const harga    = parseFloat(row.querySelector('.input-harga-satuan').value) || 0;
             const subtotal = qty * harga;
             row.querySelector('.section-per-item .input-subtotal').value       = subtotal;
@@ -452,6 +594,8 @@
                 .insertAdjacentHTML('beforeend', buildItemRow(itemIndex));
         itemIndex++;
         updateRemoveButtons();
+        const rows = document.querySelectorAll('.item-row');
+        initSelect2Barang(rows[rows.length - 1]);
     });
 
     function hitungTotal() {
@@ -483,5 +627,4 @@
     }
 </script>
 @stop
-
 @stop

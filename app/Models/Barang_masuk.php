@@ -14,6 +14,7 @@ class Barang_masuk extends Model
     protected $fillable = [
         'no_invoice',
         'tanggal_masuk',
+        'kategori_nota',
         'supplier',
         'bukti_nota',
         'penerima',

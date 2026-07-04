@@ -20,7 +20,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label>Tanggal Masuk</label>
-                <input type="date"
+                <input type="datetime-local"
                        name="tanggal_masuk"
                        class="form-control @error('tanggal_masuk') is-invalid @enderror"
                        value="{{ old('tanggal_masuk', $barangMasuk->tanggal_masuk) }}"

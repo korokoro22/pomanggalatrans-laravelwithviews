@@ -15,6 +15,7 @@ class Barang extends Model
         'foto',
         'nama_barang',
         'kategori',
+        'gudang',        // tambah ini
         'qty',
         'satuan',
         'harga_jual',
@@ -23,6 +24,20 @@ class Barang extends Model
         'tanggal_masuk',
         'qr_code',
     ];
+
+    protected $appends = ['foto_url', 'tanggal_masuk_formatted'];
+
+    public function getFotoUrlAttribute()
+    {
+        return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
+
+    public function getTanggalMasukFormattedAttribute()
+    {
+        return $this->tanggal_masuk
+            ? \Carbon\Carbon::parse($this->tanggal_masuk)->format('d-m-Y')
+            : '-';
+    }
 
     // Barang punya banyak riwayat masuk
     public function barangMasuk()
@@ -43,6 +58,16 @@ class Barang extends Model
     }
 
     public function barangMasukDetail()
+    {
+        return $this->hasMany(Barang_masuk_detail::class, 'barang_id');
+    }
+
+    public function transaksiKeluarDetails()
+    {
+        return $this->hasMany(Transaksi_keluar_detail::class, 'barang_id');
+    }
+
+    public function barangMasukDetails()
     {
         return $this->hasMany(Barang_masuk_detail::class, 'barang_id');
     }

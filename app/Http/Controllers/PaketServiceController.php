@@ -37,16 +37,38 @@ class PaketServiceController extends Controller {
         return view('paket-service.show', compact('paketService'));
     }
 
-    public function create()
-    {
-        $buses   = Bus::orderBy('nama_bus')->get();
-        $barangs = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
-                         ->where('stok_saat_ini', '>', 0)
-                         ->orderBy('nama_barang')
-                         ->get();
+    // public function create()
+    // {
+    //     $buses   = Bus::orderBy('nama_bus')->get();
+    //     $barangs = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
+    //                      ->where('stok_saat_ini', '>', 0)
+    //                      ->orderBy('nama_barang')
+    //                      ->get();
 
-        return view('paket-service.create', compact('buses', 'barangs'));
-    }
+    //     return view('paket-service.create', compact('buses', 'barangs'));
+    // }
+
+    public function create()
+{
+    $buses   = Bus::orderBy('nama_bus')->get();
+    $barangs = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
+                    ->orderBy('nama_barang')
+                    ->get()
+                    ->map(fn($b) => [
+                        'id'             => $b->id,
+                        'kode_barang'    => $b->kode_barang,
+                        'nama_barang'    => $b->nama_barang,
+                        'foto'           => $b->foto ? asset('storage/' . $b->foto) : null,
+                        'harga_jual'     => $b->harga_jual,
+                        'satuan'         => $b->satuan,
+                        'stok_saat_ini'  => $b->stok_saat_ini,
+                        'gudang'         => $b->gudang,
+                        'kategori_label' => $b->kategori == 'oli_mesin' ? 'Oli Mesin' : 'Filter Solar'
+                    ])
+                    ->keyBy('id');
+
+    return view('paket-service.create', compact('buses', 'barangs'));
+}
 
     public function store(Request $request)
     {
@@ -83,14 +105,28 @@ class PaketServiceController extends Controller {
     }
 
     public function edit($id)
-    {
-        $paketService   = Paket_service::with('paketServiceItem.barang')->findOrFail($id);
-        $buses          = Bus::orderBy('nama_bus')->get();
-        $barangs        = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
-                            ->orderBy('nama_barang')
-                            ->get();
-        return view('paket-service.edit', compact('paketService', 'buses', 'barangs'));
-    }
+{
+    $paketService = Paket_service::with('paketServiceItem.barang')->findOrFail($id);
+    $buses        = Bus::orderBy('nama_bus')->get();
+    
+    $barangs = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
+                    ->orderBy('nama_barang')
+                    ->get()
+                    ->map(fn($b) => [
+                        'id'             => $b->id,
+                        'kode_barang'    => $b->kode_barang,
+                        'nama_barang'    => $b->nama_barang,
+                        'foto'           => $b->foto ? asset('storage/' . $b->foto) : null,
+                        'harga_jual'     => $b->harga_jual,
+                        'satuan'         => $b->satuan,
+                        'stok_saat_ini'  => $b->stok_saat_ini,
+                        'gudang'         => $b->gudang, // <-- Tambahan field gudang
+                        'kategori_label' => $b->kategori == 'oli_mesin' ? 'Oli Mesin' : 'Filter Solar'
+                    ])
+                    ->keyBy('id');
+
+    return view('paket-service.edit', compact('paketService', 'buses', 'barangs'));
+}
 
     public function update(Request $request, $id)
     {

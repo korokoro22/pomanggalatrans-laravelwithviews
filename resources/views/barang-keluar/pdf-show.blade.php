@@ -20,6 +20,7 @@
         .badge-paket { background-color: #007bff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
         .badge-item  { background-color: #6c757d; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
         .isi-paket { color: #666; font-size: 10px; margin-top: 2px; }
+        .item-foto { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -57,6 +58,7 @@
             <tr>
                 <th width="4%">No</th>
                 <th width="12%">Tipe</th>
+                <th width="8%">Foto</th>
                 <th>Nama Item</th>
                 <th width="8%">Qty</th>
                 <th width="10%">Satuan</th>
@@ -73,6 +75,14 @@
                         <span class="badge-paket">Paket</span>
                     @else
                         <span class="badge-item">Per Item</span>
+                    @endif
+                </td>
+                <td class="text-center">
+                    @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
+                        <img src="{{ $storagePath . $detail->barang->foto }}"
+                            style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                    @else
+                        -
                     @endif
                 </td>
                 <td>
@@ -99,7 +109,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="6" class="text-right"><strong>Total Transaksi</strong></td>
+                <td colspan="7" class="text-right"><strong>Total Transaksi</strong></td>
                 <td class="text-right">
                     <strong>Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong>
                 </td>

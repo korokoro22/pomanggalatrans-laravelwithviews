@@ -40,4 +40,17 @@ class Transaksi_keluar_detail extends Model
     {
         return $this->belongsTo(Paket_service::class, 'paket_service_id');
     }
+
+    public function getTanggalMasukTerakhirAttribute()
+    {
+        if ($this->tipe !== 'per_item' || !$this->barang) {
+            return null;
+        }
+
+        $latestDetail = $this->barang->barangMasukDetails
+            ->sortByDesc(fn ($d) => optional($d->barangMasuk)->tanggal_masuk)
+            ->first();
+
+        return optional($latestDetail?->barangMasuk)->tanggal_masuk;
+    }
 }

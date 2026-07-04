@@ -48,7 +48,21 @@
                         - {{ $detail->nama_item }}
                         <small>({{ $detail->tipe === 'paket_service' ? 'Paket' : 'Item' }})</small><br>
                     @endforeach
+                    
                 </td>
+                {{-- <td>
+                    @foreach($transaksi->details as $detail)
+                        <div style="margin-bottom: 4px;">
+                            - {{ $detail->nama_item }}
+                            <small>({{ $detail->tipe === 'paket_service' ? 'Paket' : 'Item' }})</small>
+                            @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
+                                <br>
+                                <img src="{{ $storagePath . $detail->barang->foto }}"
+                                    style="width:40px; height:40px; object-fit:cover; border-radius:3px; margin-top:2px;">
+                            @endif
+                        </div>
+                    @endforeach
+                </td> --}}
                 <td class="text-right">
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>

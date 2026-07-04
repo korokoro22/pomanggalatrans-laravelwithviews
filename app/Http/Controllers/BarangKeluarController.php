@@ -36,21 +36,39 @@ class BarangKeluarController extends Controller {
     }
 
     public function create()
-    {
-        $busList  = Bus::orderBy('nama_bus')->get();
-        $barangs  = Barang::where('stok_saat_ini', '>', 0)->orderBy('nama_barang')->get();
+{
+    $busList = Bus::orderBy('nama_bus')->get();
+    $barangs = Barang::where('stok_saat_ini', '>', 0)
+                 ->orderBy('nama_barang')
+                 ->get()
+                 ->map(fn($b) => [
+                     'id'            => $b->id,
+                     'kode_barang'   => $b->kode_barang,
+                     'nama_barang'   => $b->nama_barang,
+                     'foto'          => $b->foto ? asset('storage/' . $b->foto) : null,
+                     'harga_jual'    => $b->harga_jual,
+                     'satuan'        => $b->satuan,
+                     'stok_saat_ini' => $b->stok_saat_ini,
+                     'gudang'        => $b->gudang,
+                     'tanggal_masuk' => $b->tanggal_masuk
+                         ? \Carbon\Carbon::parse($b->tanggal_masuk)->format('d-m-Y')
+                         : '-',
+                 ])
+                 ->keyBy('id');
 
-        return view('barang-keluar.create', compact('busList', 'barangs'));
-    }
+    return view('barang-keluar.create', compact('busList', 'barangs'));
+}
 
+    //BarangKeluarController
     public function store(Request $request)
     {
         $request->validate([
-            'bus_id'          => 'required|exists:bus,id',
-            'tanggal'         => 'required|date',
-            'total_transaksi' => 'required|numeric|min:0',
-            'items'           => 'required|array|min:1',
-            'items.*.tipe'    => 'required|in:paket_service,per_item',
+            'bus_id'                => 'required|exists:bus,id',
+            'tanggal'               => 'required|date',
+            'total_transaksi'       => 'required|numeric|min:0',
+            'items'                 => 'required|array|min:1',
+            'items.*.tipe'          => 'required|in:paket_service,per_item',
+            'items.*.harga_satuan'  => 'nullable|numeric|min:0',
         ]);
 
         try {
@@ -96,7 +114,12 @@ class BarangKeluarController extends Controller {
                             throw new \Exception("Stok {$barang->nama_barang} tidak mencukupi. Stok tersedia: {$barang->stok_saat_ini} {$barang->satuan}.");
                         }
 
-                        $subtotal = $barang->harga_jual * $item['qty']; // hitung dari DB
+                        // Pakai harga dari form jika diisi, fallback ke harga_jual dari DB
+                        $hargaSatuan = isset($item['harga_satuan']) && $item['harga_satuan'] > 0
+                            ? $item['harga_satuan']
+                            : $barang->harga_jual;
+
+                        $subtotal = $hargaSatuan * $item['qty'];
 
                         Transaksi_keluar_detail::create([
                             'transaksi_keluar_id' => $transaksi->id,
@@ -105,7 +128,7 @@ class BarangKeluarController extends Controller {
                             'nama_item'           => $barang->nama_barang,
                             'qty'                 => $item['qty'],
                             'satuan'              => $barang->satuan,
-                            'harga_satuan'        => $barang->harga_jual,
+                            'harga_satuan'        => $hargaSatuan,
                             'subtotal'            => $subtotal,
                         ]);
 
@@ -134,134 +157,152 @@ class BarangKeluarController extends Controller {
         $transaksi = Transaksi_keluar::with([
             'bus',
             'details.paketService.paketServiceItem.barang',
-            'details.barang',
+            'details.barang.barangMasukDetails.barangMasuk',
         ])->findOrFail($id);
 
         return view('barang-keluar.show', compact('transaksi'));
     }
 
-    public function edit($id)
-    {
-        $transaksi = Transaksi_keluar::with([
-            'bus',
-            'details.paketService',
-            'details.barang',
-        ])->findOrFail($id);
+    // Controller
 
-        $busList = Bus::orderBy('nama_bus')->get();
-        $barangs = Barang::where('stok_saat_ini', '>', 0)
-                    ->orWhereHas('transaksiKeluarDetail', function($q) use ($id) {
-                        $q->where('transaksi_keluar_id', $id);
-                    })
-                    ->orderBy('nama_barang')->get();
+public function edit($id)
+{
+    $transaksi = Transaksi_keluar::with([
+        'bus',
+        'details.paketService',
+        'details.barang',
+    ])->findOrFail($id);
 
-        return view('barang-keluar.edit', compact('transaksi', 'busList', 'barangs'));
-    }
+    $busList = Bus::orderBy('nama_bus')->get();
+    
+    $barangs = Barang::where('stok_saat_ini', '>', 0)
+                ->orWhereHas('transaksiKeluarDetail', function($q) use ($id) {
+                    $q->where('transaksi_keluar_id', $id);
+                })
+                ->orderBy('nama_barang')
+                ->get()
+                ->map(fn($b) => [
+                    'id'            => $b->id,
+                    'kode_barang'   => $b->kode_barang,
+                    'nama_barang'   => $b->nama_barang,
+                    'foto'          => $b->foto ? asset('storage/' . $b->foto) : null,
+                    'harga_jual'    => $b->harga_jual,
+                    'satuan'        => $b->satuan,
+                    'stok_saat_ini' => $b->stok_saat_ini,
+                    'gudang'        => $b->gudang, // Tambahkan baris ini
+                    'tanggal_masuk' => $b->tanggal_masuk
+                        ? \Carbon\Carbon::parse($b->tanggal_masuk)->format('d-m-Y')
+                        : '-',
+                ])
+                ->keyBy('id');
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'bus_id'       => 'required|exists:bus,id',
-            'tanggal'      => 'required|date',
-            'items'        => 'required|array|min:1',
-            'items.*.tipe' => 'required|in:paket_service,per_item',
-        ]);
+    return view('barang-keluar.edit', compact('transaksi', 'busList', 'barangs'));
+}
 
-        try {
-            DB::transaction(function () use ($request, $id) {
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'bus_id'       => 'required|exists:bus,id',
+        'tanggal'      => 'required|date',
+        'items'        => 'required|array|min:1',
+        'items.*.tipe' => 'required|in:paket_service,per_item',
+    ]);
 
-                $transaksi = Transaksi_keluar::with([
-                    'details.paketService.paketServiceItem.barang',
-                    'details.barang',
-                ])->findOrFail($id);
+    try {
+        DB::transaction(function () use ($request, $id) {
 
-                // Kembalikan stok lama
-                foreach ($transaksi->details as $detail) {
-                    if ($detail->tipe === 'paket_service' && $detail->paketService) {
-                        foreach ($detail->paketService->paketServiceItem as $psi) {
-                            if ($psi->barang) {
-                                $psi->barang->increment('stok_saat_ini', $psi->qty);
-                            }
+            $transaksi = Transaksi_keluar::with([
+                'details.paketService.paketServiceItem.barang',
+                'details.barang',
+            ])->findOrFail($id);
+
+            // Kembalikan stok lama
+            foreach ($transaksi->details as $detail) {
+                if ($detail->tipe === 'paket_service' && $detail->paketService) {
+                    foreach ($detail->paketService->paketServiceItem as $psi) {
+                        if ($psi->barang) {
+                            $psi->barang->increment('stok_saat_ini', $psi->qty);
                         }
-                    } else if ($detail->tipe === 'per_item' && $detail->barang) {
-                        $detail->barang->increment('stok_saat_ini', $detail->qty);
                     }
+                } else if ($detail->tipe === 'per_item' && $detail->barang) {
+                    $detail->barang->increment('stok_saat_ini', $detail->qty);
                 }
+            }
 
-                // Hapus detail lama
-                $transaksi->details()->delete();
+            // Hapus detail lama
+            $transaksi->details()->delete();
 
-                // Update header
-                $transaksi->update([
-                    'bus_id'  => $request->bus_id,
-                    'tanggal' => $request->tanggal,
-                ]);
+            // Update header
+            $transaksi->update([
+                'bus_id'  => $request->bus_id,
+                'tanggal' => $request->tanggal,
+            ]);
 
-                // Insert detail baru + kurangi stok baru
-                $totalTransaksi = 0;
+            // Insert detail baru + kurangi stok baru
+            $totalTransaksi = 0;
 
-                foreach ($request->items as $item) {
+            foreach ($request->items as $item) {
 
-                    if ($item['tipe'] === 'paket_service') {
+                if ($item['tipe'] === 'paket_service') {
 
-                        $paket = Paket_service::with('paketServiceItem.barang')
-                                    ->findOrFail($item['paket_service_id']);
+                    $paket = Paket_service::with('paketServiceItem.barang')
+                                ->findOrFail($item['paket_service_id']);
 
-                        $subtotal = $paket->harga;
+                    $subtotal = $paket->harga;
 
-                        Transaksi_keluar_detail::create([
-                            'transaksi_keluar_id' => $transaksi->id,
-                            'tipe'                => 'paket_service',
-                            'paket_service_id'    => $paket->id,
-                            'nama_item'           => $paket->nama_paket,
-                            'qty'                 => 1,
-                            'harga_satuan'        => $paket->harga,
-                            'subtotal'            => $subtotal,
-                        ]);
+                    Transaksi_keluar_detail::create([
+                        'transaksi_keluar_id' => $transaksi->id,
+                        'tipe'                => 'paket_service',
+                        'paket_service_id'    => $paket->id,
+                        'nama_item'           => $paket->nama_paket,
+                        'qty'                 => 1,
+                        'harga_satuan'        => $paket->harga,
+                        'subtotal'            => $subtotal,
+                    ]);
 
-                        foreach ($paket->paketServiceItem as $psi) {
-                            $psi->barang->decrement('stok_saat_ini', $psi->qty);
-                        }
-
-                    } else {
-
-                        $barang = Barang::findOrFail($item['barang_id']);
-
-                        if ($barang->stok_saat_ini < $item['qty']) {
-                            throw new \Exception("Stok {$barang->nama_barang} tidak mencukupi. Stok tersedia: {$barang->stok_saat_ini} {$barang->satuan}.");
-                        }
-
-                        $subtotal = $barang->harga_jual * $item['qty'];
-
-                        Transaksi_keluar_detail::create([
-                            'transaksi_keluar_id' => $transaksi->id,
-                            'tipe'                => 'per_item',
-                            'barang_id'           => $barang->id,
-                            'nama_item'           => $barang->nama_barang,
-                            'qty'                 => $item['qty'],
-                            'satuan'              => $barang->satuan,
-                            'harga_satuan'        => $barang->harga_jual,
-                            'subtotal'            => $subtotal,
-                        ]);
-
-                        $barang->decrement('stok_saat_ini', $item['qty']);
+                    foreach ($paket->paketServiceItem as $psi) {
+                        $psi->barang->decrement('stok_saat_ini', $psi->qty);
                     }
 
-                    $totalTransaksi += $subtotal;
+                } else {
+
+                    $barang = Barang::findOrFail($item['barang_id']);
+
+                    if ($barang->stok_saat_ini < $item['qty']) {
+                        throw new \Exception("Stok {$barang->nama_barang} tidak mencukupi. Stok tersedia: {$barang->stok_saat_ini} {$barang->satuan}.");
+                    }
+
+                    $subtotal = $barang->harga_jual * $item['qty'];
+
+                    Transaksi_keluar_detail::create([
+                        'transaksi_keluar_id' => $transaksi->id,
+                        'tipe'                => 'per_item',
+                        'barang_id'           => $barang->id,
+                        'nama_item'           => $barang->nama_barang,
+                        'qty'                 => $item['qty'],
+                        'satuan'              => $barang->satuan,
+                        'harga_satuan'        => $barang->harga_jual,
+                        'subtotal'            => $subtotal,
+                    ]);
+
+                    $barang->decrement('stok_saat_ini', $item['qty']);
                 }
 
-                $transaksi->update(['total_transaksi' => $totalTransaksi]);
-            });
+                $totalTransaksi += $subtotal;
+            }
 
-        } catch (\Exception $e) {
-            return redirect()->back()
-                            ->withInput()
-                            ->with('error', $e->getMessage());
-        }
+            $transaksi->update(['total_transaksi' => $totalTransaksi]);
+        });
 
-        return redirect()->route('barang-keluar.index')
-                        ->with('success', 'Transaksi keluar berhasil diupdate.');
+    } catch (\Exception $e) {
+        return redirect()->back()
+                        ->withInput()
+                        ->with('error', $e->getMessage());
     }
+
+    return redirect()->route('barang-keluar.index')
+                    ->with('success', 'Transaksi keluar berhasil diupdate.');
+}
 
 
     public function destroy($id)
@@ -327,8 +368,9 @@ class BarangKeluarController extends Controller {
         }
 
         $transaksiKeluars = $query->get();
+        $storagePath = storage_path('app/public/');
 
-        $pdf = Pdf::loadView('barang-keluar.pdf-index', compact('transaksiKeluars'))
+        $pdf = Pdf::loadView('barang-keluar.pdf-index', compact('transaksiKeluars', 'storagePath'))
                 ->setPaper('a4', 'landscape');
 
         return $pdf->download('transaksi-keluar-' . now()->format('d-m-Y') . '.pdf');
@@ -342,7 +384,9 @@ class BarangKeluarController extends Controller {
             'details.barang',
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('barang-keluar.pdf-show', compact('transaksi'))
+        $storagePath = storage_path('app/public/');
+
+        $pdf = Pdf::loadView('barang-keluar.pdf-show', compact('transaksi', 'storagePath'))
                 ->setPaper('a4', 'portrait');
 
         return $pdf->download('transaksi-keluar-' . $transaksi->bus->plat_nomor . '-' . $transaksi->tanggal . '.pdf');

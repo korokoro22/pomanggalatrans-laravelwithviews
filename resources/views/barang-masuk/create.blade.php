@@ -19,11 +19,11 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label>Tanggal Masuk</label>
-                <input type="date"
-                       name="tanggal_masuk"
-                       class="form-control @error('tanggal_masuk') is-invalid @enderror"
-                       value="{{ old('tanggal_masuk') }}"
-                       required>
+                <input type="datetime-local"
+                    name="tanggal_masuk"
+                    class="form-control @error('tanggal_masuk') is-invalid @enderror"
+                    value="{{ old('tanggal_masuk') }}"
+                    required>
                 @error('tanggal_masuk')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -45,9 +45,25 @@
             </div>
         </div>
 
-    </div>
-
-    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Kategori Nota</label>
+                <select name="kategori_nota"
+                        class="form-control @error('kategori_nota') is-invalid @enderror"
+                        required>
+                    <option value="">-- Pilih Kategori Nota --</option>
+                    <option value="nota_bengkel" {{ old('kategori_nota') == 'nota_bengkel' ? 'selected' : '' }}>
+                        Nota Bengkel
+                    </option>
+                    <option value="nota_jalan" {{ old('kategori_nota') == 'nota_jalan' ? 'selected' : '' }}>
+                        Nota Jalan
+                    </option>
+                </select>
+                @error('kategori_nota')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
 
         <div class="col-md-6">
             <div class="form-group">
@@ -78,10 +94,6 @@
                 @enderror
             </div>
         </div>
-
-    </div>
-
-    <div class="row">
 
         <div class="col-md-6">
             <div class="form-group">
@@ -116,7 +128,6 @@
             <div class="card-body">
 
                 <div class="row">
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Kode Barang</label>
@@ -127,7 +138,6 @@
                                    required>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Kategori</label>
@@ -139,11 +149,9 @@
                             </select>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row">
-
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Nama Barang</label>
@@ -154,7 +162,17 @@
                                    required>
                         </div>
                     </div>
-
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Gudang</label>
+                            <select name="items[0][gudang]" class="form-control" required>
+                                <option value="">-- Pilih Gudang --</option>
+                                <option value="gudang_utama">Gudang Utama</option>
+                                <option value="gudang_2">Gudang 2</option>
+                                <option value="gudang_3">Gudang 3</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Foto Barang</label>
@@ -164,11 +182,9 @@
                                    accept="image/*">
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row">
-
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Qty</label>
@@ -180,7 +196,6 @@
                                    required>
                         </div>
                     </div>
-
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Satuan</label>
@@ -191,7 +206,6 @@
                                    required>
                         </div>
                     </div>
-
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Total (Pcs)</label>
@@ -203,7 +217,6 @@
                                    required>
                         </div>
                     </div>
-
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Harga Jual <small class="text-muted">(per pcs)</small></label>
@@ -215,14 +228,12 @@
                                    required>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row">
-
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Subtotal <small class="text-muted">(isi manual)</small></label>
+                            <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
                             <input type="number"
                                    name="items[0][subtotal]"
                                    class="form-control"
@@ -231,7 +242,6 @@
                                    required>
                         </div>
                     </div>
-
                 </div>
 
                 <button type="button" class="btn btn-danger btn-sm btn-remove-item" disabled>
@@ -270,7 +280,6 @@
         <i class="fas fa-arrow-left"></i>
         Kembali
     </a>
-
     <button type="submit" class="btn btn-primary">
         <i class="fas fa-save"></i>
         Simpan
@@ -320,6 +329,17 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label>Gudang</label>
+                            <select name="items[${index}][gudang]" class="form-control" required>
+                                <option value="">-- Pilih Gudang --</option>
+                                <option value="gudang_utama">Gudang Utama</option>
+                                <option value="gudang_2">Gudang 2</option>
+                                <option value="gudang_3">Gudang 3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label>Foto Barang</label>
                             <input type="file" name="items[${index}][foto]" class="form-control" accept="image/*">
                         </div>
@@ -356,7 +376,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Subtotal <small class="text-muted">(isi manual)</small></label>
+                            <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
                             <input type="number" name="items[${index}][subtotal]" class="form-control" placeholder="Masukkan subtotal" min="0" required>
                         </div>
                     </div>
@@ -392,6 +412,48 @@
             btn.disabled = rows.length === 1;
         });
     }
+
+    // ========== Auto hitung subtotal per item ==========
+    function hitungSubtotalItem(row) {
+        const qtySatuanInput = row.querySelector('input[name$="[qty_satuan]"]');
+        const hargaJualInput = row.querySelector('input[name$="[harga_jual]"]');
+        const subtotalInput  = row.querySelector('input[name$="[subtotal]"]');
+
+        const qtySatuan = parseFloat(qtySatuanInput.value) || 0;
+        const hargaJual = parseFloat(hargaJualInput.value) || 0;
+
+        subtotalInput.value = qtySatuan * hargaJual;
+    }
+
+    // ========== Auto hitung total keseluruhan ==========
+    function hitungTotalKeseluruhan() {
+        let total = 0;
+        document.querySelectorAll('.item-row input[name$="[subtotal]"]').forEach(function (input) {
+            total += parseFloat(input.value) || 0;
+        });
+        document.querySelector('input[name="total"]').value = total;
+    }
+
+    document.getElementById('item-container').addEventListener('input', function (e) {
+        // Jika qty_satuan atau harga_jual diubah, hitung ulang subtotal item tsb
+        if (e.target.matches('input[name$="[qty_satuan]"]') || e.target.matches('input[name$="[harga_jual]"]')) {
+            const row = e.target.closest('.item-row');
+            hitungSubtotalItem(row);
+        }
+
+        // Subtotal ikut dihitung ke total keseluruhan, baik hasil auto maupun edit manual
+        if (e.target.matches('input[name$="[subtotal]"]') ||
+            e.target.matches('input[name$="[qty_satuan]"]') ||
+            e.target.matches('input[name$="[harga_jual]"]')) {
+            hitungTotalKeseluruhan();
+        }
+    });
+
+    document.getElementById('item-container').addEventListener('input', function (e) {
+        if (e.target.matches('input[name$="[subtotal]"]')) {
+            hitungTotalKeseluruhan();
+        }
+    });
 </script>
 @stop
 

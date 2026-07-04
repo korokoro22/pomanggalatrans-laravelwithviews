@@ -37,6 +37,10 @@ class BarangMasukController extends Controller {
             $query->whereYear('tanggal_masuk', $request->tahun);
         }
 
+        if ($request->filled('kategori_nota')) {
+            $query->where('kategori_nota', $request->kategori_nota);
+        }
+
         $barangMasuks = $query->get();
 
         return view('barang-masuk.index', compact('barangMasuks'));
@@ -152,6 +156,7 @@ class BarangMasukController extends Controller {
     //                      ->with('success', 'Data barang masuk berhasil disimpan.');
     // }
 
+    //BarangMasukController
     public function store(Request $request)
 {
     $request->validate([
@@ -170,6 +175,8 @@ class BarangMasukController extends Controller {
         'items.*.qty_satuan'    => 'required|integer|min:1',
         'items.*.harga_jual'    => 'required|numeric|min:0',
         'items.*.subtotal'      => 'required|numeric|min:0',
+        'items.*.gudang' => 'required|in:gudang_utama,gudang_2,gudang_3',
+        'kategori_nota' => 'required|in:nota_bengkel,nota_jalan',
     ]);
 
     DB::transaction(function () use ($request) {
@@ -198,6 +205,7 @@ class BarangMasukController extends Controller {
         $barangMasuk = Barang_masuk::create([
             'no_invoice'    => $request->no_invoice,
             'supplier'      => $request->supplier,
+            'kategori_nota'  => $request->kategori_nota,
             'penerima'      => $request->penerima,
             'tanggal_masuk' => $request->tanggal_masuk,
             'bukti_nota'    => $buktiNotaPath,
@@ -231,6 +239,7 @@ class BarangMasukController extends Controller {
                 'kode_barang'   => $item['kode_barang'],
                 'nama_barang'   => $item['nama_barang'],
                 'kategori'      => $item['kategori'],
+                'gudang'        => $item['gudang'],
                 'foto'          => $fotoPath,
                 'qty'           => $item['qty'],
                 'satuan'        => $item['satuan'],
@@ -283,8 +292,10 @@ class BarangMasukController extends Controller {
 
     public function show($id)
     {
-        $barangMasuk = Barang_masuk::with('details')->findOrFail($id);
-        
+        $barangMasuk = Barang_masuk::with([
+            'details.barang.transaksiKeluarDetails.transaksiKeluar'
+        ])->findOrFail($id);
+
         return view('barang-masuk.show', compact('barangMasuk'));
     }
 
@@ -495,8 +506,9 @@ class BarangMasukController extends Controller {
     public function exportPdfShow($id)
     {
         $barangMasuk = Barang_masuk::with('details')->findOrFail($id);
+        $storagePath = storage_path('app/public/');
 
-        $pdf = Pdf::loadView('barang-masuk.pdf-show', compact('barangMasuk'))
+        $pdf = Pdf::loadView('barang-masuk.pdf-show', compact('barangMasuk', 'storagePath'))
                 ->setPaper('a4', 'portrait');
 
         return $pdf->download('nota-' . $barangMasuk->no_invoice . '.pdf');

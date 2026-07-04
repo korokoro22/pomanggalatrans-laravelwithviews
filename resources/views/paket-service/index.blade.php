@@ -74,8 +74,8 @@
 
 {{-- TABLE --}}
 <x-adminlte-card title="Daftar Paket Service" theme="primary" icon="fas fa-list">
-
-    <table class="table table-bordered table-hover">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
         <thead>
             <tr>
                 <th>No</th>
@@ -134,6 +134,8 @@
             @endforelse
         </tbody>
     </table>
+    </div>
+    
 
 </x-adminlte-card>
 

@@ -30,6 +30,7 @@
             <tr>
                 <th width="4%">No</th>
                 <th width="10%">Kode Barang</th>
+                <th width="8%">Foto</th>
                 <th>Nama Barang</th>
                 <th width="10%">Kategori</th>
                 <th width="6%">Qty</th>
@@ -45,6 +46,14 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $barang->kode_barang }}</td>
+                <td class="text-center">
+                    @if ($barang->foto)
+                        <img src="{{ storage_path('app/public/' . $barang->foto) }}"
+                            style="width:45px; height:45px; object-fit:cover; border-radius:3px;">
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>{{ $barang->nama_barang }}</td>
                 <td class="text-center">
                     @if ($barang->kategori == 'oli_mesin') Oli Mesin
@@ -60,7 +69,7 @@
                     {{ $barang->stok_saat_ini <= 5 ? '(Menipis)' : '' }}
                 </td>
                 <td class="text-right">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
-                <td class="text-center">{{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y') }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
             </tr>
             @empty
             <tr>

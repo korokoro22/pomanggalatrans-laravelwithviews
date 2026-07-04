@@ -72,59 +72,60 @@
 
 {{-- TABLE --}}
 <x-adminlte-card title="Daftar Bus" theme="info" icon="fas fa-bus">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="text-center">
+                <tr>
+                    <th width="5%">No</th>
+                    <th>Nama Bus</th>
+                    <th>Plat Nomor</th>
+                    <th>Rute / Trayek</th>
+                    <th>Nama Driver</th>
+                    <th width="15%">Aksi</th>
+                </tr>
+            </thead>
 
-    <table class="table table-bordered table-striped">
+            <tbody>
 
-        <thead class="text-center">
-            <tr>
-                <th width="5%">No</th>
-                <th>Nama Bus</th>
-                <th>Plat Nomor</th>
-                <th>Rute / Trayek</th>
-                <th>Nama Driver</th>
-                <th width="15%">Aksi</th>
-            </tr>
-        </thead>
+                @forelse ($buses as $index => $bus)
+                <tr>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $bus->nama_bus }}</td>
+                    <td>{{ $bus->plat_nomor }}</td>
+                    <td>{{ $bus->rute_trayek ?? '-' }}</td>
+                    <td>{{ $bus->nama_driver }}</td>
+                    <td class="text-center">
+                        <a href="{{ route('data-bus.show', $bus->id) }}"
+                        class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('data-bus.edit', $bus->id) }}"
+                        class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('data-bus.destroy', $bus->id) }}"
+                            method="POST"
+                            style="display:inline"
+                            onsubmit="return confirm('Yakin ingin hapus data bus ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">Belum ada data bus</td>
+                </tr>
+                @endforelse
 
-        <tbody>
+            </tbody>
 
-            @forelse ($buses as $index => $bus)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $bus->nama_bus }}</td>
-                <td>{{ $bus->plat_nomor }}</td>
-                <td>{{ $bus->rute_trayek ?? '-' }}</td>
-                <td>{{ $bus->nama_driver }}</td>
-                <td class="text-center">
-                    <a href="{{ route('data-bus.show', $bus->id) }}"
-                       class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{{ route('data-bus.edit', $bus->id) }}"
-                       class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form action="{{ route('data-bus.destroy', $bus->id) }}"
-                          method="POST"
-                          style="display:inline"
-                          onsubmit="return confirm('Yakin ingin hapus data bus ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="text-center">Belum ada data bus</td>
-            </tr>
-            @endforelse
-
-        </tbody>
-
-    </table>
+        </table>
+    </div>
+    
 
 </x-adminlte-card>
 

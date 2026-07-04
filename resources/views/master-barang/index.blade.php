@@ -39,7 +39,7 @@
 
         <div class="row">
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Nama Barang</label>
                 <input type="text"
                        name="nama_barang"
@@ -48,7 +48,17 @@
                        value="{{ request('nama_barang') }}">
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label>Gudang</label>
+                <select name="gudang" class="form-control">
+                    <option value="">-- Semua Gudang --</option>
+                    <option value="gudang_utama" {{ request('gudang') == 'gudang_utama' ? 'selected' : '' }}>Gudang Utama</option>
+                    <option value="gudang_2"     {{ request('gudang') == 'gudang_2'     ? 'selected' : '' }}>Gudang 2</option>
+                    <option value="gudang_3"     {{ request('gudang') == 'gudang_3'     ? 'selected' : '' }}>Gudang 3</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
                 <label>Bulan Masuk</label>
                 <select name="bulan" class="form-control">
                     <option value="">-- Pilih Bulan --</option>
@@ -67,7 +77,7 @@
                 </select>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Tahun Masuk</label>
                 <select name="tahun" class="form-control">
                     <option value="">-- Pilih Tahun --</option>
@@ -107,6 +117,7 @@
                     <th>Kode Barang</th>
                     <th>Foto</th>
                     <th>Nama Barang</th>
+                    <th>Gudang</th>
                     {{-- <th>Kategori</th> --}}
                     <th>Qty</th>
                     <th>Satuan</th>
@@ -135,6 +146,17 @@
                         @endif
                     </td>
                     <td>{{ $barang->nama_barang }}</td>
+                    <td class="text-center">
+                        @php
+                            $labelGudang = match($barang->gudang) {
+                                'gudang_utama' => ['label' => 'Gudang Utama', 'color' => 'primary'],
+                                'gudang_2'     => ['label' => 'Gudang 2',     'color' => 'warning'],
+                                'gudang_3'     => ['label' => 'Gudang 3',     'color' => 'success'],
+                                default        => ['label' => '-',             'color' => 'secondary'],
+                            };
+                        @endphp
+                        <span class="badge badge-{{ $labelGudang['color'] }}">{{ $labelGudang['label'] }}</span>
+                    </td>
                     {{-- <td class="text-center">
                         @if ($barang->kategori == 'oli_mesin')
                             <span class="badge badge-warning">Oli Mesin</span>
@@ -160,7 +182,7 @@
                         Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}
                     </td>
                     <td class="text-center">
-                        {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y') }}
+                        {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}
                     </td>
                     <td class="text-center">
                         @if ($barang->qr_code)
@@ -210,7 +232,7 @@
 
                 @empty
                 <tr>
-                    <td colspan="13" class="text-center">Belum ada data barang</td>
+                    <td colspan="14" class="text-center">Belum ada data barang</td>
                 </tr>
                 @endforelse
 
@@ -307,11 +329,23 @@
                 fps: 10,
                 qrbox: { width: 250, height: 250 }
             },
+            // function (decodedText, decodedResult) {
+            //     // Berhasil scan — stop kamera lalu redirect
+            //     html5QrCode.stop().then(() => {
+            //         $('#modal-scan-qr').modal('hide');
+            //         window.location.href = decodedText;
+            //     });
+            // },
             function (decodedText, decodedResult) {
-                // Berhasil scan — stop kamera lalu redirect
                 html5QrCode.stop().then(() => {
                     $('#modal-scan-qr').modal('hide');
-                    window.location.href = decodedText;
+
+                    // Handle QR lama (URL) dan baru (angka murni)
+                    const id = decodedText.includes('/')
+                        ? decodedText.split('/').pop()
+                        : decodedText;
+
+                    window.location.href = "{{ route('master-barang.show', ':id') }}".replace(':id', id);
                 });
             },
             function (errorMessage) {

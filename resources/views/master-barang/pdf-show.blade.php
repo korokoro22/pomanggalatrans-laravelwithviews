@@ -33,6 +33,17 @@
             <td>: {{ $barang->kode_barang }}</td>
         </tr>
         <tr>
+            <td>Foto</td>
+            <td>
+                @if ($barang->foto)
+                    <img src="{{ storage_path('app/public/' . $barang->foto) }}"
+                        style="max-width:100px; max-height:100px; object-fit:cover; border-radius:5px;">
+                @else
+                    -
+                @endif
+            </td>
+        </tr>
+        <tr>
             <td>Nama Barang</td>
             <td>: {{ $barang->nama_barang }}</td>
         </tr>
@@ -66,7 +77,7 @@
         </tr>
         <tr>
             <td>Tanggal Masuk</td>
-            <td>: {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y') }}</td>
+            <td>: {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
         </tr>
     </table>
 

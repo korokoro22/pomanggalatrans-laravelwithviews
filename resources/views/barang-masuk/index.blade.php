@@ -80,6 +80,15 @@
                 </select>
             </div>
 
+            <div class="col-md-3">
+                <label>Kategori Nota</label>
+                <select name="kategori_nota" class="form-control">
+                    <option value="">-- Semua Nota --</option>
+                    <option value="nota_bengkel" {{ request('kategori_nota') == 'nota_bengkel' ? 'selected' : '' }}>Nota Bengkel</option>
+                    <option value="nota_jalan"   {{ request('kategori_nota') == 'nota_jalan'   ? 'selected' : '' }}>Nota Jalan</option>
+                </select>
+            </div>
+
         </div>
 
         <div class="mt-3">
@@ -107,101 +116,110 @@
 
 {{-- TABLE SECTION --}}
 <x-adminlte-card title="Log Barang Masuk" theme="success" icon="fas fa-arrow-down">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="text-center">
+                <tr>
+                    <th width="5%">No</th>
+                    <th>Tanggal Masuk</th>
+                    <th>No Invoice</th>
+                    <th>Kategori</th>
+                    <th>Supplier</th>
+                    <th>Bukti Nota</th>
+                    <th>Penerima</th>
+                    <th>Item Barang</th>
+                    <th width="15%">Aksi</th>
+                </tr>
+            </thead>
 
-    <table class="table table-bordered table-striped">
+            <tbody>
 
-        <thead class="text-center">
-            <tr>
-                <th width="5%">No</th>
-                <th>Tanggal Masuk</th>
-                <th>No Invoice</th>
-                <th>Supplier</th>
-                <th>Bukti Nota</th>
-                <th>Penerima</th>
-                <th>Item Barang</th>
-                <th width="15%">Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @forelse ($barangMasuks as $index => $barangMasuk)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y') }}</td>
-                <td>{{ $barangMasuk->no_invoice }}</td>
-                <td>{{ $barangMasuk->supplier }}</td>
-                <td>
-                    @if ($barangMasuk->bukti_nota)
-                        <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
-                             width="60"
-                             style="border-radius:5px; cursor:pointer"
-                             data-toggle="modal"
-                             data-target="#modalNota{{ $barangMasuk->id }}">
-                    @else
-                        <span class="text-muted">-</span>
-                    @endif
-                </td>
-                <td>{{ $barangMasuk->penerima }}</td>
-                <td>
-                    @forelse ($barangMasuk->details as $detail)
-                        <span class="badge badge-info">{{ $detail->nama_barang }}</span>
-                    @empty
-                        <span class="text-muted">-</span>
-                    @endforelse
-                </td>
-                <td class="text-center">
-                    <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
-                       class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
-                       class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
-                          method="POST"
-                          style="display:inline"
-                          onsubmit="return confirm('Yakin ingin hapus data ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-
-            {{-- Modal Bukti Nota --}}
-            @if ($barangMasuk->bukti_nota)
-            <div class="modal fade" id="modalNota{{ $barangMasuk->id }}" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Bukti Nota — {{ $barangMasuk->no_invoice }}</h5>
-                            <button type="button" class="close" data-dismiss="modal">
-                                <span>&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body text-center">
+                @forelse ($barangMasuks as $index => $barangMasuk)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
+                    <td>{{ $barangMasuk->no_invoice }}</td>
+                    <td class="text-center">
+                        @if($barangMasuk->kategori_nota === 'nota_jalan')
+                            <span class="badge badge-warning">Nota Jalan</span>
+                        @else
+                            <span class="badge badge-primary">Nota Bengkel</span>
+                        @endif
+                    </td>
+                    <td>{{ $barangMasuk->supplier }}</td>
+                    <td>
+                        @if ($barangMasuk->bukti_nota)
                             <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
-                                 class="img-fluid"
-                                 style="border-radius:5px">
+                                width="60"
+                                style="border-radius:5px; cursor:pointer"
+                                data-toggle="modal"
+                                data-target="#modalNota{{ $barangMasuk->id }}">
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+                    <td>{{ $barangMasuk->penerima }}</td>
+                    <td>
+                        @forelse ($barangMasuk->details as $detail)
+                            <span class="badge badge-info">{{ $detail->nama_barang }}</span>
+                        @empty
+                            <span class="text-muted">-</span>
+                        @endforelse
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
+                        class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
+                        class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
+                            method="POST"
+                            style="display:inline"
+                            onsubmit="return confirm('Yakin ingin hapus data ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                {{-- Modal Bukti Nota --}}
+                @if ($barangMasuk->bukti_nota)
+                <div class="modal fade" id="modalNota{{ $barangMasuk->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Bukti Nota — {{ $barangMasuk->no_invoice }}</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
+                                    class="img-fluid"
+                                    style="border-radius:5px">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            @endif
+                @endif
 
-            @empty
-            <tr>
-                <td colspan="8" class="text-center">Belum ada data barang masuk</td>
-            </tr>
-            @endforelse
+                @empty
+                <tr>
+                    <td colspan="8" class="text-center">Belum ada data barang masuk</td>
+                </tr>
+                @endforelse
 
-        </tbody>
+            </tbody>
 
-    </table>
+        </table>
+    </div>
+    
 
 </x-adminlte-card>
 

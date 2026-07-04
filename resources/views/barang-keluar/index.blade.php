@@ -88,8 +88,8 @@
 
 {{-- TABLE --}}
 <x-adminlte-card title="Log Barang Keluar" theme="danger" icon="fas fa-arrow-up">
-
-    <table class="table table-bordered table-striped">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
         <thead class="text-center">
             <tr>
                 <th width="5%">No</th>
@@ -122,7 +122,7 @@
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>
                 <td class="text-center">
-                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}
+                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i:s') }}
                 </td>
                 <td class="text-center">
                     <a href="{{ route('barang-keluar.show', $transaksi->id) }}" class="btn btn-info btn-sm">
@@ -150,6 +150,8 @@
             @endforelse
         </tbody>
     </table>
+    </div>
+    
 
     <div class="mt-3">
         {{ $transaksiKeluars->links() }}

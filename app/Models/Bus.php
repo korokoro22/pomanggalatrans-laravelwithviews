@@ -21,10 +21,4 @@ class Bus extends Model
     {
         return $this->hasMany(Transaksi_keluar::class, 'bus_id');
     }
-
-    // Bus punya banyak data keuangan armada
-    public function keuanganArmada()
-    {
-        return $this->hasMany(Keuangan_armada::class, 'bus_id');
-    }
 }

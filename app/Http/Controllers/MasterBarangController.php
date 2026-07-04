@@ -24,6 +24,10 @@ class MasterBarangController extends Controller {
             $query->whereYear('tanggal_masuk', $request->tahun);
         }
 
+        if ($request->filled('gudang')) {
+            $query->where('gudang', $request->gudang);
+        }
+
         $barangs = $query->get();
 
         return view('master-barang.index', compact('barangs'));
@@ -56,8 +60,9 @@ class MasterBarangController extends Controller {
         }
 
         $barangs = $query->get();
+        $storagePath = storage_path('app/public/');
 
-        $pdf = Pdf::loadView('master-barang.pdf-index', compact('barangs'))
+        $pdf = Pdf::loadView('master-barang.pdf-index', compact('barangs', 'storagePath'))
                 ->setPaper('a4', 'landscape');
 
         return $pdf->download('master-barang-' . now()->format('d-m-Y') . '.pdf');
@@ -66,8 +71,9 @@ class MasterBarangController extends Controller {
     public function exportPdfShow($id)
     {
         $barang = Barang::with('transaksiKeluarDetail.transaksiKeluar.bus')->findOrFail($id);
+        $storagePath = storage_path('app/public/');
 
-        $pdf = Pdf::loadView('master-barang.pdf-show', compact('barang'))
+        $pdf = Pdf::loadView('master-barang.pdf-show', compact('barang', 'storagePath'))
                 ->setPaper('a4', 'portrait');
 
         return $pdf->download('barang-' . $barang->kode_barang . '.pdf');

@@ -39,6 +39,17 @@
             <td>Penerima</td>
             <td>: {{ $barangMasuk->penerima }}</td>
         </tr>
+        <tr>
+            <td>Kategori Nota</td>
+            <td colspan="3">
+                :
+                @if($barangMasuk->kategori_nota == 'nota_jalan')
+                    Nota Jalan
+                @else
+                    Nota Bengkel
+                @endif
+            </td>
+        </tr>
     </table>
 
     <div class="divider"></div>
@@ -48,6 +59,7 @@
             <tr>
                 <th width="4%">No</th>
                 <th width="12%">Kode Barang</th>
+                <th width="8%">Foto</th>
                 <th>Nama Barang</th>
                 <th width="10%">Kategori</th>
                 <th width="8%">Qty</th>
@@ -62,6 +74,14 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $detail->barang->kode_barang ?? '-' }}</td>
+                <td class="text-center">
+                    @if($detail->barang && $detail->barang->foto)
+                        <img src="{{ $storagePath . $detail->barang->foto }}"
+                            style="width:45px; height:45px; object-fit:cover; border-radius:3px;">
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>{{ $detail->nama_barang }}</td>
                 <td class="text-center">
                     @if ($detail->kategori == 'oli_mesin') Oli Mesin
@@ -83,7 +103,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="8" class="text-right"><strong>Total Keseluruhan</strong></td>
+                <td colspan="9" class="text-right"><strong>Total Keseluruhan</strong></td>
                 <td class="text-right">
                     <strong>
                         Rp {{ number_format($barangMasuk->details->sum('subtotal'), 0, ',', '.') }}

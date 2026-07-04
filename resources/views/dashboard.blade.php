@@ -1,131 +1,3 @@
-{{-- @extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
-@section('content_header')
-    <h1>Dashboard</h1>
-@stop
-
-@section('content')
-    <div>
-
-    </div>
-    <x-adminlte-info-box title="Downloads" text="1205" icon="fas fa-lg fa-download" icon-theme="purple"/>
-@stop --}}
-
-
-{{-- ////////////////////////////////////////////////////////// --}}
-
-
-{{-- @extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
-@section('content_header')
-    <h1>Dashboard</h1>
-@stop
-
-@section('content')
-
-<div class="row">
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Master Barang"
-            text="Kelola data barang"
-            icon="fas fa-box"
-            theme="primary"
-            url="/barang"
-            url-text="Buka Menu"/>
-    </div>
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Data Bus"
-            text="Kelola data bus"
-            icon="fas fa-bus"
-            theme="success"
-            url="/bus"
-            url-text="Buka Menu"/>
-    </div>
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Barang Masuk"
-            text="Transaksi barang masuk"
-            icon="fas fa-arrow-down"
-            theme="info"
-            url="/barang-masuk"
-            url-text="Buka Menu"/>
-    </div>
-
-</div>
-
-<div class="row">
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Barang Keluar"
-            text="Transaksi barang keluar"
-            icon="fas fa-arrow-up"
-            theme="danger"
-            url="/barang-keluar"
-            url-text="Buka Menu"/>
-    </div>
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Laporan"
-            text="Lihat laporan"
-            icon="fas fa-chart-bar"
-            theme="warning"
-            url="/laporan"
-            url-text="Buka Menu"/>
-    </div>
-
-    <div class="col-md-4">
-        <x-adminlte-small-box
-            title="Riwayat & Dokumentasi"
-            text="Riwayat aktivitas"
-            icon="fas fa-history"
-            theme="secondary"
-            url="/riwayat"
-            url-text="Buka Menu"/>
-    </div>
-
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <x-adminlte-card title="Riwayat Transaksi Terbaru" theme="light">
-
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Jenis</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>23/06/2026</td>
-                        <td>Masuk</td>
-                        <td>Ban Bus</td>
-                        <td>10</td>
-                    </tr>
-                </tbody>
-
-            </table>
-
-        </x-adminlte-card>
-    </div>
-</div>
-
-@stop --}}
-
 @extends('adminlte::page')
 
 @section('title', 'Dashboard')
@@ -140,7 +12,7 @@
 
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
-            title="127"
+            title="{{ $totalBarang }}"
             text="Total Barang"
             icon="fas fa-box"
             theme="primary"/>
@@ -148,7 +20,7 @@
 
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
-            title="8"
+            title="{{ $totalBus }}"
             text="Total Bus"
             icon="fas fa-bus"
             theme="success"/>
@@ -156,7 +28,7 @@
 
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
-            title="5"
+            title="{{ $barangMasukHariIni }}"
             text="Barang Masuk Hari Ini"
             icon="fas fa-arrow-down"
             theme="info"/>
@@ -168,26 +40,10 @@
 
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
-            title="5"
+            title="{{ $barangKeluarHariIni }}"
             text="Barang Keluar Hari Ini"
             icon="fas fa-arrow-up"
             theme="danger"/>
-    </div>
-
-    {{-- <div class="col-lg-4 col-6">
-        <x-adminlte-small-box
-            title="4"
-            text="Total Laporan"
-            icon="fas fa-chart-bar"
-            theme="warning"/>
-    </div> --}}
-
-    <div class="col-lg-4 col-6">
-        <x-adminlte-small-box
-            title="12"
-            text="Riwayat & Dokumentasi"
-            icon="fas fa-history"
-            theme="secondary"/>
     </div>
 
 </div>
@@ -213,27 +69,24 @@
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td>23/06/2026</td>
-                        <td><span class="badge badge-success">Masuk</span></td>
-                        <td>Ban Bus</td>
-                        <td>10</td>
-                    </tr>
-
-                    <tr>
-                        <td>23/06/2026</td>
-                        <td><span class="badge badge-danger">Keluar</span></td>
-                        <td>Oli Mesin</td>
-                        <td>5</td>
-                    </tr>
-
-                    <tr>
-                        <td>22/06/2026</td>
-                        <td><span class="badge badge-success">Masuk</span></td>
-                        <td>Filter Udara</td>
-                        <td>20</td>
-                    </tr>
-
+                    @forelse($aktivitasTerbaru as $aktivitas)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($aktivitas['tanggal'])->format('d/m/Y') }}</td>
+                            <td>
+                                @if($aktivitas['jenis'] === 'masuk')
+                                    <span class="badge badge-success">Masuk</span>
+                                @else
+                                    <span class="badge badge-danger">Keluar</span>
+                                @endif
+                            </td>
+                            <td>{{ $aktivitas['nama'] }}</td>
+                            <td>{{ $aktivitas['qty'] }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Belum ada aktivitas</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
 
@@ -257,12 +110,12 @@
 
             <p>
                 Total Barang :
-                <strong>127</strong>
+                <strong>{{ $totalBarang }}</strong>
             </p>
 
             <p>
                 Total Bus :
-                <strong>8</strong>
+                <strong>{{ $totalBus }}</strong>
             </p>
 
             <p>

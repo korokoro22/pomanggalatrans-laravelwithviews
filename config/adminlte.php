@@ -301,11 +301,11 @@ return [
 
     'menu' => [
         // Navbar items:
-        [
-            'type' => 'navbar-search',
-            'text' => 'search',
-            'topnav_right' => true,
-        ],
+        // [
+        //     'type' => 'navbar-search',
+        //     'text' => 'search',
+        //     'topnav_right' => true,
+        // ],
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
@@ -360,8 +360,8 @@ return [
             // 'label_color' => 'success',
         ],
         [
-            'text' => 'Keuangan Armada',
-            'url' => 'keuangan-armada',
+            'text' => 'Laporan Bus',
+            'url' => 'laporan-bus',
             'icon' => ' fas fa-solid fa-money-bill',
             // 'label' => 4,
             // 'label_color' => 'success',
@@ -377,13 +377,13 @@ return [
         ['header' => ''],
         ['header' => ''],
         ['header' => ''],
-        [
-            'text' => 'Logout',
-            'url' => 'riwayat',
-            'icon' => 'fas fa-sign-out-alt',
-            // 'label' => 4,
-            // 'label_color' => 'success',
-        ],
+        // [
+        //     'text' => 'Logout',
+        //     'url' => 'logout',
+        //     'icon' => 'fas fa-sign-out-alt',
+        //     // 'label' => 4,
+        //     // 'label_color' => 'success',
+        // ],
 
 
 

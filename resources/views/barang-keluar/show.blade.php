@@ -61,64 +61,84 @@
 {{-- DETAIL ITEM --}}
 <x-adminlte-card title="Detail Item Transaksi" theme="danger" icon="fas fa-boxes">
 
-    <table class="table table-bordered table-striped">
-        <thead class="text-center">
-            <tr>
-                <th width="5%">No</th>
-                <th>Tipe</th>
-                <th>Nama Item</th>
-                <th>Qty</th>
-                <th>Satuan</th>
-                <th>Harga Satuan</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
+<table class="table table-bordered table-striped">
+    <thead class="text-center">
+        <tr>
+            <th width="5%">No</th>
+            <th width="9%">Tanggal Keluar</th>
+            <th width="9%">Tanggal Masuk</th>
+            <th>Tipe</th>
+            <th width="8%">Foto</th>
+            <th>Nama Item</th>
+            <th>Qty</th>
+            <th>Satuan</th>
+            <th>Harga Satuan</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
 
-        <tbody>
-            @forelse($transaksi->details as $detail)
-            <tr>
-                <td class="text-center">{{ $loop->iteration }}</td>
-                <td class="text-center">
-                    @if($detail->tipe === 'paket_service')
-                        <span class="badge badge-primary">Paket Service</span>
-                    @else
-                        <span class="badge badge-secondary">Per Item</span>
-                    @endif
-                </td>
-                <td>
-                    {{ $detail->nama_item }}
-                    @if($detail->tipe === 'paket_service' && $detail->paketService)
-                        <br>
-                        <small class="text-muted">
-                            Isi paket:
-                            @foreach($detail->paketService->paketServiceItem as $psi)
-                                {{ $psi->barang->nama_barang ?? '-' }} ({{ $psi->qty }})
-                                @if(!$loop->last), @endif
-                            @endforeach
-                        </small>
-                    @endif
-                </td>
-                <td class="text-center">{{ $detail->qty }}</td>
-                <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
-                <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center text-muted">Tidak ada item</td>
-            </tr>
-            @endforelse
-        </tbody>
+    <tbody>
+        @forelse($transaksi->details as $detail)
+        <tr>
+            <td class="text-center">{{ $loop->iteration }}</td>
+            <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+            <td class="text-center">
+                @if($detail->tanggal_masuk_terakhir)
+                    {{ \Carbon\Carbon::parse($detail->tanggal_masuk_terakhir)->format('d-m-Y') }}
+                @else
+                    <span class="text-muted">-</span>
+                @endif
+            </td>
+            <td class="text-center">
+                @if($detail->tipe === 'paket_service')
+                    <span class="badge badge-primary">Paket Service</span>
+                @else
+                    <span class="badge badge-secondary">Per Item</span>
+                @endif
+            </td>
+            <td class="text-center">
+                @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
+                    <img src="{{ asset('storage/' . $detail->barang->foto) }}"
+                        width="50"
+                        style="border-radius:5px; object-fit:cover; height:50px;">
+                @else
+                    <span class="text-muted">-</span>
+                @endif
+            </td>
+            <td>
+                {{ $detail->nama_item }}
+                @if($detail->tipe === 'paket_service' && $detail->paketService)
+                    <br>
+                    <small class="text-muted">
+                        Isi paket:
+                        @foreach($detail->paketService->paketServiceItem as $psi)
+                            {{ $psi->barang->nama_barang ?? '-' }} ({{ $psi->qty }})
+                            @if(!$loop->last), @endif
+                        @endforeach
+                    </small>
+                @endif
+            </td>
+            <td class="text-center">{{ $detail->qty }}</td>
+            <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
+            <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+            <td class="text-right">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="10" class="text-center text-muted">Tidak ada item</td>
+        </tr>
+        @endforelse
+    </tbody>
 
-        <tfoot>
-            <tr>
-                <td colspan="6" class="text-right"><strong>Total Transaksi</strong></td>
-                <td class="text-right">
-                    <strong class="text-danger">Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+    <tfoot>
+        <tr>
+            <td colspan="9" class="text-right"><strong>Total Transaksi</strong></td>
+            <td class="text-right">
+                <strong class="text-danger">Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong>
+            </td>
+        </tr>
+    </tfoot>
+</table>
 
     <div class="mt-3">
         <a href="{{ route('barang-keluar.index') }}" class="btn btn-secondary">
