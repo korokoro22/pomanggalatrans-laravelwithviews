@@ -36,7 +36,7 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td class="text-center">
-                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}
+                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}
                 </td>
                 <td>
                     {{ $transaksi->bus->nama_bus ?? '-' }}<br>

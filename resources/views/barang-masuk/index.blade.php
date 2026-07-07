@@ -137,7 +137,7 @@
                 @forelse ($barangMasuks as $index => $barangMasuk)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
                     <td>{{ $barangMasuk->no_invoice }}</td>
                     <td class="text-center">
                         @if($barangMasuk->kategori_nota === 'nota_jalan')

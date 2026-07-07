@@ -77,7 +77,7 @@
         </tr>
         <tr>
             <td>Tanggal Masuk</td>
-            <td>: {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
+            <td>: {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i') }}</td>
         </tr>
     </table>
 
@@ -99,7 +99,7 @@
             @forelse ($barang->transaksiKeluarDetail as $index => $detail)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td class="text-center">{{ \Carbon\Carbon::parse($detail->transaksiKeluar->tanggal)->format('d-m-Y') }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($detail->transaksiKeluar->tanggal)->format('d-m-Y H:i') }}</td>
                 <td>{{ $detail->transaksiKeluar->bus->nama_bus }}</td>
                 <td class="text-center">{{ $detail->transaksiKeluar->bus->plat_nomor }}</td>
                 <td class="text-center">{{ $detail->qty }} Pcs</td>

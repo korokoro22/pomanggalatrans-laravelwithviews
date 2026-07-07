@@ -62,7 +62,7 @@
             @forelse ($bus->transaksiKeluar as $index => $transaksi)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
                 <td>
                     @foreach ($transaksi->details as $detail)
                         - {{ $detail->nama_item }}<br>

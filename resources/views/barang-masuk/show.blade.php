@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                     <td><strong>Tanggal Masuk</strong></td>
-                    <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y') }}</td>
+                    <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
                 </tr>
                 <tr>
                     <td><strong>Supplier</strong></td>

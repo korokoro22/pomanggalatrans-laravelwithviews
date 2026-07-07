@@ -57,38 +57,41 @@
             title="Aktivitas Terbaru"
             theme="lightblue"
             icon="fas fa-clock">
-
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Jenis</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse($aktivitasTerbaru as $aktivitas)
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td>{{ \Carbon\Carbon::parse($aktivitas['tanggal'])->format('d/m/Y') }}</td>
-                            <td>
-                                @if($aktivitas['jenis'] === 'masuk')
-                                    <span class="badge badge-success">Masuk</span>
-                                @else
-                                    <span class="badge badge-danger">Keluar</span>
-                                @endif
-                            </td>
-                            <td>{{ $aktivitas['nama'] }}</td>
-                            <td>{{ $aktivitas['qty'] }}</td>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Belum ada aktivitas</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @forelse($aktivitasTerbaru as $aktivitas)
+                            <tr>
+                                <td>{{ \Carbon\Carbon::parse($aktivitas['tanggal'])->format('d/m/Y') }}</td>
+                                <td>
+                                    @if($aktivitas['jenis'] === 'masuk')
+                                        <span class="badge badge-success">Masuk</span>
+                                    @else
+                                        <span class="badge badge-danger">Keluar</span>
+                                    @endif
+                                </td>
+                                <td>{{ $aktivitas['nama'] }}</td>
+                                <td>{{ $aktivitas['qty'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Belum ada aktivitas</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            
 
         </x-adminlte-card>
 

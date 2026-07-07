@@ -69,7 +69,7 @@
                     {{ $barang->stok_saat_ini <= 5 ? '(Menipis)' : '' }}
                 </td>
                 <td class="text-right">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
-                <td class="text-center">{{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}</td>
+                <td class="text-center">{{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i') }}</td>
             </tr>
             @empty
             <tr>

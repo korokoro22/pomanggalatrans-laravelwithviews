@@ -182,7 +182,7 @@
                         Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}
                     </td>
                     <td class="text-center">
-                        {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i:s') }}
+                        {{ \Carbon\Carbon::parse($barang->tanggal_masuk)->format('d-m-Y H:i') }}
                     </td>
                     <td class="text-center">
                         @if ($barang->qr_code)

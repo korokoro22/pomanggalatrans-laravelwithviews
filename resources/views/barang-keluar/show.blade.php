@@ -46,7 +46,7 @@
                 </tr>
                 <tr>
                     <td><strong>Tanggal</strong></td>
-                    <td>: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+                    <td>: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
                 </tr>
                 <tr>
                     <td><strong>Total Transaksi</strong></td>
@@ -81,10 +81,10 @@
         @forelse($transaksi->details as $detail)
         <tr>
             <td class="text-center">{{ $loop->iteration }}</td>
-            <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+            <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
             <td class="text-center">
                 @if($detail->tanggal_masuk_terakhir)
-                    {{ \Carbon\Carbon::parse($detail->tanggal_masuk_terakhir)->format('d-m-Y') }}
+                    {{ \Carbon\Carbon::parse($detail->tanggal_masuk_terakhir)->format('d-m-Y H:i') }}
                 @else
                     <span class="text-muted">-</span>
                 @endif

@@ -45,7 +45,7 @@
         </tr>
         <tr>
             <td>Tanggal</td>
-            <td>: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+            <td>: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
             <td></td>
             <td></td>
         </tr>
@@ -53,69 +53,80 @@
 
     <div class="divider"></div>
 
-    <table>
-        <thead>
-            <tr>
-                <th width="4%">No</th>
-                <th width="12%">Tipe</th>
-                <th width="8%">Foto</th>
-                <th>Nama Item</th>
-                <th width="8%">Qty</th>
-                <th width="10%">Satuan</th>
-                <th width="14%">Harga Satuan</th>
-                <th width="14%">Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($transaksi->details as $index => $detail)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td class="text-center">
-                    @if($detail->tipe === 'paket_service')
-                        <span class="badge-paket">Paket</span>
-                    @else
-                        <span class="badge-item">Per Item</span>
-                    @endif
-                </td>
-                <td class="text-center">
-                    @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
-                        <img src="{{ $storagePath . $detail->barang->foto }}"
-                            style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-                    @else
-                        -
-                    @endif
-                </td>
-                <td>
-                    {{ $detail->nama_item }}
-                    @if($detail->tipe === 'paket_service' && $detail->paketService)
-                        <div class="isi-paket">
-                            Isi:
-                            @foreach($detail->paketService->paketServiceItem as $psi)
-                                {{ $psi->barang->nama_barang ?? '-' }} ({{ $psi->qty }})@if(!$loop->last), @endif
-                            @endforeach
-                        </div>
-                    @endif
-                </td>
-                <td class="text-center">{{ $detail->qty }}</td>
-                <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
-                <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center">Tidak ada item</td>
-            </tr>
-            @endforelse
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="7" class="text-right"><strong>Total Transaksi</strong></td>
-                <td class="text-right">
-                    <strong>Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+<table>
+    <thead>
+        <tr>
+            <th width="4%">No</th>
+            <th width="8%">Tanggal Keluar</th>
+            <th width="8%">Tanggal Masuk</th>
+            <th width="9%">Tipe</th>
+            <th width="7%">Foto</th>
+            <th>Nama Item</th>
+            <th width="6%">Qty</th>
+            <th width="7%">Satuan</th>
+            <th width="11%">Harga Satuan</th>
+            <th width="11%">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($transaksi->details as $index => $detail)
+        <tr>
+            <td class="text-center">{{ $index + 1 }}</td>
+            <td class="text-center">{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
+            <td class="text-center">
+                @if($detail->tanggal_masuk_terakhir)
+                    {{ \Carbon\Carbon::parse($detail->tanggal_masuk_terakhir)->format('d-m-Y H:i') }}
+                @else
+                    -
+                @endif
+            </td>
+            <td class="text-center">
+                @if($detail->tipe === 'paket_service')
+                    <span class="badge-paket">Paket</span>
+                @else
+                    <span class="badge-item">Per Item</span>
+                @endif
+            </td>
+            <td class="text-center">
+                @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
+                    <img src="{{ $storagePath . $detail->barang->foto }}"
+                        style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+                @else
+                    -
+                @endif
+            </td>
+            <td>
+                {{ $detail->nama_item }}
+                @if($detail->tipe === 'paket_service' && $detail->paketService)
+                    <div class="isi-paket">
+                        Isi:
+                        @foreach($detail->paketService->paketServiceItem as $psi)
+                            {{ $psi->barang->nama_barang ?? '-' }} ({{ $psi->qty }})@if(!$loop->last), @endif
+                        @endforeach
+                    </div>
+                @endif
+            </td>
+            
+            <td class="text-center">{{ $detail->qty }}</td>
+            <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
+            <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+            <td class="text-right">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="10" class="text-center">Tidak ada item</td>
+        </tr>
+        @endforelse
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="9" class="text-right"><strong>Total Transaksi</strong></td>
+            <td class="text-right">
+                <strong>Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}</strong>
+            </td>
+        </tr>
+    </tfoot>
+</table>
 
 </body>
 </html>

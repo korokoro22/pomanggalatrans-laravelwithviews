@@ -122,7 +122,7 @@
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>
                 <td class="text-center">
-                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i:s') }}
+                    {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}
                 </td>
                 <td class="text-center">
                     <a href="{{ route('barang-keluar.show', $transaksi->id) }}" class="btn btn-info btn-sm">

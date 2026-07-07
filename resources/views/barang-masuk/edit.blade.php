@@ -420,6 +420,39 @@
             btn.disabled = rows.length === 1;
         });
     }
+
+    function hitungSubtotalItem(row) {
+        const qtySatuanInput = row.querySelector('input[name$="[qty_satuan]"]');
+        const hargaJualInput = row.querySelector('input[name$="[harga_jual]"]');
+        const subtotalInput  = row.querySelector('input[name$="[subtotal]"]');
+
+        const qtySatuan = parseFloat(qtySatuanInput.value) || 0;
+        const hargaJual = parseFloat(hargaJualInput.value) || 0;
+
+        subtotalInput.value = qtySatuan * hargaJual;
+    }
+
+    // ========== Auto hitung total keseluruhan ==========
+    function hitungTotalKeseluruhan() {
+        let total = 0;
+        document.querySelectorAll('.item-row input[name$="[subtotal]"]').forEach(function (input) {
+            total += parseFloat(input.value) || 0;
+        });
+        document.querySelector('input[name="total"]').value = total;
+    }
+
+    document.getElementById('item-container').addEventListener('input', function (e) {
+        if (e.target.matches('input[name$="[qty_satuan]"]') || e.target.matches('input[name$="[harga_jual]"]')) {
+            const row = e.target.closest('.item-row');
+            hitungSubtotalItem(row);
+        }
+
+        if (e.target.matches('input[name$="[subtotal]"]') ||
+            e.target.matches('input[name$="[qty_satuan]"]') ||
+            e.target.matches('input[name$="[harga_jual]"]')) {
+            hitungTotalKeseluruhan();
+        }
+    });
 </script>
 @stop
 

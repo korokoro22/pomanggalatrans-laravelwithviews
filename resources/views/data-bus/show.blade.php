@@ -57,7 +57,7 @@
             @forelse ($bus->transaksiKeluar as $index => $transaksi)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}</td>
                 <td>
                     @forelse ($transaksi->details as $detail)
                         <span class="badge badge-light border text-dark">

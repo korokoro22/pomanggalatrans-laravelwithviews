@@ -381,7 +381,7 @@ public function update(Request $request, $id)
         $transaksi = Transaksi_keluar::with([
             'bus',
             'details.paketService.paketServiceItem.barang',
-            'details.barang',
+            'details.barang.barangMasukDetails.barangMasuk',
         ])->findOrFail($id);
 
         $storagePath = storage_path('app/public/');
