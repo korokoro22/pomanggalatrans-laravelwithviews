@@ -116,14 +116,17 @@
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>
                 <td class="text-center">
-                    <a href="{{ route('laporan-bus.show', $transaksi->bus->id) }}"
-                       class="btn btn-info btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    <a href="{{ route('barang-keluar.edit', $transaksi->id) }}"
-                       class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i>
-                    </a>
+                    <div class="d-flex flex-column" style="row-gap: 8px;">
+                        <a href="{{ route('laporan-bus.show', $transaksi->bus->id) }}"
+                        class="btn btn-info btn-sm">
+                            Detail
+                        </a>
+                        <a href="{{ route('barang-keluar.edit', $transaksi->id) }}"
+                        class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+                    </div>
+                    
                 </td>
             </tr>
             @empty

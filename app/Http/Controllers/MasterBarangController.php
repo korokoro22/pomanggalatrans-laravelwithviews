@@ -24,11 +24,7 @@ class MasterBarangController extends Controller {
             $query->whereYear('tanggal_masuk', $request->tahun);
         }
 
-        if ($request->filled('gudang')) {
-            $query->where('gudang', $request->gudang);
-        }
-
-        $barangs = $query->get();
+        $barangs = $query->paginate(10)->withQueryString();
 
         return view('master-barang.index', compact('barangs'));
     }

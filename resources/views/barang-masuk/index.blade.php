@@ -167,24 +167,26 @@
                         @endforelse
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
-                        class="btn btn-info btn-sm">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
-                        class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
-                            method="POST"
-                            style="display:inline"
-                            onsubmit="return confirm('Yakin ingin hapus data ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div class="d-flex flex-column" style="row-gap: 8px;">
+                            <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
+                            class="btn btn-info btn-sm">
+                                Detail
+                            </a>
+                            <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
+                            class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                            <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
+                                method="POST"
+                                
+                                onsubmit="return confirm('Yakin ingin hapus data ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
 

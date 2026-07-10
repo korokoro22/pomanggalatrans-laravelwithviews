@@ -95,24 +95,26 @@
                     <td>{{ $bus->rute_trayek ?? '-' }}</td>
                     <td>{{ $bus->nama_driver }}</td>
                     <td class="text-center">
-                        <a href="{{ route('data-bus.show', $bus->id) }}"
-                        class="btn btn-info btn-sm">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{{ route('data-bus.edit', $bus->id) }}"
-                        class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form action="{{ route('data-bus.destroy', $bus->id) }}"
-                            method="POST"
-                            style="display:inline"
-                            onsubmit="return confirm('Yakin ingin hapus data bus ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div class="d-flex flex-column" style="row-gap: 8px;">
+                            <a href="{{ route('data-bus.show', $bus->id) }}"
+                            class="btn btn-info btn-sm">
+                                Detail
+                            </a>
+                            <a href="{{ route('data-bus.edit', $bus->id) }}"
+                            class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                            <form action="{{ route('data-bus.destroy', $bus->id) }}"
+                                method="POST"
+                                style="display:inline"
+                                onsubmit="return confirm('Yakin ingin hapus data bus ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

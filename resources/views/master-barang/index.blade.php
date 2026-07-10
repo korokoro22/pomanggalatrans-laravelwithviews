@@ -134,7 +134,7 @@
 
                 @forelse ($barangs as $index => $barang)
                 <tr>
-                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td class="text-center">{{ $barangs->firstItem() + $index }}</td>
                     <td>{{ $barang->kode_barang }}</td>
                     <td class="text-center">
                         @if ($barang->foto)
@@ -198,7 +198,7 @@
                     <td class="text-center">
                         <a href="{{ route('master-barang.show', $barang->id) }}"
                            class="btn btn-info btn-sm">
-                            <i class="fas fa-eye"></i>
+                            Detail
                         </a>
                     </td>
                 </tr>
@@ -240,6 +240,12 @@
 
         </table>
     </div>
+
+    {{-- PAGINATION --}}
+    <div class="d-flex justify-content-center mt-3">
+        {{ $barangs->links() }}
+    </div>
+
 
 </x-adminlte-card>
 
