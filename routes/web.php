@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataBusController;
 use App\Http\Controllers\LaporanBusController;
 use App\Http\Controllers\MasterBarangController;
+use App\Http\Controllers\NotaJalanController;
 use App\Http\Controllers\PaketServiceController;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -33,14 +34,18 @@ Route::middleware('auth')->group(function () {
     Route::get('barang-keluar-export-pdf/{id}', [BarangKeluarController::class, 'exportPdfShow'])->name('barang-keluar.export-pdf-show');
     Route::get('barang-keluar/paket-by-bus/{busId}', [BarangKeluarController::class, 'getPaketByBus'])->name('barang-keluar.paket-by-bus');
 
+    Route::resource('nota-jalan', NotaJalanController::class);
+    Route::get('nota-jalan-export', [NotaJalanController::class, 'exportPdf'])->name('nota-jalan.export-pdf');
+    Route::get('nota-jalan-export/{id}', [NotaJalanController::class, 'exportPdfShow'])->name('nota-jalan.export-pdf-show');
+    
     Route::resource('data-bus', DataBusController::class);
     Route::get('data-bus-export', [DataBusController::class, 'exportPdf'])->name('data-bus.export-pdf');
     Route::get('data-bus-export/{id}', [DataBusController::class, 'exportPdfShow'])->name('data-bus.export-pdf-show');
 
     Route::get('laporan-bus', [LaporanBusController::class, 'index'])->name('laporan-bus.index');
-Route::get('laporan-bus-export', [LaporanBusController::class, 'exportPdf'])->name('laporan-bus.export-pdf');
-Route::get('laporan-bus/{id}', [LaporanBusController::class, 'show'])->name('laporan-bus.show');
-Route::get('laporan-bus/{id}/export', [LaporanBusController::class, 'exportPdfShow'])->name('laporan-bus.export-pdf-show');
+    Route::get('laporan-bus-export', [LaporanBusController::class, 'exportPdf'])->name('laporan-bus.export-pdf');
+    Route::get('laporan-bus/{id}', [LaporanBusController::class, 'show'])->name('laporan-bus.show');
+    Route::get('laporan-bus/{id}/export', [LaporanBusController::class, 'exportPdfShow'])->name('laporan-bus.export-pdf-show');
 
     Route::resource('paket-service', PaketServiceController::class);
     Route::get('paket-service-export', [PaketServiceController::class, 'exportPdf'])->name('paket-service.export-pdf');

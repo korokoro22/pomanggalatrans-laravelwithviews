@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="text-transform: uppercase;">
 <head>
     <meta charset="utf-8">
     <title>Laporan Transaksi Keluar</title>
@@ -46,9 +46,15 @@
                 <td>
                     @foreach($transaksi->details as $detail)
                         - {{ $detail->nama_item }}
-                        <small>({{ $detail->tipe === 'paket_service' ? 'Paket' : 'Item' }})</small><br>
+                        <small>({{
+                            match($detail->tipe) {
+                                'paket_service'     => 'Paket',
+                                'nota_jalan'        => 'Nota Jalan',
+                                'biaya_pengerjaan'  => 'Biaya Pengerjaan',
+                                default             => 'Item',
+                            }
+                        }})</small><br>
                     @endforeach
-                    
                 </td>
                 {{-- <td>
                     @foreach($transaksi->details as $detail)

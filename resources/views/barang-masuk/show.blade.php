@@ -3,12 +3,12 @@
 @section('title', 'Detail Barang Masuk')
 
 @section('content_header')
-    <h1>Detail Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Detail Barang Masuk</h1>
 @stop
 
 @section('content')
 
-<div class="mb-3">
+<div class="mb-3" style="text-transform: uppercase;">
     <a href="{{ route('barang-masuk.export-pdf-show', $barangMasuk->id) }}" class="btn btn-success">
         <i class="fas fa-file-pdf"></i> Export PDF
     </a>
@@ -18,7 +18,7 @@
 </div>
 
 {{-- INFORMASI NOTA --}}
-<x-adminlte-card title="Informasi Nota" theme="success" icon="fas fa-file-invoice">
+<x-adminlte-card title="Informasi Nota" theme="success" icon="fas fa-file-invoice" style="text-transform: uppercase;">
     <div class="row">
 
         <div class="col-md-6">
@@ -76,7 +76,7 @@
 
 
 {{-- DETAIL ITEM --}}
-<x-adminlte-card title="Detail Item Barang" theme="success" icon="fas fa-boxes">
+<x-adminlte-card title="Detail Item Barang" theme="success" icon="fas fa-boxes" style="text-transform: uppercase;">
 
     <table class="table table-bordered table-striped">
 

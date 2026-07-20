@@ -3,7 +3,7 @@
 @section('title', 'Master Barang')
 
 @section('content_header')
-    <h1>Master Barang</h1>
+    <h1 style="text-transform: uppercase;">Master Barang</h1>
 @stop
 
 @section('content')
@@ -18,7 +18,7 @@
 @endif
 
 {{-- ACTION BUTTONS --}}
-<div class="row mb-3">
+<div class="row mb-3" style="text-transform: uppercase;">
     <div class="col-md-12">
 
         <a href="{{ route('master-barang.export-pdf', request()->query()) }}" class="btn btn-success">
@@ -26,22 +26,23 @@
         </a>
 
         <button class="btn btn-dark" data-toggle="modal" data-target="#modal-scan-qr">
-            <i class="fas fa-qrcode"></i> Scan QR Code
+            <i class="fas fa-qrcode"></i> SCAN QR CODE
         </button>
 
     </div>
 </div>
 
 {{-- FILTER SECTION --}}
-<x-adminlte-card title="Filter Data Barang" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Data Barang" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form action="{{ route('master-barang.index') }}" method="GET">
 
         <div class="row">
 
-            <div class="col-md-3">
+            <div class="col-md-3" style="text-transform: uppercase;">
                 <label>Nama Barang</label>
                 <input type="text"
+                        style="text-transform: uppercase;"
                        name="nama_barang"
                        class="form-control"
                        placeholder="Cari nama barang..."
@@ -50,7 +51,7 @@
 
             <div class="col-md-3">
                 <label>Gudang</label>
-                <select name="gudang" class="form-control">
+                <select name="gudang" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Semua Gudang --</option>
                     <option value="gudang_utama" {{ request('gudang') == 'gudang_utama' ? 'selected' : '' }}>Gudang Utama</option>
                     <option value="gudang_2"     {{ request('gudang') == 'gudang_2'     ? 'selected' : '' }}>Gudang 2</option>
@@ -60,7 +61,7 @@
 
             <div class="col-md-3">
                 <label>Bulan Masuk</label>
-                <select name="bulan" class="form-control">
+                <select name="bulan" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Bulan --</option>
                     <option value="1"  {{ request('bulan') == '1'  ? 'selected' : '' }}>Januari</option>
                     <option value="2"  {{ request('bulan') == '2'  ? 'selected' : '' }}>Februari</option>
@@ -79,7 +80,7 @@
 
             <div class="col-md-3">
                 <label>Tahun Masuk</label>
-                <select name="tahun" class="form-control">
+                <select name="tahun" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Tahun --</option>
                     @for ($i = now()->year; $i >= now()->year - 5; $i--)
                         <option value="{{ $i }}" {{ request('tahun') == $i ? 'selected' : '' }}>
@@ -93,7 +94,7 @@
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Filter
+                <i class="fas fa-search"></i> FILTER
             </button>
             <a href="{{ route('master-barang.index') }}" class="btn btn-secondary">
                 Reset
@@ -106,7 +107,7 @@
 
 
 {{-- TABLE SECTION --}}
-<x-adminlte-card title="Daftar Master Barang" theme="lightblue" icon="fas fa-box">
+<x-adminlte-card title="Daftar Master Barang" theme="lightblue" icon="fas fa-box" style="text-transform: uppercase;">
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped">

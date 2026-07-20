@@ -3,15 +3,15 @@
 @section('title', 'Detail Barang')
 
 @section('content_header')
-    <h1>Detail Barang</h1>
+    <h1>DETAIL BARANG</h1>
 @stop
 
 @section('content')
 
-<div class="row">
+<div class="row" style="text-transform: uppercase;">
 
     {{-- KOLOM KIRI — Info Barang --}}
-    <div class="col-md-8">
+    <div class="col-md-8" >
 
         <x-adminlte-card title="Informasi Barang" theme="lightblue" icon="fas fa-box">
 

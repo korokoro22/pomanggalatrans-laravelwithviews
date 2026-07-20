@@ -351,6 +351,13 @@ return [
             // 'label' => 4,
             // 'label_color' => 'success',
         ],
+        [
+            'text' => 'Nota Jalan',
+            'url' => 'nota-jalan',
+            'icon' => 'fas fa-solid fa-file-export',
+            // 'label' => 4,
+            // 'label_color' => 'success',
+        ],
         ['header' => 'Data Armada'],
         [
             'text' => 'Data Bus',

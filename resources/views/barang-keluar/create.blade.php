@@ -67,18 +67,18 @@
 @stop
 
 @section('content_header')
-    <h1>Tambah Transaksi Keluar</h1>
+    <h1 style="text-transform: uppercase;">Tambah Transaksi Keluar</h1>
 @stop
 
 @section('content')
 
 @if(session('error'))
-    <div class="alert alert-danger">
+    <div class="alert alert-danger" style="text-transform: uppercase;">
         <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
     </div>
 @endif
 
-<x-adminlte-card title="Form Transaksi Keluar" theme="danger" icon="fas fa-plus-circle">
+<x-adminlte-card title="Form Transaksi Keluar" theme="danger" icon="fas fa-plus-circle" style="text-transform: uppercase;">
 
     <form action="{{ route('barang-keluar.store') }}" method="POST">
         @csrf
@@ -87,7 +87,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Bus</label>
-                    <select name="bus_id" id="bus-select" class="form-control" required>
+                    <select name="bus_id" id="bus-select" class="form-control" required style="text-transform: uppercase;">
                         <option value="">-- Pilih Bus --</option>
                         @foreach($busList as $bus)
                             <option value="{{ $bus->id }}">
@@ -100,7 +100,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Tanggal</label>
-                    <input type="datetime-local" name="tanggal" class="form-control" required>
+                    <input type="datetime-local" name="tanggal" class="form-control" required style="text-transform: uppercase;">
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
                 <small class="text-muted">Tambahkan item transaksi, bisa lebih dari satu dalam satu transaksi</small>
             </div>
             <button type="button" class="btn btn-info btn-sm" id="btn-scan-qr">
-                <i class="fas fa-qrcode"></i> Scan QR Barang
+                <i class="fas fa-qrcode"></i> SCAN QR BARANG
             </button>
         </div>
 
@@ -143,6 +143,13 @@
                                                value="paket_service">
                                         <label class="form-check-label">Paket Service</label>
                                     </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input tipe-radio"
+                                            type="radio"
+                                            name="items[0][tipe]"
+                                            value="biaya_pengerjaan">
+                                        <label class="form-check-label">Biaya Pengerjaan</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +161,7 @@
                         {{-- Pilih Barang full width --}}
                         <div class="form-group">
                             <label>Pilih Barang</label>
-                            <select name="items[0][barang_id]" class="form-control select-barang">
+                            <select name="items[0][barang_id]" class="form-control select-barang" style="text-transform: uppercase;">
                                 <option value="">-- Cari nama barang atau kode barang --</option>
                                 @foreach($barangs as $barang)
                                     <option value="{{ $barang['id'] }}">
@@ -172,6 +179,7 @@
                                            name="items[0][satuan]"
                                            class="form-control input-satuan"
                                            placeholder="Otomatis terisi"
+                                           style="text-transform: uppercase;"
                                            readonly>
                                 </div>
                             </div>
@@ -182,6 +190,7 @@
                                            name="items[0][harga_satuan]"
                                            class="form-control input-harga-satuan"
                                            placeholder="Otomatis terisi"
+                                           style="text-transform: uppercase;"
                                            min="0">
                                 </div>
                             </div>
@@ -192,6 +201,7 @@
                                            name="items[0][qty]"
                                            class="form-control input-qty"
                                            placeholder="Masukkan qty"
+                                           style="text-transform: uppercase;"
                                            min="1">
                                 </div>
                             </div>
@@ -205,7 +215,8 @@
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            placeholder="Otomatis terisi"
-                                           readonly>
+                                           style="text-transform: uppercase;"
+                                           >
                                 </div>
                             </div>
                         </div>
@@ -220,6 +231,7 @@
                                     <label>Paket Service</label>
                                     <select name="items[0][paket_service_id]"
                                             class="form-control select-paket"
+                                            style="text-transform: uppercase;"
                                             disabled>
                                         <option value="">-- Pilih Bus dulu --</option>
                                     </select>
@@ -231,6 +243,7 @@
                                     <input type="number"
                                            class="form-control input-harga-paket"
                                            placeholder="Otomatis terisi"
+                                           style="text-transform: uppercase;"
                                            readonly>
                                 </div>
                             </div>
@@ -241,7 +254,48 @@
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            placeholder="Otomatis terisi"
-                                           readonly>
+                                           style="text-transform: uppercase;"
+                                           >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Section Biaya Pengerjaan --}}
+                    <div class="section-biaya-pengerjaan" style="display:none">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label>Keterangan Pengerjaan</label>
+                                    <input type="text"
+                                        name="items[0][keterangan]"
+                                        class="form-control input-keterangan-pengerjaan"
+                                        style="text-transform: uppercase;"
+                                        placeholder="Contoh: Servis rem, ganti oli mesin, dll">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Biaya Pengerjaan</label>
+                                    <input type="number"
+                                        name="items[0][biaya_pengerjaan]"
+                                        class="form-control input-biaya-pengerjaan"
+                                        placeholder="Masukkan biaya"
+                                        style="text-transform: uppercase;"
+                                        min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Subtotal</label>
+                                    <input type="hidden" name="items[0][subtotal]" class="input-subtotal-value">
+                                    <input type="number"
+                                        class="form-control input-subtotal"
+                                        placeholder="Otomatis terisi"
+                                        style="text-transform: uppercase;"
+                                        >
                                 </div>
                             </div>
                         </div>
@@ -271,16 +325,16 @@
                            id="total-transaksi"
                            class="form-control"
                            placeholder="Rp 0"
-                           readonly>
+                           >
                 </div>
             </div>
         </div>
 
         <a href="{{ route('barang-keluar.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
+            <i class="fas fa-arrow-left"></i> KEMBALI
         </a>
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Simpan
+            <i class="fas fa-save"></i> SIMPAN
         </button>
 
     </form>
@@ -292,7 +346,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-qrcode"></i> Scan QR Code Barang</h5>
+                <h5 class="modal-title"><i class="fas fa-qrcode"></i> SCAN QR BARANG</h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
@@ -558,18 +612,22 @@
         <div class="card card-outline card-secondary mb-3 item-row">
             <div class="card-body">
 
-                <div class="row mb-2">
+                <div class="row mb-2" style="text-transform: uppercase;">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Tipe Item</label>
                             <div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="per_item" checked>
+                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="per_item" checked style="text-transform: uppercase;">
                                     <label class="form-check-label">Per Item</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="paket_service">
+                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="paket_service" style="text-transform: uppercase;">
                                     <label class="form-check-label">Paket Service</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input tipe-radio" type="radio" name="items[${index}][tipe]" value="biaya_pengerjaan" style="text-transform: uppercase;">
+                                    <label class="form-check-label">Biaya Pengerjaan</label>
                                 </div>
                             </div>
                         </div>
@@ -579,7 +637,7 @@
                 <div class="section-per-item">
                     <div class="form-group">
                         <label>Pilih Barang</label>
-                        <select name="items[${index}][barang_id]" class="form-control select-barang">
+                        <select name="items[${index}][barang_id]" class="form-control select-barang" style="text-transform: uppercase;">
                             <option value="">-- Cari nama barang atau kode barang --</option>
                             ${barangOptions}
                         </select>
@@ -588,19 +646,19 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Satuan</label>
-                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" readonly>
+                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" readonly style="text-transform: uppercase;">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Harga Satuan</label>
-                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Otomatis terisi" min="0">
+                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Otomatis terisi" min="0" style="text-transform: uppercase;">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Qty</label>
-                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1">
+                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -608,8 +666,8 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Subtotal</label>
-                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
-                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
+                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value" style="text-transform: uppercase;">
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -620,7 +678,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Paket Service</label>
-                                <select name="items[${index}][paket_service_id]" class="form-control select-paket" ${paketList.length ? '' : 'disabled'}>
+                                <select name="items[${index}][paket_service_id]" class="form-control select-paket" ${paketList.length ? '' : 'disabled'} style="text-transform: uppercase;">
                                     <option value="">${paketList.length ? '-- Pilih Paket Service --' : '-- Pilih Bus dulu --'}</option>
                                     ${paketOptions}
                                 </select>
@@ -629,14 +687,42 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Harga Paket</label>
-                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" readonly>
+                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" style="text-transform: uppercase;">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Subtotal</label>
-                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
-                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
+                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value" style="text-transform: uppercase;">
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+                <div class="section-biaya-pengerjaan" style="display:none">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Keterangan Pengerjaan</label>
+                                <input type="text" name="items[${index}][keterangan]" class="form-control input-keterangan-pengerjaan" placeholder="Contoh: Servis rem, ganti oli mesin, dll" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Biaya Pengerjaan</label>
+                                <input type="number" name="items[${index}][biaya_pengerjaan]" class="form-control input-biaya-pengerjaan" placeholder="Masukkan biaya" min="0" style="text-transform: uppercase;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Subtotal</label>
+                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value" style="text-transform: uppercase;">
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -663,14 +749,20 @@
         if (!row) return;
 
         if (e.target.classList.contains('tipe-radio')) {
-            const sectionPaket = row.querySelector('.section-paket-service');
-            const sectionItem  = row.querySelector('.section-per-item');
+            const sectionPaket  = row.querySelector('.section-paket-service');
+            const sectionItem   = row.querySelector('.section-per-item');
+            const sectionBiaya  = row.querySelector('.section-biaya-pengerjaan');
+
+            sectionPaket.style.display = 'none';
+            sectionItem.style.display  = 'none';
+            sectionBiaya.style.display = 'none';
+
             if (e.target.value === 'paket_service') {
                 sectionPaket.style.display = 'block';
-                sectionItem.style.display  = 'none';
+            } else if (e.target.value === 'biaya_pengerjaan') {
+                sectionBiaya.style.display = 'block';
             } else {
-                sectionPaket.style.display = 'none';
-                sectionItem.style.display  = 'block';
+                sectionItem.style.display = 'block';
             }
             resetSubtotal(row);
         }
@@ -697,7 +789,15 @@
             row.querySelector('.section-per-item .input-subtotal-value').value = subtotal;
             hitungTotal();
         }
-    });
+
+        // BARU: Biaya Pengerjaan
+        if (e.target.classList.contains('input-biaya-pengerjaan')) {
+            const biaya = parseFloat(e.target.value) || 0;
+            row.querySelector('.section-biaya-pengerjaan .input-subtotal').value       = biaya;
+            row.querySelector('.section-biaya-pengerjaan .input-subtotal-value').value = biaya;
+            hitungTotal();
+        }
+        });
 
     // ========== Event: hapus item ==========
     document.getElementById('item-container').addEventListener('click', function (e) {
@@ -725,6 +825,8 @@
             const tipe = row.querySelector('.tipe-radio:checked')?.value;
             if (tipe === 'paket_service') {
                 total += parseFloat(row.querySelector('.section-paket-service .input-subtotal')?.value) || 0;
+            } else if (tipe === 'biaya_pengerjaan') {
+                total += parseFloat(row.querySelector('.section-biaya-pengerjaan .input-subtotal')?.value) || 0;
             } else {
                 total += parseFloat(row.querySelector('.section-per-item .input-subtotal')?.value) || 0;
             }
@@ -733,10 +835,12 @@
     }
 
     function resetSubtotal(row) {
-        row.querySelector('.section-paket-service .input-subtotal').value       = 0;
-        row.querySelector('.section-paket-service .input-subtotal-value').value = 0;
-        row.querySelector('.section-per-item .input-subtotal').value            = 0;
-        row.querySelector('.section-per-item .input-subtotal-value').value      = 0;
+        row.querySelector('.section-paket-service .input-subtotal').value           = 0;
+        row.querySelector('.section-paket-service .input-subtotal-value').value     = 0;
+        row.querySelector('.section-per-item .input-subtotal').value                = 0;
+        row.querySelector('.section-per-item .input-subtotal-value').value          = 0;
+        row.querySelector('.section-biaya-pengerjaan .input-subtotal').value        = 0;
+        row.querySelector('.section-biaya-pengerjaan .input-subtotal-value').value  = 0;
         hitungTotal();
     }
 

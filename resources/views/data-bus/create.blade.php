@@ -3,12 +3,12 @@
 @section('title', 'Tambah Bus')
 
 @section('content_header')
-    <h1>Tambah Bus</h1>
+    <h1 style="text-transform: uppercase;">Tambah Bus</h1>
 @stop
 
 @section('content')
 
-<x-adminlte-card title="Form Tambah Bus" theme="info" icon="fas fa-bus">
+<x-adminlte-card title="Form Tambah Bus" theme="info" icon="fas fa-bus" style="text-transform: uppercase;">
 
     <form action="{{ route('data-bus.store') }}" method="POST">
         @csrf
@@ -22,6 +22,7 @@
                            name="nama_bus"
                            class="form-control @error('nama_bus') is-invalid @enderror"
                            placeholder="Contoh: Bus 01"
+                           style="text-transform: uppercase;"
                            value="{{ old('nama_bus') }}"
                            required>
                     @error('nama_bus')
@@ -37,6 +38,7 @@
                            name="plat_nomor"
                            class="form-control @error('plat_nomor') is-invalid @enderror"
                            placeholder="Contoh: DD 1234 AB"
+                           style="text-transform: uppercase;"
                            value="{{ old('plat_nomor') }}"
                            required>
                     @error('plat_nomor')
@@ -56,6 +58,7 @@
                            name="rute_trayek"
                            class="form-control @error('rute_trayek') is-invalid @enderror"
                            placeholder="Contoh: Makassar - Parepare"
+                           style="text-transform: uppercase;"
                            value="{{ old('rute_trayek') }}">
                     @error('rute_trayek')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -70,6 +73,7 @@
                            name="nama_driver"
                            class="form-control @error('nama_driver') is-invalid @enderror"
                            placeholder="Contoh: Andi Pratama"
+                           style="text-transform: uppercase;"
                            value="{{ old('nama_driver') }}"
                            required>
                     @error('nama_driver')

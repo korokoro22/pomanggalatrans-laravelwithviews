@@ -3,19 +3,19 @@
 @section('title', 'Detail Bus')
 
 @section('content_header')
-    <h1>Detail Bus</h1>
+    <h1 style="text-transform: uppercase;">Detail Bus</h1>
 @stop
 
 @section('content')
 
 <div class="mb-3 mt-3">
     <a href="{{ route('data-bus.export-pdf-show', $bus->id) }}" class="btn btn-success btn-sm">
-        <i class="fas fa-file-pdf"></i> Export PDF
+        <i class="fas fa-file-pdf"></i> EXPORT PDF
     </a>
 </div>
 
 {{-- INFORMASI BUS --}}
-<x-adminlte-card title="Informasi Bus" theme="info" icon="fas fa-bus">
+<x-adminlte-card title="Informasi Bus" theme="info" icon="fas fa-bus" style="text-transform: uppercase;">
 
     <table class="table table-borderless">
         <tr>
@@ -39,7 +39,7 @@
 </x-adminlte-card>
 
 {{-- RIWAYAT TRANSAKSI KELUAR --}}
-<x-adminlte-card title="Riwayat Pengeluaran" theme="danger" icon="fas fa-arrow-up">
+<x-adminlte-card title="Riwayat Pengeluaran" theme="danger" icon="fas fa-arrow-up" style="text-transform: uppercase;">
 
     <table class="table table-bordered table-striped">
 

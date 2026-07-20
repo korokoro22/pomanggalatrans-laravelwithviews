@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="text-transform: uppercase;">
 <head>
     <meta charset="utf-8">
     <title>Transaksi Keluar - {{ $transaksi->bus->plat_nomor ?? '' }}</title>
@@ -19,6 +19,8 @@
         .divider { border-top: 1px solid #ddd; margin: 10px 0; }
         .badge-paket { background-color: #007bff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
         .badge-item  { background-color: #6c757d; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
+        .badge-nota { background-color: #17a2b8; color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
+        .badge-biaya { background-color: #ffc107; color: #333; padding: 2px 5px; border-radius: 3px; font-size: 10px; }
         .isi-paket { color: #666; font-size: 10px; margin-top: 2px; }
         .item-foto { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-top: 4px; }
     </style>
@@ -81,11 +83,19 @@
                 @endif
             </td>
             <td class="text-center">
-                @if($detail->tipe === 'paket_service')
-                    <span class="badge-paket">Paket</span>
-                @else
-                    <span class="badge-item">Per Item</span>
-                @endif
+                @switch($detail->tipe)
+                    @case('paket_service')
+                        <span class="badge-paket">Paket</span>
+                        @break
+                    @case('nota_jalan')
+                        <span class="badge-nota">Nota Jalan</span>
+                        @break
+                    @case('biaya_pengerjaan')
+                        <span class="badge-biaya">Biaya Pengerjaan</span>
+                        @break
+                    @default
+                        <span class="badge-item">Per Item</span>
+                @endswitch
             </td>
             <td class="text-center">
                 @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->foto)
@@ -104,10 +114,12 @@
                             {{ $psi->barang->nama_barang ?? '-' }} ({{ $psi->qty }})@if(!$loop->last), @endif
                         @endforeach
                     </div>
+                @elseif($detail->tipe === 'biaya_pengerjaan' && $detail->keterangan)
+                    <div class="isi-paket">{{ $detail->keterangan }}</div>
                 @endif
             </td>
             
-            <td class="text-center">{{ $detail->qty }}</td>
+            <td class="text-center">{{ $detail->tipe === 'biaya_pengerjaan' ? '-' : $detail->qty }}</td>
             <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
             <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
             <td class="text-right">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>

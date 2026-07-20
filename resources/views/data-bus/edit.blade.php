@@ -3,12 +3,12 @@
 @section('title', 'Edit Bus')
 
 @section('content_header')
-    <h1>Edit Bus</h1>
+    <h1 style="text-transform: uppercase;">Edit Bus</h1>
 @stop
 
 @section('content')
 
-<x-adminlte-card title="Form Edit Bus" theme="warning" icon="fas fa-edit">
+<x-adminlte-card title="Form Edit Bus" theme="warning" icon="fas fa-edit" style="text-transform: uppercase;">
 
     <form action="{{ route('data-bus.update', $bus->id) }}" method="POST">
         @csrf
@@ -23,6 +23,7 @@
                            name="nama_bus"
                            class="form-control @error('nama_bus') is-invalid @enderror"
                            placeholder="Contoh: Bus 01"
+                           style="text-transform: uppercase;"
                            value="{{ old('nama_bus', $bus->nama_bus) }}"
                            required>
                     @error('nama_bus')
@@ -36,6 +37,7 @@
                     <label>Plat Nomor</label>
                     <input type="text"
                            name="plat_nomor"
+                           style="text-transform: uppercase;"
                            class="form-control @error('plat_nomor') is-invalid @enderror"
                            placeholder="Contoh: DD 1234 AB"
                            value="{{ old('plat_nomor', $bus->plat_nomor) }}"
@@ -55,6 +57,7 @@
                     <label>Rute / Trayek</label>
                     <input type="text"
                            name="rute_trayek"
+                           style="text-transform: uppercase;"
                            class="form-control @error('rute_trayek') is-invalid @enderror"
                            placeholder="Contoh: Makassar - Parepare"
                            value="{{ old('rute_trayek', $bus->rute_trayek) }}">
@@ -69,6 +72,7 @@
                     <label>Nama Driver</label>
                     <input type="text"
                            name="nama_driver"
+                           style="text-transform: uppercase;"
                            class="form-control @error('nama_driver') is-invalid @enderror"
                            placeholder="Contoh: Andi Pratama"
                            value="{{ old('nama_driver', $bus->nama_driver) }}"
@@ -90,7 +94,7 @@
 
         <button type="submit" class="btn btn-warning">
             <i class="fas fa-save"></i>
-            Update
+            UPDATE
         </button>
 
     </form>

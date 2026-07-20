@@ -3,17 +3,17 @@
 @section('title', 'Edit Barang Masuk')
 
 @section('content_header')
-    <h1>Edit Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Edit Barang Masuk</h1>
 @stop
 
 @section('content')
 
-<form action="{{ route('barang-masuk.update', $barangMasuk->id) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('barang-masuk.update', $barangMasuk->id) }}" method="POST" enctype="multipart/form-data" style="text-transform: uppercase;">
 @csrf
 @method('PUT')
 
 {{-- HEADER NOTA --}}
-<x-adminlte-card title="Informasi Nota" theme="warning" icon="fas fa-file-invoice">
+<x-adminlte-card title="Informasi Nota" theme="warning" icon="fas fa-file-invoice" style="text-transform: uppercase;">
 
     <div class="row">
 
@@ -24,6 +24,7 @@
                        name="tanggal_masuk"
                        class="form-control @error('tanggal_masuk') is-invalid @enderror"
                        value="{{ old('tanggal_masuk', $barangMasuk->tanggal_masuk) }}"
+                       style="text-transform: uppercase;"
                        required>
                 @error('tanggal_masuk')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -39,6 +40,7 @@
                        class="form-control @error('no_invoice') is-invalid @enderror"
                        placeholder="Masukkan nomor invoice"
                        value="{{ old('no_invoice', $barangMasuk->no_invoice) }}"
+                       style="text-transform: uppercase;"
                        required>
                 @error('no_invoice')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -58,6 +60,7 @@
                        class="form-control @error('supplier') is-invalid @enderror"
                        placeholder="Masukkan nama supplier"
                        value="{{ old('supplier', $barangMasuk->supplier) }}"
+                       style="text-transform: uppercase;"
                        required>
                 @error('supplier')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -73,6 +76,7 @@
                        class="form-control @error('penerima') is-invalid @enderror"
                        placeholder="Masukkan nama penerima"
                        value="{{ old('penerima', $barangMasuk->penerima) }}"
+                       style="text-transform: uppercase;"
                        required>
                 @error('penerima')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -111,7 +115,7 @@
 
 
 {{-- ITEM BARANG --}}
-<x-adminlte-card title="Item Barang" theme="warning" icon="fas fa-boxes">
+<x-adminlte-card title="Item Barang" theme="warning" icon="fas fa-boxes" style="text-transform: uppercase;">
 
     <small class="text-muted">Edit item barang dalam nota ini</small>
 
@@ -133,6 +137,7 @@
                                    name="items[{{ $index }}][kode_barang]"
                                    class="form-control"
                                    placeholder="Masukkan kode barang"
+                                   style="text-transform: uppercase;"
                                    value="{{ old('items.' . $index . '.kode_barang', $detail->barang->kode_barang ?? '') }}"
                                    required>
                         </div>
@@ -141,7 +146,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Kategori</label>
-                            <select name="items[{{ $index }}][kategori]" class="form-control" required>
+                            <select name="items[{{ $index }}][kategori]" class="form-control" required style="text-transform: uppercase;">
                                 <option value="">-- Pilih Kategori --</option>
                                 <option value="oli_mesin"    {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'oli_mesin'    ? 'selected' : '' }}>Oli Mesin</option>
                                 <option value="filter_solar" {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'filter_solar' ? 'selected' : '' }}>Filter Solar</option>
@@ -161,6 +166,7 @@
                                    name="items[{{ $index }}][nama_barang]"
                                    class="form-control"
                                    placeholder="Masukkan nama barang"
+                                   style="text-transform: uppercase;"
                                    value="{{ old('items.' . $index . '.nama_barang', $detail->nama_barang) }}"
                                    required>
                         </div>
@@ -197,6 +203,7 @@
                                    placeholder="Contoh: 2"
                                    min="1"
                                    value="{{ old('items.' . $index . '.qty', $detail->qty) }}"
+                                   style="text-transform: uppercase;"
                                    required>
                         </div>
                     </div>
@@ -209,6 +216,7 @@
                                    class="form-control"
                                    placeholder="Dus, Box, Lusin"
                                    value="{{ old('items.' . $index . '.satuan', $detail->satuan) }}"
+                                   style="text-transform: uppercase;"
                                    required>
                         </div>
                     </div>
@@ -222,6 +230,7 @@
                                    placeholder="Contoh: 24"
                                    min="1"
                                    value="{{ old('items.' . $index . '.qty_satuan', $detail->qty_satuan) }}"
+                                   style="text-transform: uppercase;"
                                    required>
                         </div>
                     </div>
@@ -235,6 +244,7 @@
                                    placeholder="Harga jual per pcs"
                                    min="0"
                                    value="{{ old('items.' . $index . '.harga_jual', $detail->harga_jual) }}"
+                                   style="text-transform: uppercase;"
                                    required>
                         </div>
                     </div>
@@ -252,6 +262,7 @@
                                    placeholder="Masukkan subtotal"
                                    min="0"
                                    value="{{ old('items.' . $index . '.subtotal', $detail->subtotal) }}"
+                                   style="text-transform: uppercase;"
                                    required>
                         </div>
                     </div>
@@ -301,7 +312,7 @@
 
     <button type="submit" class="btn btn-warning">
         <i class="fas fa-save"></i>
-        Update
+        UPDATE
     </button>
 </div>
 
@@ -313,23 +324,22 @@
 
     function buildItemRow(index) {
         return `
-        <div class="card card-outline card-secondary mb-3 item-row">
+        <div class="card card-outline card-secondary mb-3 item-row" style="text-transform: uppercase;">
             <div class="card-header">
                 <h6 class="card-title mb-0">Item #${index + 1}</h6>
             </div>
             <div class="card-body">
-
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Kode Barang</label>
-                            <input type="text" name="items[${index}][kode_barang]" class="form-control" placeholder="Masukkan kode barang" required>
+                            <input type="text" name="items[${index}][kode_barang]" class="form-control" placeholder="Masukkan kode barang" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Kategori</label>
-                            <select name="items[${index}][kategori]" class="form-control" required>
+                            <select name="items[${index}][kategori]" class="form-control" required style="text-transform: uppercase;">
                                 <option value="">-- Pilih Kategori --</option>
                                 <option value="oli_mesin">Oli Mesin</option>
                                 <option value="filter_solar">Filter Solar</option>
@@ -343,7 +353,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Nama Barang</label>
-                            <input type="text" name="items[${index}][nama_barang]" class="form-control" placeholder="Masukkan nama barang" required>
+                            <input type="text" name="items[${index}][nama_barang]" class="form-control" placeholder="Masukkan nama barang" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -358,25 +368,25 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input type="number" name="items[${index}][qty]" class="form-control" placeholder="Contoh: 2" min="1" required>
+                            <input type="number" name="items[${index}][qty]" class="form-control" placeholder="Contoh: 2" min="1" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Satuan</label>
-                            <input type="text" name="items[${index}][satuan]" class="form-control" placeholder="Dus, Box, Lusin" required>
+                            <input type="text" name="items[${index}][satuan]" class="form-control" placeholder="Dus, Box, Lusin" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Total (Pcs)</label>
-                            <input type="number" name="items[${index}][qty_satuan]" class="form-control" placeholder="Contoh: 24" min="1" required>
+                            <input type="number" name="items[${index}][qty_satuan]" class="form-control" placeholder="Contoh: 24" min="1" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Harga Jual <small class="text-muted">(per pcs)</small></label>
-                            <input type="number" name="items[${index}][harga_jual]" class="form-control" placeholder="Harga jual per pcs" min="0" required>
+                            <input type="number" name="items[${index}][harga_jual]" class="form-control" placeholder="Harga jual per pcs" min="0" required style="text-transform: uppercase;">
                         </div>
                     </div>
                 </div>
@@ -385,7 +395,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Subtotal <small class="text-muted">(isi manual)</small></label>
-                            <input type="number" name="items[${index}][subtotal]" class="form-control" placeholder="Masukkan subtotal" min="0" required>
+                            <input type="number" name="items[${index}][subtotal]" class="form-control" placeholder="Masukkan subtotal" min="0" required style="text-transform: uppercase;">
                         </div>
                     </div>
                 </div>

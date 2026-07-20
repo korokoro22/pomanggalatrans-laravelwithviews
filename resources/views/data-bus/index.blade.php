@@ -3,7 +3,7 @@
 @section('title', 'Data Bus')
 
 @section('content_header')
-    <h1>Data Bus</h1>
+    <h1 style="text-transform: uppercase;">Data Bus</h1>
 @stop
 
 @section('content')
@@ -18,7 +18,7 @@
 @endif
 
 {{-- ACTION BUTTON --}}
-<div class="row mb-3">
+<div class="row mb-3" style="text-transform: uppercase;">
     <div class="col-md-12">
         <a href="{{ route('data-bus.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Bus
@@ -31,7 +31,7 @@
 </div>
 
 {{-- FILTER --}}
-<x-adminlte-card title="Filter Data Bus" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Data Bus" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form action="{{ route('data-bus.index') }}" method="GET">
 
@@ -42,6 +42,7 @@
                 <input type="text"
                        name="nama_bus"
                        class="form-control"
+                       style="text-transform: uppercase;"
                        placeholder="Cari nama bus..."
                        value="{{ request('nama_bus') }}">
             </div>
@@ -50,6 +51,7 @@
                 <label>Plat Nomor</label>
                 <input type="text"
                        name="plat_nomor"
+                       style="text-transform: uppercase;"
                        class="form-control"
                        placeholder="Cari plat nomor..."
                        value="{{ request('plat_nomor') }}">
@@ -59,7 +61,7 @@
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Filter
+                <i class="fas fa-search"></i> FILTER
             </button>
             <a href="{{ route('data-bus.index') }}" class="btn btn-secondary">
                 Reset
@@ -71,7 +73,7 @@
 </x-adminlte-card>
 
 {{-- TABLE --}}
-<x-adminlte-card title="Daftar Bus" theme="info" icon="fas fa-bus">
+<x-adminlte-card title="Daftar Bus" theme="info" icon="fas fa-bus" style="text-transform: uppercase;">
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="text-center">

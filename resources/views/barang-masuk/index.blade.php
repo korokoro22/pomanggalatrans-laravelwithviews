@@ -3,13 +3,13 @@
 @section('title', 'Barang Masuk')
 
 @section('content_header')
-    <h1>Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Barang Masuk</h1>
 @stop
 
 @section('content')
 
 {{-- ACTION BUTTON --}}
-<div class="row mb-3">
+<div class="row mb-3" style="text-transform: uppercase;">
     <div class="col-md-12">
 
         <a href="{{ route('barang-masuk.create') }}" class="btn btn-primary">
@@ -25,7 +25,7 @@
 
 
 {{-- FILTER SECTION --}}
-<x-adminlte-card title="Filter Barang Masuk" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Barang Masuk" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form action="{{ route('barang-masuk.index') }}" method="GET">
 
@@ -37,6 +37,7 @@
                        name="no_invoice"
                        class="form-control"
                        placeholder="Cari no invoice..."
+                       style="text-transform: uppercase;"
                        value="{{ request('no_invoice') }}">
             </div>
 
@@ -46,12 +47,13 @@
                        name="supplier"
                        class="form-control"
                        placeholder="Cari nama supplier..."
+                       style="text-transform: uppercase;"
                        value="{{ request('supplier') }}">
             </div>
 
             <div class="col-md-3">
                 <label>Bulan Masuk</label>
-                <select name="bulan" class="form-control">
+                <select name="bulan" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Bulan --</option>
                     <option value="1"  {{ request('bulan') == '1'  ? 'selected' : '' }}>Januari</option>
                     <option value="2"  {{ request('bulan') == '2'  ? 'selected' : '' }}>Februari</option>
@@ -70,7 +72,7 @@
 
             <div class="col-md-3">
                 <label>Tahun Masuk</label>
-                <select name="tahun" class="form-control">
+                <select name="tahun" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Tahun --</option>
                     @for ($i = now()->year; $i >= now()->year - 5; $i--)
                         <option value="{{ $i }}" {{ request('tahun') == $i ? 'selected' : '' }}>
@@ -82,7 +84,7 @@
 
             <div class="col-md-3">
                 <label>Kategori Nota</label>
-                <select name="kategori_nota" class="form-control">
+                <select name="kategori_nota" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Semua Nota --</option>
                     <option value="nota_bengkel" {{ request('kategori_nota') == 'nota_bengkel' ? 'selected' : '' }}>Nota Bengkel</option>
                     <option value="nota_jalan"   {{ request('kategori_nota') == 'nota_jalan'   ? 'selected' : '' }}>Nota Jalan</option>
@@ -93,7 +95,7 @@
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Filter
+                <i class="fas fa-search"></i> FILTER
             </button>
             <a href="{{ route('barang-masuk.index') }}" class="btn btn-secondary">
                 Reset
@@ -105,7 +107,7 @@
 </x-adminlte-card>
 
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="text-transform: uppercase;">
         {{ session('success') }}
         <button type="button" class="close" data-dismiss="alert">
             <span>&times;</span>
@@ -115,7 +117,7 @@
 {{-- <x-adminlte-card>hai</x-adminlte-card> --}}
 
 {{-- TABLE SECTION --}}
-<x-adminlte-card title="Log Barang Masuk" theme="success" icon="fas fa-arrow-down">
+<x-adminlte-card title="Log Barang Masuk" theme="success" icon="fas fa-arrow-down" style="text-transform: uppercase;">
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="text-center">
@@ -170,11 +172,11 @@
                         <div class="d-flex flex-column" style="row-gap: 8px;">
                             <a href="{{ route('barang-masuk.show', $barangMasuk->id) }}"
                             class="btn btn-info btn-sm">
-                                Detail
+                                DETAIL
                             </a>
                             <a href="{{ route('barang-masuk.edit', $barangMasuk->id) }}"
                             class="btn btn-warning btn-sm">
-                                Edit
+                                EDIT
                             </a>
                             <form action="{{ route('barang-masuk.destroy', $barangMasuk->id) }}"
                                 method="POST"
@@ -183,7 +185,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm w-100">
-                                    Hapus
+                                    HAPUS
                                 </button>
                             </form>
                         </div>

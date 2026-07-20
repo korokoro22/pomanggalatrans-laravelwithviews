@@ -69,18 +69,18 @@
 @stop
 
 @section('content_header')
-    <h1>Edit Transaksi Keluar</h1>
+    <h1 style="text-transform: uppercase;">Edit Transaksi Keluar</h1>
 @stop
 
 @section('content')
 
 @if(session('error'))
-    <div class="alert alert-danger">
+    <div class="alert alert-danger" style="text-transform: uppercase;">
         <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
     </div>
 @endif
 
-<x-adminlte-card title="Form Edit Transaksi Keluar" theme="danger" icon="fas fa-edit">
+<x-adminlte-card title="Form Edit Transaksi Keluar" theme="danger" icon="fas fa-edit" style="text-transform: uppercase;">
 
     <form action="{{ route('barang-keluar.update', $transaksi->id) }}" method="POST">
         @csrf
@@ -90,7 +90,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Bus</label>
-                    <select name="bus_id" id="bus-select" class="form-control" required>
+                    <select name="bus_id" id="bus-select" class="form-control" required style="text-transform: uppercase;">
                         <option value="">-- Pilih Bus --</option>
                         @foreach($busList as $bus)
                             <option value="{{ $bus->id }}"
@@ -125,7 +125,7 @@
                 <div class="card-body">
 
                     {{-- Tipe --}}
-                    <div class="row mb-2">
+                    {{-- <div class="row mb-2">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Tipe Item</label>
@@ -151,6 +151,17 @@
                                 </div>
                             </div>
                         </div>
+                    </div> --}}
+
+                    {{-- Tipe (fixed, tidak bisa diubah untuk item yang sudah ada) --}}
+                    <input type="hidden" name="items[{{ $index }}][tipe]" value="{{ $detail->tipe }}">
+                    <div class="mb-2">
+                        <label class="d-block mb-1">Tipe Item</label>
+                        <span class="badge badge-{{ $detail->tipe === 'paket_service' ? 'primary' : 'secondary' }} p-2" style="text-transform: uppercase;">
+                            <i class="fas {{ $detail->tipe === 'paket_service' ? 'fa-tools' : 'fa-box' }}"></i>
+                            {{ $detail->tipe === 'paket_service' ? 'Paket Service' : 'Per Item' }}
+                        </span>
+                        <small class="text-muted d-block mt-1">Tipe item tidak bisa diubah setelah dibuat. Hapus item ini dan tambahkan item baru jika ingin ganti tipe.</small>
                     </div>
 
                     {{-- Section Paket Service --}}
@@ -160,7 +171,7 @@
                                 <div class="form-group">
                                     <label>Paket Service</label>
                                     <select name="items[{{ $index }}][paket_service_id]"
-                                            class="form-control select-paket">
+                                            class="form-control select-paket" style="text-transform: uppercase;">
                                         <option value="">-- Pilih Paket Service --</option>
                                         @if($detail->tipe === 'paket_service' && $detail->paketService)
                                             <option value="{{ $detail->paketService->id }}" selected>
@@ -177,6 +188,7 @@
                                     <input type="number"
                                            class="form-control input-harga-paket"
                                            value="{{ $detail->tipe === 'paket_service' ? $detail->harga_satuan : '' }}"
+                                           style="text-transform: uppercase;"
                                            readonly>
                                 </div>
                             </div>
@@ -186,8 +198,9 @@
                                     <input type="hidden" name="items[{{ $index }}][subtotal]" class="input-subtotal-value" value="{{ $detail->tipe === 'paket_service' ? $detail->subtotal : '' }}">
                                     <input type="number"
                                            class="form-control input-subtotal"
+                                           style="text-transform: uppercase;"
                                            value="{{ $detail->tipe === 'paket_service' ? $detail->subtotal : '' }}"
-                                           readonly>
+                                           >
                                 </div>
                             </div>
                         </div>
@@ -197,7 +210,7 @@
                     <div class="section-per-item" style="{{ $detail->tipe === 'per_item' ? '' : 'display:none' }}">
                         <div class="form-group">
                             <label>Pilih Barang</label>
-                            <select name="items[{{ $index }}][barang_id]" class="form-control select-barang">
+                            <select name="items[{{ $index }}][barang_id]" class="form-control select-barang" style="text-transform: uppercase;">
                                 <option value="">-- Cari nama barang atau kode barang --</option>
                                 @foreach($barangs as $barang)
                                     <option value="{{ $barang['id'] }}" {{ $detail->barang_id == $barang['id'] ? 'selected' : '' }}>
@@ -216,6 +229,7 @@
                                            class="form-control input-satuan"
                                            value="{{ $detail->satuan }}"
                                            placeholder="Otomatis terisi"
+                                           style="text-transform: uppercase;"
                                            readonly>
                                 </div>
                             </div>
@@ -227,6 +241,7 @@
                                            class="form-control input-harga-satuan"
                                            value="{{ $detail->harga_satuan }}"
                                            placeholder="Otomatis terisi"
+                                           style="text-transform: uppercase;"
                                            min="0">
                                 </div>
                             </div>
@@ -238,6 +253,7 @@
                                            class="form-control input-qty"
                                            value="{{ $detail->qty }}"
                                            placeholder="Masukkan qty"
+                                           style="text-transform: uppercase;"
                                            min="1">
                                 </div>
                             </div>
@@ -250,8 +266,9 @@
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            value="{{ $detail->tipe === 'per_item' ? $detail->subtotal : '' }}"
+                                           style="text-transform: uppercase;"
                                            placeholder="Otomatis terisi"
-                                           readonly>
+                                           >
                                 </div>
                             </div>
                         </div>
@@ -282,16 +299,16 @@
                            name="total_transaksi"
                            class="form-control"
                            value="{{ $transaksi->total_transaksi }}"
-                           readonly>
+                           >
                 </div>
             </div>
         </div>
 
         <a href="{{ route('barang-keluar.show', $transaksi->id) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
+            <i class="fas fa-arrow-left"></i> KEMBALI
         </a>
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Simpan Perubahan
+            <i class="fas fa-save"></i> SIMPAN PERUBAHAN
         </button>
 
     </form>
@@ -444,7 +461,7 @@
             : '';
 
         return `
-        <div class="card card-outline card-secondary mb-3 item-row">
+        <div class="card card-outline card-secondary mb-3 item-row" style="text-transform: uppercase;">
             <div class="card-body">
                 <div class="row mb-2">
                     <div class="col-md-12">
@@ -467,7 +484,7 @@
                 <div class="section-per-item">
                     <div class="form-group">
                         <label>Pilih Barang</label>
-                        <select name="items[${index}][barang_id]" class="form-control select-barang">
+                        <select name="items[${index}][barang_id]" class="form-control select-barang" style="text-transform: uppercase;">
                             <option value="">-- Cari nama barang atau kode barang --</option>
                             ${barangOptions}
                         </select>
@@ -476,19 +493,19 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Satuan</label>
-                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" readonly>
+                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Harga Satuan</label>
-                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Otomatis terisi" min="0">
+                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" style="text-transform: uppercase;" placeholder="Otomatis terisi" min="0">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Qty</label>
-                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1">
+                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" style="text-transform: uppercase;" min="1">
                             </div>
                         </div>
                     </div>
@@ -497,18 +514,19 @@
                             <div class="form-group">
                                 <label>Subtotal</label>
                                 <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
-                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
                 </div>
 
+                
                 <div class="section-paket-service" style="display:none">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Paket Service</label>
-                                <select name="items[${index}][paket_service_id]" class="form-control select-paket" ${paketList.length ? '' : 'disabled'}>
+                                <select name="items[${index}][paket_service_id]" class="form-control select-paket" ${paketList.length ? '' : 'disabled'} style="text-transform: uppercase;">
                                     <option value="">${paketList.length ? '-- Pilih Paket Service --' : '-- Pilih Bus dulu --'}</option>
                                     ${paketOptions}
                                 </select>
@@ -517,14 +535,14 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Harga Paket</label>
-                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" readonly>
+                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Subtotal</label>
                                 <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
-                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" readonly>
+                                <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
                             </div>
                         </div>
                     </div>

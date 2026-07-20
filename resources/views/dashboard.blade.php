@@ -3,17 +3,17 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h1>DASHBOARD</h1>
 @stop
 
 @section('content')
 
-<div class="row">
+<div class="row" style="text-transform: uppercase;">
 
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $totalBarang }}"
-            text="Total Barang"
+            text="TOTAL BARANG"
             icon="fas fa-box"
             theme="primary"/>
     </div>
@@ -21,7 +21,7 @@
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $totalBus }}"
-            text="Total Bus"
+            text="TOTAL BUS"
             icon="fas fa-bus"
             theme="success"/>
     </div>
@@ -29,7 +29,7 @@
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $barangMasukHariIni }}"
-            text="Barang Masuk Hari Ini"
+            text="BARANG MASUK HARI INI"
             icon="fas fa-arrow-down"
             theme="info"/>
     </div>
@@ -41,7 +41,7 @@
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $barangKeluarHariIni }}"
-            text="Barang Keluar Hari Ini"
+            text="BARANG KELUAR HARI INI"
             icon="fas fa-arrow-up"
             theme="danger"/>
     </div>
@@ -49,22 +49,22 @@
 </div>
 
 
-<div class="row">
+<div class="row" style="text-transform: uppercase;">
 
     <div class="col-md-8">
 
         <x-adminlte-card
-            title="Aktivitas Terbaru"
+            title="AKTIVITAS TERBARU"
             theme="lightblue"
             icon="fas fa-clock">
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Jenis</th>
-                            <th>Barang</th>
-                            <th>Jumlah</th>
+                            <th>TANGGAL</th>
+                            <th>JENIS</th>
+                            <th>BARANG</th>
+                            <th>JUMLAH</th>
                         </tr>
                     </thead>
 
@@ -74,9 +74,9 @@
                                 <td>{{ \Carbon\Carbon::parse($aktivitas['tanggal'])->format('d/m/Y') }}</td>
                                 <td>
                                     @if($aktivitas['jenis'] === 'masuk')
-                                        <span class="badge badge-success">Masuk</span>
+                                        <span class="badge badge-success">MASUK</span>
                                     @else
-                                        <span class="badge badge-danger">Keluar</span>
+                                        <span class="badge badge-danger">KELUAR</span>
                                     @endif
                                 </td>
                                 <td>{{ $aktivitas['nama'] }}</td>
@@ -84,7 +84,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted">Belum ada aktivitas</td>
+                                <td colspan="4" class="text-center text-muted">BELUM ADA AKTIVITAS</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -101,28 +101,28 @@
     <div class="col-md-4">
 
         <x-adminlte-card
-            title="Informasi Sistem"
+            title="INFORMASI SISTEM"
             theme="primary"
             icon="fas fa-info-circle">
 
             <p>
-                Selamat datang di Sistem Inventory Bus.
+                SELAMAT DATANG DI SISTEM INVENTORY BUS.
             </p>
 
             <hr>
 
             <p>
-                Total Barang :
+                TOTAL BARANG :
                 <strong>{{ $totalBarang }}</strong>
             </p>
 
             <p>
-                Total Bus :
+                TOTAL BUS :
                 <strong>{{ $totalBus }}</strong>
             </p>
 
             <p>
-                Update terakhir :
+                UPDATE TERAKHIR :
                 <strong>{{ now()->format('d M Y') }}</strong>
             </p>
 
