@@ -52,6 +52,18 @@
             </div>
 
             <div class="col-md-3">
+                <div class="form-group">
+                    <label>Tanggal (spesifik)</label>
+                    <input type="date"
+                           name="tanggal"
+                           class="form-control"
+                           style="text-transform: uppercase;"
+                           value="{{ request('tanggal') }}">
+                    <small class="text-muted">Isi ini untuk cari per hari. Kosongkan untuk pakai filter bulan/tahun.</small>
+                </div>
+            </div>
+
+            <div class="col-md-3">
                 <label>Bulan Masuk</label>
                 <select name="bulan" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Bulan --</option>

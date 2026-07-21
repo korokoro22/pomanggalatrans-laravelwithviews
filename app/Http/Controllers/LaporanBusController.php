@@ -22,12 +22,15 @@ class LaporanBusController extends Controller
             $query->where('bus_id', $request->bus_id);
         }
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->bulan);
-        }
-
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun);
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal', $request->tahun);
+            }
         }
 
         $transaksis = $query->get();
@@ -43,12 +46,15 @@ class LaporanBusController extends Controller
                                   ->where('bus_id', $busId)
                                   ->orderBy('tanggal', 'desc');
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->bulan);
-        }
-
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun);
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal', $request->tahun);
+            }
         }
 
         $transaksis = $query->get();

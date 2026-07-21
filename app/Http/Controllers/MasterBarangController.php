@@ -16,12 +16,15 @@ class MasterBarangController extends Controller {
             $query->where('nama_barang', 'like', '%' . $request->nama_barang . '%');
         }
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal_masuk', $request->bulan);
-        }
-
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal_masuk', $request->tahun);
+         if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal_masuk', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal_masuk', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal_masuk', $request->tahun);
+            }
         }
 
         $barangs = $query->paginate(10)->withQueryString();

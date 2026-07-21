@@ -22,12 +22,15 @@ class BarangKeluarController extends Controller {
             $query->where('bus_id', $request->bus_id);
         }
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->bulan);
-        }
-
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun);
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal', $request->tahun);
+            }
         }
 
         $transaksiKeluars = $query->paginate(10)->withQueryString();

@@ -54,7 +54,19 @@
 
         <div class="row">
 
-            <div class="col-md-5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Tanggal (spesifik)</label>
+                    <input type="date"
+                           name="tanggal"
+                           class="form-control"
+                           style="text-transform: uppercase;"
+                           value="{{ request('tanggal') }}">
+                    <small class="text-muted">Isi ini untuk cari per hari. Kosongkan untuk pakai filter bulan/tahun.</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Bulan</label>
                     <select name="bulan" class="form-control" style="text-transform: uppercase;">
@@ -68,7 +80,7 @@
                 </div>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Tahun</label>
                     <select name="tahun" class="form-control" style="text-transform: uppercase;">
@@ -80,19 +92,27 @@
                 </div>
             </div>
 
-            <div class="col-md-2 d-flex align-items-end">
+            {{-- <div class="col-md-2 d-flex align-items-end">
                 <div class="form-group w-100">
                     <button type="submit" class="btn btn-primary btn-block" style="text-transform: uppercase;">
                         <i class="fas fa-search"></i> Filter
                     </button>
+                    <a href="{{ route('laporan-bus.show', $bus->id) }}" class="btn btn-secondary btn-sm">
+                        Reset
+                    </a>
                 </div>
+                
+            </div> --}}
+            <div class="mt-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> FILTER
+                </button>
+                <a href="{{ route('laporan-bus.show', $bus->id) }}" class="btn btn-secondary">Reset</a>
             </div>
 
         </div>
 
-        <a href="{{ route('laporan-bus.show', $bus->id) }}" class="btn btn-secondary btn-sm">
-            Reset
-        </a>
+        
 
     </form>
 

@@ -29,13 +29,24 @@ class BarangMasukController extends Controller {
             $query->where('supplier', 'like', '%' . $request->supplier . '%');
         }
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal_masuk', $request->bulan);
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal_masuk', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal_masuk', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal_masuk', $request->tahun);
+            }
         }
 
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal_masuk', $request->tahun);
-        }
+        // if ($request->filled('bulan')) {
+        //     $query->whereMonth('tanggal_masuk', $request->bulan);
+        // }
+
+        // if ($request->filled('tahun')) {
+        //     $query->whereYear('tanggal_masuk', $request->tahun);
+        // }
 
         if ($request->filled('kategori_nota')) {
             $query->where('kategori_nota', $request->kategori_nota);
