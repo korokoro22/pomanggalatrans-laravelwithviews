@@ -3,13 +3,13 @@
 @section('title', 'Laporan Bus')
 
 @section('content_header')
-    <h1>Laporan Bus</h1>
+    <h1 style="text-transform: uppercase;">Laporan Bus</h1>
 @stop
 
 @section('content')
 
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
+    <div class="alert alert-success alert-dismissible fade show" style="text-transform: uppercase;">
         {{ session('success') }}
         <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
     </div>
@@ -18,14 +18,14 @@
 {{-- ACTION BUTTON --}}
 <div class="row mb-3">
     <div class="col-md-12">
-        <a href="{{ route('laporan-bus.export-pdf', request()->query()) }}" class="btn btn-success">
+        <a href="{{ route('laporan-bus.export-pdf', request()->query()) }}" class="btn btn-success" style="text-transform: uppercase;">
             <i class="fas fa-file-pdf"></i> Export PDF
         </a>
     </div>
 </div>
 
 {{-- FILTER --}}
-<x-adminlte-card title="Filter Laporan Bus" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Laporan Bus" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form method="GET" action="{{ route('laporan-bus.index') }}">
         <div class="row">
@@ -33,7 +33,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Bus</label>
-                    <select name="bus_id" class="form-control">
+                    <select name="bus_id" class="form-control" style="text-transform: uppercase;">
                         <option value="">-- Semua Bus --</option>
                         @foreach($busList as $bus)
                             <option value="{{ $bus->id }}" {{ request('bus_id') == $bus->id ? 'selected' : '' }}>
@@ -47,7 +47,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Bulan</label>
-                    <select name="bulan" class="form-control">
+                    <select name="bulan" class="form-control" style="text-transform: uppercase;">
                         <option value="">-- Semua Bulan --</option>
                         @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $bln)
                             <option value="{{ $i + 1 }}" {{ request('bulan') == $i + 1 ? 'selected' : '' }}>
@@ -61,7 +61,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Tahun</label>
-                    <select name="tahun" class="form-control">
+                    <select name="tahun" class="form-control" style="text-transform: uppercase;">
                         <option value="">-- Semua Tahun --</option>
                         @foreach(range(date('Y'), 2024) as $t)
                             <option value="{{ $t }}" {{ request('tahun') == $t ? 'selected' : '' }}>{{ $t }}</option>
@@ -73,7 +73,7 @@
         </div>
         <div class="mt-2">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Filter
+                <i class="fas fa-search"></i> FILTER
             </button>
             <a href="{{ route('laporan-bus.index') }}" class="btn btn-secondary">Reset</a>
         </div>
@@ -82,9 +82,9 @@
 </x-adminlte-card>
 
 {{-- TABLE --}}
-<x-adminlte-card title="Daftar Pengeluaran Bus" theme="danger" icon="fas fa-bus">
+<x-adminlte-card title="Daftar Pengeluaran Bus" theme="danger" icon="fas fa-bus" style="text-transform: uppercase;">
 
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped" style="text-transform: uppercase;">
         <thead class="text-center">
             <tr>
                 <th width="5%">No</th>

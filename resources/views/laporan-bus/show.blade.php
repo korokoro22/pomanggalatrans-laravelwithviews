@@ -3,13 +3,13 @@
 @section('title', 'Detail Laporan Bus')
 
 @section('content_header')
-    <h1>Detail Laporan Bus</h1>
+    <h1 style="text-transform: uppercase;">Detail Laporan Bus</h1>
 @stop
 
 @section('content')
 
 {{-- PROFIL BUS --}}
-<x-adminlte-card title="Profil Bus" theme="info" icon="fas fa-bus">
+<x-adminlte-card title="Profil Bus" theme="info" icon="fas fa-bus" style="text-transform: uppercase;">
 
     <div class="row">
         <div class="col-md-6">
@@ -48,7 +48,7 @@
 </x-adminlte-card>
 
 {{-- FILTER --}}
-<x-adminlte-card title="Filter Pengeluaran" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Pengeluaran" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form method="GET" action="{{ route('laporan-bus.show', $bus->id) }}">
 
@@ -57,7 +57,7 @@
             <div class="col-md-5">
                 <div class="form-group">
                     <label>Bulan</label>
-                    <select name="bulan" class="form-control">
+                    <select name="bulan" class="form-control" style="text-transform: uppercase;">
                         <option value="">-- Semua Bulan --</option>
                         @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $bln)
                             <option value="{{ $i + 1 }}" {{ request('bulan') == $i + 1 ? 'selected' : '' }}>
@@ -71,7 +71,7 @@
             <div class="col-md-5">
                 <div class="form-group">
                     <label>Tahun</label>
-                    <select name="tahun" class="form-control">
+                    <select name="tahun" class="form-control" style="text-transform: uppercase;">
                         <option value="">-- Semua Tahun --</option>
                         @foreach(range(date('Y'), 2024) as $t)
                             <option value="{{ $t }}" {{ request('tahun') == $t ? 'selected' : '' }}>{{ $t }}</option>
@@ -82,7 +82,7 @@
 
             <div class="col-md-2 d-flex align-items-end">
                 <div class="form-group w-100">
-                    <button type="submit" class="btn btn-primary btn-block">
+                    <button type="submit" class="btn btn-primary btn-block" style="text-transform: uppercase;">
                         <i class="fas fa-search"></i> Filter
                     </button>
                 </div>
@@ -106,7 +106,7 @@
         $totalBulan = $transaksis->sum('total_transaksi');
     @endphp
 
-    <x-adminlte-card title="Pengeluaran {{ $periode->translatedFormat('F Y') }}" theme="danger" icon="fas fa-arrow-up">
+    <x-adminlte-card style="text-transform: uppercase;" title="Pengeluaran {{ $periode->translatedFormat('F Y') }}" theme="danger" icon="fas fa-arrow-up">
 
         <table class="table table-bordered table-striped">
             <thead class="text-center">

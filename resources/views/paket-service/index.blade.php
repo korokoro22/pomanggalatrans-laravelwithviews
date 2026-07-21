@@ -3,13 +3,13 @@
 @section('title', 'Paket Service')
 
 @section('content_header')
-<h1>Paket Service</h1>
+<h1 style="text-transform: uppercase;">Paket Service</h1>
 @stop
 
 @section('content')
 
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="text-transform: uppercase;">
         {{ session('success') }}
         <button type="button" class="close" data-dismiss="alert">
             <span>&times;</span>
@@ -18,7 +18,7 @@
 @endif
 
 {{-- ACTION BUTTON --}}
-<div class="row mb-3">
+<div class="row mb-3" style="text-transform: uppercase;">
     <div class="col-md-12">
         <a href="{{ route('paket-service.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Paket Service
@@ -30,7 +30,7 @@
 </div>
 
 {{-- FILTER --}}
-<x-adminlte-card title="Filter Paket Service" theme="light" icon="fas fa-filter">
+<x-adminlte-card title="Filter Paket Service" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form action="{{ route('paket-service.index') }}" method="GET">
 
@@ -39,7 +39,7 @@
             <div class="col-md-6">
                 <label>Nama Paket</label>
                 <input type="text"
-                       name="nama_paket"
+                       name="nama_paket" style="text-transform: uppercase;"
                        class="form-control"
                        placeholder="Cari nama paket..."
                        value="{{ request('nama_paket') }}">
@@ -47,7 +47,7 @@
 
             <div class="col-md-6">
                 <label>Bus</label>
-                <select name="bus_id" class="form-control">
+                <select name="bus_id" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Pilih Bus --</option>
                     @foreach ($buses as $bus)
                         <option value="{{ $bus->id }}" {{ request('bus_id') == $bus->id ? 'selected' : '' }}>
@@ -61,7 +61,7 @@
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Filter
+                <i class="fas fa-search"></i> FILTER
             </button>
             <a href="{{ route('paket-service.index') }}" class="btn btn-secondary">
                 Reset
@@ -73,7 +73,7 @@
 </x-adminlte-card>
 
 {{-- TABLE --}}
-<x-adminlte-card title="Daftar Paket Service" theme="primary" icon="fas fa-list">
+<x-adminlte-card title="Daftar Paket Service" theme="primary" icon="fas fa-list" style="text-transform: uppercase;">
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
         <thead>
@@ -120,7 +120,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm w-100">
-                                    Hapus
+                                    HAPUS
                                 </button>
                             </form>
                         </div>

@@ -3,12 +3,12 @@
 @section('title', 'Detail Paket Service')
 
 @section('content_header')
-    <h1>Detail Paket Service</h1>
+    <h1 style="text-transform: uppercase;">Detail Paket Service</h1>
 @stop
 
 @section('content')
 
-<div class="my-3">
+<div class="my-3" style="text-transform: uppercase;">
     <a href="{{ route('paket-service.export-pdf-show', $paketService->id) }}" class="btn btn-success">
         <i class="fas fa-file-pdf"></i> Export PDF
     </a>
@@ -19,7 +19,7 @@
 </div>
 
 {{-- INFORMASI PAKET --}}
-<x-adminlte-card title="Informasi Paket Service" theme="primary" icon="fas fa-list">
+<x-adminlte-card title="Informasi Paket Service" theme="primary" icon="fas fa-list" style="text-transform: uppercase;">
 
     <table class="table table-borderless">
         <tr>
@@ -43,7 +43,7 @@
 </x-adminlte-card>
 
 {{-- ITEM BARANG DALAM PAKET --}}
-<x-adminlte-card title="Item Barang dalam Paket" theme="primary" icon="fas fa-boxes">
+<x-adminlte-card title="Item Barang dalam Paket" theme="primary" icon="fas fa-boxes" style="text-transform: uppercase;">
 
     <table class="table table-bordered table-striped">
         <thead class="text-center">
@@ -89,7 +89,7 @@
 
 </x-adminlte-card>
 
-<div class="mb-3">
+<div class="mb-3" style="text-transform: uppercase;">
     <a href="{{ route('paket-service.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
         Kembali

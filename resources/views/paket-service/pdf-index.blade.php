@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="text-transform: uppercase;">
 <head>
     <meta charset="utf-8">
     <title>Laporan Paket Service</title>

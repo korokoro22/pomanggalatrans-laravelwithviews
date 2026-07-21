@@ -67,12 +67,12 @@
 @stop
 
 @section('content_header')
-<h1>Tambah Paket Service</h1>
+<h1 style="text-transform: uppercase;">Tambah Paket Service</h1>
 @stop
 
 @section('content')
 
-<x-adminlte-card title="Form Paket Service" theme="primary" icon="fas fa-plus-circle">
+<x-adminlte-card title="Form Paket Service" theme="primary" icon="fas fa-plus-circle" style="text-transform: uppercase;">
 
     <form action="{{ route('paket-service.store') }}" method="POST">
         @csrf
@@ -82,6 +82,7 @@
                 <div class="form-group">
                     <label>Bus</label>
                     <select name="bus_id"
+                    style="text-transform: uppercase;"
                             class="form-control @error('bus_id') is-invalid @enderror"
                             required>
                         <option value="">-- Pilih Bus --</option>
@@ -102,6 +103,7 @@
                     <label>Nama Paket</label>
                     <input type="text"
                            name="nama_paket"
+                           style="text-transform: uppercase;"
                            class="form-control @error('nama_paket') is-invalid @enderror"
                            placeholder="Masukkan nama paket"
                            value="{{ old('nama_paket') }}"
@@ -118,6 +120,7 @@
                 <div class="form-group">
                     <label>Harga</label>
                     <input type="number"
+                    style="text-transform: uppercase;"
                            name="harga"
                            class="form-control @error('harga') is-invalid @enderror"
                            placeholder="Masukkan harga paket"
@@ -138,10 +141,10 @@
         <div class="mt-3" id="item-container">
             <div class="row item-row mb-2">
                 <div class="col-md-7">
-                    <select name="items[0][barang_id]" class="form-control select-barang" required>
-                        <option value="">-- Pilih Barang --</option>
+                    <select style="text-transform: uppercase;" name="items[0][barang_id]" class="form-control select-barang" required >
+                        <option value="" style="text-transform: uppercase;">-- Pilih Barang --</option>
                         @foreach ($barangs as $barang)
-                            <option value="{{ $barang['id'] }}">
+                            <option value="{{ $barang['id'] }}" style="text-transform: uppercase;">
                                 {{ $barang['nama_barang'] }} ({{ $barang['kode_barang'] }})
                             </option>
                         @endforeach
@@ -153,6 +156,7 @@
                            class="form-control"
                            placeholder="Qty"
                            min="1"
+                           style="text-transform: uppercase;"
                            required>
                 </div>
                 <div class="col-md-2">
@@ -174,7 +178,7 @@
             <i class="fas fa-arrow-left"></i>
             Kembali
         </a>
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" style="text-transform: uppercase;">
             <i class="fas fa-save"></i>
             Simpan
         </button>

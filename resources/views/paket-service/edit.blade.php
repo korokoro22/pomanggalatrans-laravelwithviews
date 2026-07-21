@@ -67,12 +67,12 @@
 @stop
 
 @section('content_header')
-<h1>Edit Paket Service</h1>
+<h1 style="text-transform: uppercase;">Edit Paket Service</h1>
 @stop
 
 @section('content')
 
-<x-adminlte-card title="Form Edit Paket Service" theme="warning" icon="fas fa-edit">
+<x-adminlte-card title="Form Edit Paket Service" theme="warning" icon="fas fa-edit" style="text-transform: uppercase;">
 
     <form action="{{ route('paket-service.update', $paketService->id) }}" method="POST">
         @csrf
@@ -83,6 +83,7 @@
                 <div class="form-group">
                     <label>Bus</label>
                     <select name="bus_id"
+                            style="text-transform: uppercase;"
                             class="form-control @error('bus_id') is-invalid @enderror"
                             required>
                         <option value="">-- Pilih Bus --</option>
@@ -104,6 +105,7 @@
                     <label>Nama Paket</label>
                     <input type="text"
                            name="nama_paket"
+                           style="text-transform: uppercase;"
                            class="form-control @error('nama_paket') is-invalid @enderror"
                            placeholder="Masukkan nama paket"
                            value="{{ old('nama_paket', $paketService->nama_paket) }}"
@@ -142,7 +144,7 @@
             @foreach ($paketService->paketServiceItem as $index => $item)
             <div class="row item-row mb-2">
                 <div class="col-md-7">
-                    <select name="items[{{ $index }}][barang_id]" class="form-control select-barang" required>
+                    <select style="text-transform: uppercase;" name="items[{{ $index }}][barang_id]" class="form-control select-barang" required>
                         <option value="">-- Pilih Barang --</option>
                         @foreach ($barangs as $barang)
                             <option value="{{ $barang['id'] }}"
@@ -186,7 +188,7 @@
         </a>
         <button type="submit" class="btn btn-warning">
             <i class="fas fa-save"></i>
-            Update
+            UPDATE
         </button>
 
     </form>
@@ -267,15 +269,15 @@
         ).join('');
 
         const rowHtml = `
-            <div class="row item-row mb-2">
+            <div class="row item-row mb-2" style="text-transform: uppercase;">
                 <div class="col-md-7">
-                    <select name="items[${itemIndex}][barang_id]" class="form-control select-barang" required>
+                    <select name="items[${itemIndex}][barang_id]" class="form-control select-barang" required style="text-transform: uppercase;">
                         <option value="">-- Pilih Barang --</option>
                         ${barangOptionsHtml}
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input type="number" name="items[${itemIndex}][qty]" class="form-control" placeholder="Qty" min="1" required>
+                    <input style="text-transform: uppercase;" type="number" name="items[${itemIndex}][qty]" class="form-control" placeholder="Qty" min="1" required>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-danger btn-remove-item">
