@@ -213,7 +213,23 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Harga Jual <small class="text-muted">(per pcs)</small></label>
-                            <input type="number" name="items[{{ $index }}][harga_jual]" class="form-control" placeholder="Harga jual per pcs" min="0" value="{{ old('items.' . $index . '.harga_jual', $detail->harga_jual) }}" style="text-transform: uppercase;" required>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
+                                </div>
+                                <input type="hidden"
+                                    name="items[{{ $index }}][harga_jual]"
+                                    class="input-harga-jual-value"
+                                    value="{{ old('items.' . $index . '.harga_jual', $detail->harga_jual) }}">
+                                <input type="text"
+                                    class="form-control input-harga-jual input-rupiah"
+                                    placeholder="Harga jual per pcs"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    style="text-transform: uppercase;"
+                                    value="{{ number_format(old('items.' . $index . '.harga_jual', $detail->harga_jual), 0, '', '.') }}"
+                                    required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,7 +238,23 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Subtotal <small class="text-muted">(isi manual)</small></label>
-                            <input type="number" name="items[{{ $index }}][subtotal]" class="form-control" placeholder="Masukkan subtotal" min="0" value="{{ old('items.' . $index . '.subtotal', $detail->subtotal) }}" style="text-transform: uppercase;" required>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Rp</span>
+                                </div>
+                                <input type="hidden"
+                                    name="items[{{ $index }}][subtotal]"
+                                    class="input-subtotal-value"
+                                    value="{{ old('items.' . $index . '.subtotal', $detail->subtotal) }}">
+                                <input type="text"
+                                    class="form-control input-subtotal input-rupiah"
+                                    placeholder="Masukkan subtotal"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    style="text-transform: uppercase;"
+                                    value="{{ number_format(old('items.' . $index . '.subtotal', $detail->subtotal), 0, '', '.') }}"
+                                    required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -249,7 +281,22 @@
         <div class="col-md-4 offset-md-8">
             <div class="form-group">
                 <label><strong>Total Keseluruhan</strong></label>
-                <input type="number" name="total" class="form-control" placeholder="Masukkan total keseluruhan" value="{{ $barangMasuk->details->sum('subtotal') }}" min="0" required>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Rp</span>
+                    </div>
+                    <input type="hidden"
+                        name="total"
+                        class="input-total-value"
+                        value="{{ $barangMasuk->details->sum('subtotal') }}">
+                    <input type="text"
+                        class="form-control input-total input-rupiah"
+                        placeholder="Masukkan total keseluruhan"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        value="{{ number_format($barangMasuk->details->sum('subtotal'), 0, '', '.') }}"
+                        required>
+                </div>
             </div>
         </div>
     </div>
@@ -331,6 +378,21 @@
 
             const row = e.target.closest('.item-row');
             if (row) hitungSubtotalItem(row);
+        }
+
+        // Sinkron subtotal item lama yang diedit manual (bukan hasil buildItemRow, yang itu readonly)
+        if (e.target.classList.contains('input-subtotal') && !e.target.readOnly) {
+            const container = e.target.closest('.input-group');
+            const hidden = container.querySelector('.input-subtotal-value');
+            if (hidden) hidden.value = rawValue;
+            hitungTotalKeseluruhan();
+        }
+
+        // Sinkron Total Keseluruhan kalau diedit manual
+        if (e.target.classList.contains('input-total')) {
+            const container = e.target.closest('.input-group');
+            const hidden = container.querySelector('.input-total-value');
+            if (hidden) hidden.value = rawValue;
         }
     });
 
@@ -679,12 +741,11 @@
         const subtotalHidden = row.querySelector('.input-subtotal-value');
         const subtotalVisible = row.querySelector('.input-subtotal');
 
+        // Selalu sinkron subtotal (item lama maupun baru) saat qty_satuan atau harga_jual berubah,
+        // sama seperti perilaku aslinya. User tetap bisa mengetik ulang manual setelahnya jika perlu.
         if (subtotalHidden && subtotalVisible) {
             subtotalHidden.value = subtotal;
             subtotalVisible.value = formatRupiah(subtotal);
-        } else {
-            const subtotalInput = row.querySelector('input[name$="[subtotal]"]');
-            if (subtotalInput) subtotalInput.value = subtotal;
         }
 
         hitungTotalKeseluruhan();
@@ -696,20 +757,18 @@
             const subtotalHidden = row.querySelector('.input-subtotal-value');
             if (subtotalHidden) {
                 total += parseFloat(subtotalHidden.value) || 0;
-            } else {
-                const subtotalInput = row.querySelector('input[name$="[subtotal]"]');
-                total += parseFloat(subtotalInput?.value) || 0;
             }
         });
-        
-        const totalInput = document.querySelector('input[name="total"]');
-        if (totalInput) totalInput.value = total;
+
+        const totalHidden = document.querySelector('.input-total-value');
+        const totalVisible = document.querySelector('.input-total');
+        if (totalHidden) totalHidden.value = total;
+        if (totalVisible) totalVisible.value = formatRupiah(total);
     }
 
-    // Tangkap perubahan input QTY, Harga Jual Biasa, & Harga Jual Format Rupiah
+    // Tangkap perubahan input QTY & Harga Jual Format Rupiah
     document.getElementById('item-container').addEventListener('input', function (e) {
-        if (e.target.matches('input[name$="[qty_satuan]"]') || 
-            e.target.matches('input[name$="[harga_jual]"]') || 
+        if (e.target.matches('input[name$="[qty_satuan]"]') ||
             e.target.matches('.input-harga-jual')) {
             const row = e.target.closest('.item-row');
             hitungSubtotalItem(row);

@@ -201,23 +201,35 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Harga Satuan</label>
-                                <input type="number"
-                                    name="items[0][harga_satuan]"
-                                    class="form-control input-harga-satuan"
-                                    placeholder="Harga per satuan"
-                                    style="text-transform: uppercase;"
-                                    min="0">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[0][harga_satuan]" class="input-harga-satuan-value">
+                                    <input type="text"
+                                        class="form-control input-harga-satuan input-rupiah"
+                                        placeholder="Harga per satuan"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
-                                <input type="number"
-                                    name="items[0][subtotal]"
-                                    class="form-control input-subtotal"
-                                    placeholder="Subtotal"
-                                    style="text-transform: uppercase;"
-                                    min="0">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[0][subtotal]" class="input-subtotal-value">
+                                    <input type="text"
+                                        class="form-control input-subtotal input-rupiah"
+                                        placeholder="Subtotal"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -240,13 +252,19 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Biaya Pengerjaan</label>
-                                <input type="number"
-                                    name="items[0][subtotal]"
-                                    class="form-control input-biaya-pengerjaan"
-                                    placeholder="Masukkan biaya"
-                                    style="text-transform: uppercase;"
-                                    min="0"
-                                    disabled>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[0][subtotal]" class="input-biaya-pengerjaan-value" disabled>
+                                    <input type="text"
+                                        class="form-control input-biaya-pengerjaan input-rupiah"
+                                        placeholder="Masukkan biaya"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        style="text-transform: uppercase;"
+                                        disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -271,13 +289,19 @@
         <div class="col-md-4 offset-md-8">
             <div class="form-group">
                 <label><strong>Total Keseluruhan</strong></label>
-                <input type="number"
-                       name="total"
-                       class="form-control"
-                       placeholder="Total keseluruhan"
-                       style="text-transform: uppercase;"
-                       min="0"
-                       required>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Rp</span>
+                    </div>
+                    <input type="hidden" name="total" class="input-total-value">
+                    <input type="text"
+                           class="form-control input-total input-rupiah"
+                           placeholder="Total keseluruhan"
+                           inputmode="numeric"
+                           autocomplete="off"
+                           style="text-transform: uppercase;"
+                           readonly>
+                </div>
             </div>
         </div>
     </div>
@@ -300,6 +324,57 @@
 @section('js')
 <script>
     let itemIndex = 1;
+
+    // ========== Format & Unformat Rupiah ==========
+    function formatRupiah(angka) {
+        angka = angka.toString().replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function unformatRupiah(str) {
+        return str ? str.toString().replace(/\./g, '') : '';
+    }
+
+    // ========== Auto-format tampilan + sinkron ke hidden pasangannya ==========
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-rupiah') || e.target.readOnly || e.target.disabled) return;
+
+        const cursorPos = e.target.selectionStart;
+        const oldLength = e.target.value.length;
+
+        e.target.value = formatRupiah(e.target.value);
+
+        const newLength = e.target.value.length;
+        const diff = newLength - oldLength;
+        const newPos = Math.max(0, cursorPos + diff);
+        e.target.setSelectionRange(newPos, newPos);
+
+        const rawValue = unformatRupiah(e.target.value);
+        const row = e.target.closest('.item-row');
+
+        if (e.target.classList.contains('input-harga-satuan')) {
+            const hidden = row.querySelector('.input-harga-satuan-value');
+            if (hidden) hidden.value = rawValue;
+            hitungSubtotalItem(row);
+        }
+
+        if (e.target.classList.contains('input-subtotal')) {
+            const hidden = row.querySelector('.input-subtotal-value');
+            if (hidden) hidden.value = rawValue;
+            hitungTotalKeseluruhan();
+        }
+
+        if (e.target.classList.contains('input-biaya-pengerjaan')) {
+            const hidden = row.querySelector('.input-biaya-pengerjaan-value');
+            if (hidden) hidden.value = rawValue;
+            // Untuk tipe biaya_pengerjaan, subtotal_biaya_value INILAH yang jadi subtotal final.
+            // Kita sinkronkan juga ke .input-subtotal-value (yang dibaca hitungTotalKeseluruhan)
+            const subtotalHidden = row.querySelector('.input-subtotal-value');
+            if (subtotalHidden) subtotalHidden.value = rawValue;
+            hitungTotalKeseluruhan();
+        }
+    });
 
     function buildItemRow(index) {
         return `
@@ -349,13 +424,25 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Harga Satuan</label>
-                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Harga per satuan" min="0" style="text-transform: uppercase;">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][harga_satuan]" class="input-harga-satuan-value">
+                                    <input type="text" class="form-control input-harga-satuan input-rupiah" placeholder="Harga per satuan" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
-                                <input type="number" name="items[${index}][subtotal]" class="form-control input-subtotal" placeholder="Subtotal" min="0" style="text-transform: uppercase;">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
+                                    <input type="text" class="form-control input-subtotal input-rupiah" placeholder="Subtotal" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -366,13 +453,19 @@
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label>Keterangan Pengerjaan</label>
-                                <input type="text" name="items[${index}][keterangan]" class="form-control input-keterangan-pengerjaan" placeholder="Contoh: Ongkos bongkar muat, servis darurat di jalan" style="text-transform: uppercase;" required>
+                                <input type="text" name="items[${index}][keterangan]" class="form-control input-keterangan-pengerjaan" placeholder="Contoh: Ongkos bongkar muat, servis darurat di jalan" style="text-transform: uppercase;" required disabled>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Biaya Pengerjaan</label>
-                                <input type="number" name="items[${index}][subtotal]" class="form-control input-biaya-pengerjaan" placeholder="Masukkan biaya" min="0" style="text-transform: uppercase;" required>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][subtotal]" class="input-biaya-pengerjaan-value" disabled>
+                                    <input type="text" class="form-control input-biaya-pengerjaan input-rupiah" placeholder="Masukkan biaya" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;" required disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -398,6 +491,7 @@
         if (e.target.closest('.btn-remove-item')) {
             e.target.closest('.item-row').remove();
             updateRemoveButtons();
+            hitungTotalKeseluruhan();
         }
     });
 
@@ -409,45 +503,34 @@
         });
     }
 
+    // ========== Hitung subtotal per item (Per Item: qty x harga) ==========
     function hitungSubtotalItem(row) {
-        const qtyInput   = row.querySelector('input[name$="[qty]"]');
-        const hargaInput = row.querySelector('input[name$="[harga_satuan]"]');
-        const subtotalInput = row.querySelector('input[name$="[subtotal]"]');
+        const qty   = parseFloat(row.querySelector('.input-qty')?.value) || 0;
+        const harga = parseFloat(row.querySelector('.input-harga-satuan-value')?.value) || 0;
+        const subtotal = qty * harga;
 
-        const qty   = parseFloat(qtyInput.value) || 0;
-        const harga = parseFloat(hargaInput.value) || 0;
+        const subtotalDisplay = row.querySelector('.input-subtotal');
+        const subtotalHidden  = row.querySelector('.input-subtotal-value');
+        if (subtotalDisplay) subtotalDisplay.value = formatRupiah(subtotal);
+        if (subtotalHidden)  subtotalHidden.value  = subtotal;
 
-        subtotalInput.value = qty * harga;
+        hitungTotalKeseluruhan();
     }
 
+    // ========== Hitung total keseluruhan (baca dari hidden, angka mentah) ==========
     function hitungTotalKeseluruhan() {
         let total = 0;
-        document.querySelectorAll('.item-row input[name$="[subtotal]"]').forEach(function (input) {
-            total += parseFloat(input.value) || 0;
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            const tipe = row.querySelector('.tipe-radio:checked')?.value;
+            if (tipe === 'biaya_pengerjaan') {
+                total += parseFloat(row.querySelector('.input-biaya-pengerjaan-value')?.value) || 0;
+            } else {
+                total += parseFloat(row.querySelector('.input-subtotal-value')?.value) || 0;
+            }
         });
-        document.querySelector('input[name="total"]').value = total;
+        document.querySelector('.input-total').value       = formatRupiah(total);
+        document.querySelector('.input-total-value').value = total;
     }
-
-    // ========== Event: ganti tipe item ==========
-    // document.getElementById('item-container').addEventListener('change', function (e) {
-    //     if (e.target.classList.contains('tipe-radio')) {
-    //         const row = e.target.closest('.item-row');
-    //         const sectionPerItem = row.querySelector('.section-per-item');
-    //         const sectionBiaya   = row.querySelector('.section-biaya-pengerjaan');
-
-    //         if (e.target.value === 'biaya_pengerjaan') {
-    //             sectionPerItem.style.display = 'none';
-    //             sectionBiaya.style.display   = 'block';
-    //         } else {
-    //             sectionPerItem.style.display = 'block';
-    //             sectionBiaya.style.display   = 'none';
-    //         }
-
-    //         // reset subtotal saat ganti tipe
-    //         row.querySelector('.input-subtotal').value = 0;
-    //         hitungTotalKeseluruhan();
-    //     }
-    // });
 
     // ========== Event: ganti tipe item ==========
     document.getElementById('item-container').addEventListener('change', function (e) {
@@ -460,7 +543,7 @@
                 sectionPerItem.style.display = 'none';
                 // Matikan input per_item agar tidak dikirim
                 sectionPerItem.querySelectorAll('input').forEach(i => i.disabled = true);
-                
+
                 sectionBiaya.style.display   = 'block';
                 // Nyalakan input biaya_pengerjaan agar dikirim
                 sectionBiaya.querySelectorAll('input').forEach(i => i.disabled = false);
@@ -468,40 +551,45 @@
                 sectionPerItem.style.display = 'block';
                 // Nyalakan input per_item
                 sectionPerItem.querySelectorAll('input').forEach(i => i.disabled = false);
-                
+
                 sectionBiaya.style.display   = 'none';
                 // Matikan input biaya_pengerjaan agar tidak dikirim
                 sectionBiaya.querySelectorAll('input').forEach(i => i.disabled = true);
             }
 
             // reset subtotal saat ganti tipe
-            const subtotalInput = row.querySelector('.input-subtotal');
-            if(subtotalInput) subtotalInput.value = 0;
-            
-            const biayaInput = row.querySelector('.input-biaya-pengerjaan');
-            if(biayaInput) biayaInput.value = '';
+            const subtotalDisplay = row.querySelector('.input-subtotal');
+            const subtotalHidden  = row.querySelector('.input-subtotal-value');
+            if (subtotalDisplay) subtotalDisplay.value = formatRupiah(0);
+            if (subtotalHidden)  subtotalHidden.value  = 0;
+
+            const biayaDisplay = row.querySelector('.input-biaya-pengerjaan');
+            const biayaHidden  = row.querySelector('.input-biaya-pengerjaan-value');
+            if (biayaDisplay) biayaDisplay.value = '';
+            if (biayaHidden)  biayaHidden.value  = 0;
 
             hitungTotalKeseluruhan();
         }
     });
 
-
-    // ========== Event: hitung subtotal ==========
+    // ========== Event: hitung subtotal per item saat qty berubah ==========
     document.getElementById('item-container').addEventListener('input', function (e) {
-        // Per Item: qty x harga
-        if (e.target.matches('input[name$="[qty]"]') || e.target.matches('input[name$="[harga_satuan]"]')) {
+        if (e.target.classList.contains('input-qty')) {
             const row = e.target.closest('.item-row');
             hitungSubtotalItem(row);
         }
-
-        // Semua tipe (Per Item hasil hitung, atau Biaya Pengerjaan input manual) ikut dihitung ke total
-        if (e.target.matches('input[name$="[subtotal]"]') ||
-            e.target.matches('input[name$="[qty]"]') ||
-            e.target.matches('input[name$="[harga_satuan]"]')) {
-            hitungTotalKeseluruhan();
-        }
     });
 
+    // ========== Pengaman terakhir sebelum submit ==========
+    document.querySelector('form').addEventListener('submit', function () {
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            const tipe = row.querySelector('.tipe-radio:checked')?.value;
+            if (tipe === 'per_item') {
+                hitungSubtotalItem(row);
+            }
+        });
+        hitungTotalKeseluruhan();
+    });
 </script>
 @stop
 

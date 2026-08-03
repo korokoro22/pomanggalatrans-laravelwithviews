@@ -122,21 +122,21 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        {{-- <div class="col-md-6">
             <div class="form-group">
                 <label>Kategori</label>
                 <select name="items[0][kategori]" class="form-control select-kategori" required style="text-transform: uppercase;">
-                    <option value="">-- Pilih / Ketik Kategori --</option>
+                    <option value="">-- Pilih / Ketik Kategori --</option> --}}
                     
                     {{-- Loop kategori yang sudah ada dari Controller --}}
-                    @foreach($kategoriList ?? [] as $kat)
+                    {{-- @foreach($kategoriList ?? [] as $kat)
                         <option value="{{ $kat }}">{{ ucwords(str_replace('_', ' ', $kat)) }}</option>
                     @endforeach
                     
                     <option value="item_bebas">Item Bebas</option>
                 </select>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-md-6">
             <div class="form-group">

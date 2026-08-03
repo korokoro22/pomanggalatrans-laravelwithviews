@@ -313,7 +313,7 @@ class BarangMasukController extends Controller {
             'supplier'              => 'required|string',
             'penerima'              => 'required|string',
             'bukti_nota'            => 'nullable|image|mimes:jpg,jpeg,png|max:6144',
-            'kategori_nota'         => 'required|in:nota_bengkel,nota_jalan',
+            'kategori_nota'         => 'in:nota_bengkel,nota_jalan',
 
             'items'                      => 'required|array|min:1',
             'items.*.jenis'              => 'required|in:barang_baru,barang_ada',
@@ -359,7 +359,8 @@ class BarangMasukController extends Controller {
             $barangMasuk = Barang_masuk::create([
                 'no_invoice'    => $request->no_invoice,
                 'supplier'      => $request->supplier,
-                'kategori_nota' => $request->kategori_nota,
+                // 'kategori_nota' => $request->kategori_nota,
+                'kategori_nota' => 'nota_bengkel',
                 'penerima'      => $request->penerima,
                 'tanggal_masuk' => $request->tanggal_masuk,
                 'bukti_nota'    => $buktiNotaPath,

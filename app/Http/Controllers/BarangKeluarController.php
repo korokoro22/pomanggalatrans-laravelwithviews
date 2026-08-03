@@ -306,29 +306,33 @@ class BarangKeluarController extends Controller {
                                 'subtotal'            => $subtotal,
                             ]);
 
-                    } else {
+                    }  else {
 
-                        $barang = Barang::findOrFail($item['barang_id']);
+                            $barang = Barang    ::findOrFail($item['barang_id']);
 
-                        if ($barang->stok_saat_ini < $item['qty']) {
-                            throw new \Exception("Stok {$barang->nama_barang} tidak mencukupi. Stok tersedia: {$barang->stok_saat_ini} {$barang->satuan}.");
+                            if ($barang->stok_saat_ini < $item['qty']) {
+                                throw new \Exception("Stok {$barang->nama_barang} tidak mencukupi. Stok tersedia: {$barang->stok_saat_ini} {$barang->satuan}.");
+                            }
+
+                            $hargaSatuan = isset($item['harga_satuan']) && $item['harga_satuan'] > 0
+                                ? $item['harga_satuan']
+                                : $barang->harga_jual;
+
+                            $subtotal = $hargaSatuan * $item['qty'];
+
+                            Transaksi_keluar_detail::create([
+                                'transaksi_keluar_id' => $transaksi->id,
+                                'tipe'                => 'per_item',
+                                'barang_id'           => $barang->id,
+                                'nama_item'           => $barang->nama_barang,
+                                'qty'                 => $item['qty'],
+                                'satuan'              => $barang->satuan,
+                                'harga_satuan'        => $hargaSatuan,
+                                'subtotal'            => $subtotal,
+                            ]);
+
+                            $barang->decrement('stok_saat_ini', $item['qty']);
                         }
-
-                        $subtotal = $barang->harga_jual * $item['qty'];
-
-                        Transaksi_keluar_detail::create([
-                            'transaksi_keluar_id' => $transaksi->id,
-                            'tipe'                => 'per_item',
-                            'barang_id'           => $barang->id,
-                            'nama_item'           => $barang->nama_barang,
-                            'qty'                 => $item['qty'],
-                            'satuan'              => $barang->satuan,
-                            'harga_satuan'        => $barang->harga_jual,
-                            'subtotal'            => $subtotal,
-                        ]);
-
-                        $barang->decrement('stok_saat_ini', $item['qty']);
-                    }
 
                     $totalTransaksi += $subtotal;
                 }

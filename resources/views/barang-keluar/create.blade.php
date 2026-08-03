@@ -501,10 +501,9 @@
 
     // ========== Fungsi Preview Gambar ==========
     function showPreview(event, src) {
-        // Mencegah select2 menganggap ini sebagai klik item (mencegah dropdown tertutup)
         event.preventDefault();
         event.stopPropagation();
-        
+
         const overlay = document.getElementById('image-preview-overlay');
         const img = document.getElementById('image-preview-src');
         img.src = src;
@@ -636,14 +635,16 @@
             }
         });
 
+        // ========== FIX #1: pakai hargaBersih (bukan b.harga_jual mentah) ==========
         select.on('change', function () {
             const barangId = $(this).val();
             const b = barangs[parseInt(barangId)] || barangs[barangId];
             const r = $(this).closest('.item-row')[0];
 
             if (b) {
-                r.querySelector('.input-harga-satuan').value       = formatRupiah(b.harga_jual);
-                r.querySelector('.input-harga-satuan-value').value = b.harga_jual;
+                const hargaBersih = Math.round(parseFloat(b.harga_jual));
+                r.querySelector('.input-harga-satuan').value       = formatRupiah(hargaBersih);
+                r.querySelector('.input-harga-satuan-value').value = hargaBersih;
                 r.querySelector('.input-satuan').value             = b.satuan;
             } else {
                 r.querySelector('.input-harga-satuan').value       = '';
@@ -919,11 +920,13 @@
             resetSubtotal(row);
         }
 
+        // ========== FIX #2: sudah benar, tetap pertahankan ==========
         if (e.target.classList.contains('select-paket')) {
-            const harga = e.target.selectedOptions[0]?.dataset.harga || 0;
-            row.querySelector('.input-harga-paket').value = formatRupiah(harga);
-            row.querySelector('.section-paket-service .input-subtotal').value       = formatRupiah(harga);
-            row.querySelector('.section-paket-service .input-subtotal-value').value = harga;
+            const hargaMentah = e.target.selectedOptions[0]?.dataset.harga || 0;
+            const hargaBersih = Math.round(parseFloat(hargaMentah));
+            row.querySelector('.input-harga-paket').value = formatRupiah(hargaBersih);
+            row.querySelector('.section-paket-service .input-subtotal').value       = formatRupiah(hargaBersih);
+            row.querySelector('.section-paket-service .input-subtotal-value').value = hargaBersih;
             hitungTotal();
         }
     });
@@ -1064,6 +1067,7 @@
         }
     });
 
+    // ========== FIX #3: pakai hargaScanBersih (bukan scannedBarang.harga_jual mentah) ==========
     document.getElementById('btn-tambah-ke-form').addEventListener('click', function () {
         if (!scannedBarang) return;
 
@@ -1094,8 +1098,9 @@
 
         $(targetRow).find('.select-barang').val(scannedBarang.id).trigger('change');
 
-        targetRow.querySelector('.input-harga-satuan').value       = formatRupiah(scannedBarang.harga_jual);
-        targetRow.querySelector('.input-harga-satuan-value').value = scannedBarang.harga_jual;
+        const hargaScanBersih = Math.round(parseFloat(scannedBarang.harga_jual));
+        targetRow.querySelector('.input-harga-satuan').value       = formatRupiah(hargaScanBersih);
+        targetRow.querySelector('.input-harga-satuan-value').value = hargaScanBersih;
         targetRow.querySelector('.input-satuan').value             = scannedBarang.satuan;
         targetRow.querySelector('.input-qty').value                = '';
 

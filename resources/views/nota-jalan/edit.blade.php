@@ -202,27 +202,45 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Harga Satuan</label>
-                                    <input type="number"
-                                           name="items[{{ $i }}][harga_satuan]"
-                                           style="text-transform: uppercase;"
-                                           class="form-control input-harga-satuan"
-                                           placeholder="Harga per satuan"
-                                           value="{{ $detail->harga_satuan }}"
-                                           min="0"
-                                           required>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Rp</span>
+                                        </div>
+                                        <input type="hidden"
+                                               name="items[{{ $i }}][harga_satuan]"
+                                               class="input-harga-satuan-value"
+                                               value="{{ $detail->harga_satuan }}">
+                                        <input type="text"
+                                               style="text-transform: uppercase;"
+                                               class="form-control input-harga-satuan input-rupiah"
+                                               placeholder="Harga per satuan"
+                                               inputmode="numeric"
+                                               autocomplete="off"
+                                               value="{{ number_format($detail->harga_satuan, 0, '', '.') }}"
+                                               required>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
-                                    <input type="number"
-                                           name="items[{{ $i }}][subtotal]"
-                                           style="text-transform: uppercase;"
-                                           class="form-control input-subtotal"
-                                           placeholder="Subtotal"
-                                           value="{{ $detail->subtotal }}"
-                                           min="0"
-                                           required>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Rp</span>
+                                        </div>
+                                        <input type="hidden"
+                                               name="items[{{ $i }}][subtotal]"
+                                               class="input-subtotal-value"
+                                               value="{{ $detail->subtotal }}">
+                                        <input type="text"
+                                               style="text-transform: uppercase;"
+                                               class="form-control input-subtotal input-rupiah"
+                                               placeholder="Subtotal"
+                                               inputmode="numeric"
+                                               autocomplete="off"
+                                               value="{{ number_format($detail->subtotal, 0, '', '.') }}"
+                                               required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -247,14 +265,23 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Biaya Pengerjaan</label>
-                                    <input type="number"
-                                           name="items[{{ $i }}][subtotal]"
-                                           class="form-control input-biaya-pengerjaan"
-                                           placeholder="Masukkan biaya"
-                                           style="text-transform: uppercase;"
-                                           value="{{ $detail->subtotal }}"
-                                           min="0"
-                                           required>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Rp</span>
+                                        </div>
+                                        <input type="hidden"
+                                               name="items[{{ $i }}][subtotal]"
+                                               class="input-subtotal-value"
+                                               value="{{ $detail->subtotal }}">
+                                        <input type="text"
+                                               class="form-control input-biaya-pengerjaan input-rupiah"
+                                               placeholder="Masukkan biaya"
+                                               style="text-transform: uppercase;"
+                                               inputmode="numeric"
+                                               autocomplete="off"
+                                               value="{{ number_format($detail->subtotal, 0, '', '.') }}"
+                                               required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -281,12 +308,19 @@
         <div class="col-md-4 offset-md-8">
             <div class="form-group">
                 <label><strong>Total Keseluruhan</strong></label>
-                <input  type="number"
-                        name="total"
-                        class="form-control"
-                        value="{{ old('total', $notaJalan->total_transaksi) }}"
-                        min="0"
-                        required>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Rp</span>
+                    </div>
+                    <input type="hidden"
+                           name="total"
+                           class="input-total-value"
+                           value="{{ old('total', $notaJalan->total_transaksi) }}">
+                    <input type="text"
+                           class="form-control input-total input-rupiah"
+                           value="{{ number_format(old('total', $notaJalan->total_transaksi), 0, '', '.') }}"
+                           required>
+                </div>
             </div>
         </div>
     </div>
@@ -309,6 +343,54 @@
 @section('js')
 <script>
     let itemIndex = {{ $notaJalan->details->count() }};
+
+    // ========== Format & Unformat Rupiah ==========
+    function formatRupiah(angka) {
+        angka = angka.toString().replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function unformatRupiah(str) {
+        return str ? str.toString().replace(/\./g, '') : '';
+    }
+
+    // ========== Auto-format tampilan + sinkron ke hidden pasangannya (real-time) ==========
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-rupiah') || e.target.disabled) return;
+
+        const cursorPos = e.target.selectionStart;
+        const oldLength = e.target.value.length;
+
+        e.target.value = formatRupiah(e.target.value);
+
+        const newLength = e.target.value.length;
+        const diff = newLength - oldLength;
+        const newPos = Math.max(0, cursorPos + diff);
+        e.target.setSelectionRange(newPos, newPos);
+
+        const rawValue = unformatRupiah(e.target.value);
+        const container = e.target.closest('.input-group');
+
+        if (e.target.classList.contains('input-harga-satuan')) {
+            const hidden = container.querySelector('.input-harga-satuan-value');
+            if (hidden) hidden.value = rawValue;
+
+            const row = e.target.closest('.item-row');
+            if (row) hitungSubtotalItem(row);
+        }
+
+        if (e.target.classList.contains('input-subtotal') || e.target.classList.contains('input-biaya-pengerjaan')) {
+            const hidden = container.querySelector('.input-subtotal-value');
+            if (hidden) hidden.value = rawValue;
+            hitungTotalKeseluruhan();
+        }
+
+        if (e.target.classList.contains('input-total')) {
+            const hidden = container.querySelector('.input-total-value');
+            if (hidden) hidden.value = rawValue;
+        }
+    });
 
     function buildItemRow(index) {
         // Saat form item baru dibuat, opsi tipe radio button ditampilkan
@@ -359,13 +441,25 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Harga Satuan</label>
-                                <input type="number" name="items[${index}][harga_satuan]" class="form-control input-harga-satuan" placeholder="Harga per satuan" min="0" style="text-transform: uppercase;">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][harga_satuan]" class="input-harga-satuan-value">
+                                    <input type="text" class="form-control input-harga-satuan input-rupiah" placeholder="Harga per satuan" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Subtotal <small class="text-muted">(otomatis, bisa diedit)</small></label>
-                                <input type="number" name="items[${index}][subtotal]" class="form-control input-subtotal" placeholder="Subtotal" min="0" style="text-transform: uppercase;">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
+                                    <input type="text" class="form-control input-subtotal input-rupiah" placeholder="Subtotal" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -382,7 +476,13 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Biaya Pengerjaan</label>
-                                <input type="number" name="items[${index}][subtotal]" class="form-control input-biaya-pengerjaan" placeholder="Masukkan biaya" min="0" style="text-transform: uppercase;" disabled>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value" disabled>
+                                    <input type="text" class="form-control input-biaya-pengerjaan input-rupiah" placeholder="Masukkan biaya" inputmode="numeric" autocomplete="off" style="text-transform: uppercase;" disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -421,23 +521,33 @@
     }
 
     function hitungSubtotalItem(row) {
-        const qtyInput   = row.querySelector('.section-per-item input[name$="[qty]"]');
-        const hargaInput = row.querySelector('.section-per-item input[name$="[harga_satuan]"]');
-        const subtotalInput = row.querySelector('.section-per-item input[name$="[subtotal]"]');
+        const qtyInput      = row.querySelector('.section-per-item input[name$="[qty]"]');
+        const hargaHidden   = row.querySelector('.section-per-item .input-harga-satuan-value');
+        const subtotalHidden  = row.querySelector('.section-per-item .input-subtotal-value');
+        const subtotalVisible = row.querySelector('.section-per-item .input-subtotal');
 
         const qty   = parseFloat(qtyInput?.value) || 0;
-        const harga = parseFloat(hargaInput?.value) || 0;
+        const harga = parseFloat(hargaHidden?.value) || 0;
+        const subtotal = qty * harga;
 
-        if (subtotalInput) subtotalInput.value = qty * harga;
+        if (subtotalHidden) subtotalHidden.value = subtotal;
+        if (subtotalVisible) subtotalVisible.value = formatRupiah(subtotal);
+
+        hitungTotalKeseluruhan();
     }
 
     function hitungTotalKeseluruhan() {
         let total = 0;
-        // Hanya jumlahkan input subtotal yang TIDAK disabled
-        document.querySelectorAll('.item-row input[name$="[subtotal]"]:not([disabled])').forEach(function (input) {
-            total += parseFloat(input.value) || 0;
+        // Hanya jumlahkan subtotal dari section yang aktif (tidak disabled)
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            const hidden = row.querySelector('.input-subtotal-value:not([disabled])');
+            if (hidden) total += parseFloat(hidden.value) || 0;
         });
-        document.querySelector('input[name="total"]').value = total;
+
+        const totalHidden  = document.querySelector('.input-total-value');
+        const totalVisible = document.querySelector('.input-total');
+        if (totalHidden) totalHidden.value = total;
+        if (totalVisible) totalVisible.value = formatRupiah(total);
     }
 
     // ========== Event: ganti tipe item ==========
@@ -450,34 +560,29 @@
             if (e.target.value === 'biaya_pengerjaan') {
                 sectionPerItem.style.display = 'none';
                 sectionPerItem.querySelectorAll('input').forEach(i => i.disabled = true);
-                
+
                 sectionBiaya.style.display   = 'block';
                 sectionBiaya.querySelectorAll('input').forEach(i => i.disabled = false);
             } else {
                 sectionPerItem.style.display = 'block';
                 sectionPerItem.querySelectorAll('input').forEach(i => i.disabled = false);
-                
+
                 sectionBiaya.style.display   = 'none';
                 sectionBiaya.querySelectorAll('input').forEach(i => i.disabled = true);
             }
 
-            // Kosongkan nilai subtotal agar tidak bingung
-            row.querySelectorAll('input[name$="[subtotal]"]').forEach(i => i.value = '');
+            // Kosongkan nilai subtotal (tampilan & hidden) agar tidak bingung
+            row.querySelectorAll('.input-subtotal-value').forEach(i => i.value = '');
+            row.querySelectorAll('.input-subtotal, .input-biaya-pengerjaan').forEach(i => i.value = '');
             hitungTotalKeseluruhan();
         }
     });
 
-    // ========== Event: hitung subtotal ==========
+    // ========== Event: hitung subtotal (qty berubah) ==========
     document.getElementById('item-container').addEventListener('input', function (e) {
-        if (e.target.matches('input[name$="[qty]"]') || e.target.matches('input[name$="[harga_satuan]"]')) {
+        if (e.target.matches('input[name$="[qty]"]')) {
             const row = e.target.closest('.item-row');
             hitungSubtotalItem(row);
-        }
-
-        if (e.target.matches('input[name$="[subtotal]"]') ||
-            e.target.matches('input[name$="[qty]"]') ||
-            e.target.matches('input[name$="[harga_satuan]"]')) {
-            hitungTotalKeseluruhan();
         }
     });
 
