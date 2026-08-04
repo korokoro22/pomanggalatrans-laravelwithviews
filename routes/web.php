@@ -58,5 +58,5 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('laporan-barang', [LaporanBarangController::class, 'index'])->name('laporan-barang.index');
-Route::get('laporan-barang/export-pdf', [LaporanBarangController::class, 'exportPdf'])->name('laporan-barang.export-pdf');
+    Route::get('laporan-barang/export-pdf', [LaporanBarangController::class, 'exportPdf'])->name('laporan-barang.export-pdf');
 });

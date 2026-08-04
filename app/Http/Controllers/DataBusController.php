@@ -50,13 +50,47 @@ class DataBusController extends Controller {
                          ->with('success', 'Data bus berhasil ditambahkan.');
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $bus = Bus::with([
-            'transaksiKeluar.details.barang'
-        ])->findOrFail($id);
-
-        return view('data-bus.show', compact('bus'));
+        $bus = Bus::findOrFail($id);
+    
+        // ===== Query dasar riwayat pengeluaran, urut terbaru duluan =====
+        $query = $bus->transaksiKeluar()
+            ->with('details.barang')
+            ->orderByDesc('tanggal');
+    
+        // ===== Filter: nama item (dari salah satu detail transaksi) =====
+        if ($request->filled('nama_item')) {
+            $query->whereHas('details', function ($q) use ($request) {
+                $q->where('nama_item', 'like', '%' . $request->nama_item . '%');
+            });
+        }
+    
+        // ===== Filter: kategori nota =====
+        if ($request->filled('kategori_nota')) {
+            $query->where('kategori', $request->kategori_nota);
+        }
+    
+        // ===== Filter: tanggal spesifik ATAU bulan/tahun =====
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        } else {
+            if ($request->filled('bulan')) {
+                $query->whereMonth('tanggal', $request->bulan);
+            }
+            if ($request->filled('tahun')) {
+                $query->whereYear('tanggal', $request->tahun);
+            }
+        }
+    
+        // ===== Total pengeluaran dihitung dari SEMUA data yang match filter =====
+        // (bukan dari hasil paginate, supaya tidak salah hitung — hanya menjumlah 1 halaman)
+        $totalPengeluaran = (clone $query)->sum('total_transaksi');
+    
+        // ===== Data untuk ditampilkan (dengan pagination) =====
+        $transaksiKeluar = $query->paginate(15)->withQueryString();
+    
+        return view('data-bus.show', compact('bus', 'transaksiKeluar', 'totalPengeluaran'));
     }
 
     public function edit($id)
