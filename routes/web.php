@@ -57,6 +57,14 @@ Route::middleware('auth')->group(function () {
     Route::get('paket-service-export/{id}', [PaketServiceController::class, 'exportPdfShow'])->name('paket-service.export-pdf-show');
 
 
+    
+
     Route::get('laporan-barang', [LaporanBarangController::class, 'index'])->name('laporan-barang.index');
     Route::get('laporan-barang/export-pdf', [LaporanBarangController::class, 'exportPdf'])->name('laporan-barang.export-pdf');
+    Route::get('/generate', function(){
+   \Illuminate\Support\Facades\Artisan::call('storage:link');
+   echo 'ok';
 });
+    
+});
+

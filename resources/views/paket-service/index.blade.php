@@ -82,6 +82,8 @@
                 <th>Nama Bus</th>
                 <th>Plat Nomor</th>
                 <th>Nama Paket</th>
+                {{-- REVISI:KATEGORI PAKET SERVICE --}}
+                <th>Kategori</th>
                 <th>Harga</th>
                 <th>Item Barang</th>
                 <th>Aksi</th>
@@ -91,9 +93,17 @@
             @forelse ($paketServices as $index => $paket)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $paket->bus->nama_bus }}</td>
-                <td>{{ $paket->bus->plat_nomor }}</td>
-                <td>{{ $paket->nama_paket }}</td>
+                <td>{{ $paket->bus_id === null ? 'Semua Bus' : $paket->bus->nama_bus }}</td>
+                <td>{{ $paket->bus_id === null ? '-' : $paket->bus->plat_nomor }}</td>
+                <td>
+                    {{ $paket->nama_paket }}
+                    {{-- REVISI: PAKET NON-ITEM --}}
+                    @if($paket->paketServiceItem->isEmpty())
+                        <span class="badge badge-warning ml-1">Tanpa Item</span>
+                    @endif
+                </td>
+                {{-- REVISI:KATEGORI PAKET SERVICE --}}
+                <td>{{ $paket->kategori === 'paket_oli' ? 'Paket Oli' : 'Paket Reguler' }}</td>
                 <td>Rp {{ number_format($paket->harga, 0, ',', '.') }}</td>
                 <td>
                     @forelse ($paket->paketServiceItem as $item)

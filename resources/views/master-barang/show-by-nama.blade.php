@@ -33,7 +33,7 @@
 
         <div class="row">
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label>Gudang</label>
                 <select name="gudang" class="form-control" style="text-transform: uppercase;">
                     <option value="">-- Semua Gudang --</option>
@@ -42,8 +42,17 @@
                     <option value="gudang_3"     {{ request('gudang') == 'gudang_3'     ? 'selected' : '' }}>Gudang 3</option>
                 </select>
             </div>
+            
+            <div class="col-md-2">
+                <label>Kondisi</label>
+                <select name="kondisi" class="form-control" style="text-transform: uppercase;">
+                    <option value="">-- Semua --</option>
+                    <option value="baru"  {{ request('kondisi') == 'baru'  ? 'selected' : '' }}>Baru</option>
+                    <option value="bekas" {{ request('kondisi') == 'bekas' ? 'selected' : '' }}>Bekas</option>
+                </select>
+            </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Tanggal (spesifik)</label>
                     <input type="date"
@@ -113,9 +122,9 @@
             <thead class="text-center">
                 <tr>
                     <th width="5%">No</th>
-                    <th>Kode Barang</th>
                     <th>Foto</th>
                     <th>Kategori</th>
+                    <th>Kondisi</th>
                     <th>Gudang</th>
                     <th>Stok Saat Ini</th>
                     <th>Harga Jual</th>
@@ -127,7 +136,6 @@
                 @forelse ($barangs as $index => $barang)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $barang->kode_barang }}</td>
                     <td class="text-center">
                         @if ($barang->foto)
                             <img src="{{ asset('storage/' . $barang->foto) }}"
@@ -147,13 +155,24 @@
                             <span class="badge badge-secondary">Item Bebas</span>
                         @endif
                     </td>
+                    <td class="text-center">
+                        @if($barang->kondisi === 'bekas')
+                            <span class="badge badge-secondary"><i class="fas fa-recycle"></i> Bekas</span>
+                        @else
+                            <span class="badge badge-success"><i class="fas fa-check-circle"></i> Baru</span>
+                        @endif
+                    </td>
                     <td class="text-center">{{ str_replace('_', ' ', $barang->gudang) }}</td>
                     <td class="text-center">
                         <span class="{{ $barang->stok_saat_ini <= 5 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold' }}">
                             {{ number_format($barang->stok_saat_ini) }} Pcs
                         </span>
                         @if ($barang->stok_saat_ini <= 5)
-                            <span class="badge badge-danger ml-1">Menipis</span>
+                            @if ($barang->stok_saat_ini > 0)
+                                <span class="badge badge-danger ml-1">Menipis</span>
+                            @else
+                                <span class="badge badge-danger ml-1">Habis</span>
+                            @endif
                         @endif
                     </td>
                     <td class="text-right">

@@ -15,7 +15,7 @@
 
         <div class="row">
 
-            <div class="col-md-6">
+            <div class="col-md-6" style="display:none">
                 <div class="form-group">
                     <label>Nama Bus</label>
                     <input type="text"
@@ -23,8 +23,8 @@
                            class="form-control @error('nama_bus') is-invalid @enderror"
                            placeholder="Contoh: Bus 01"
                            style="text-transform: uppercase;"
-                           value="{{ old('nama_bus') }}"
-                           required>
+                           value="-"
+                           >
                     @error('nama_bus')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

@@ -12,8 +12,8 @@ class DataBusController extends Controller {
     {
         $query = Bus::orderBy('created_at', 'desc');
 
-        if ($request->filled('nama_bus')) {
-            $query->where('nama_bus', 'like', '%' . $request->nama_bus . '%');
+        if ($request->filled('nama_driver')) {
+            $query->where('nama_driver', 'like', '%' . $request->nama_driver . '%');
         }
 
         if ($request->filled('plat_nomor')) {
@@ -33,7 +33,7 @@ class DataBusController extends Controller {
     public function store(Request $request)
     {
         $request->validate([
-            'nama_bus'    => 'required|string',
+            'nama_bus'    => 'string',
             'plat_nomor'  => 'required|string|unique:bus,plat_nomor',
             'rute_trayek' => 'nullable|string',
             'nama_driver' => 'required|string',
@@ -102,7 +102,7 @@ class DataBusController extends Controller {
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_bus'    => 'required|string',
+            'nama_bus'    => 'string',
             'plat_nomor'  => 'required|string|unique:bus,plat_nomor,' . $id,
             'rute_trayek' => 'nullable|string',
             'nama_driver' => 'required|string',

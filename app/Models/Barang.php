@@ -16,8 +16,10 @@ class Barang extends Model
         'nama_barang',
         'kategori',
         'gudang',        // tambah ini
+        'jenis_pembelian', // REVISI: JENIS PEMBELIAN
         'qty',
         'satuan',
+        'kondisi',
         'harga_jual',
         'qty_satuan',
         'stok_saat_ini',

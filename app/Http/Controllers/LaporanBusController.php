@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Bus;
 use App\Models\Transaksi_keluar;
-use App\Models\Transaksi_keluar as ModelsTransaksi_keluar;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,14 +14,11 @@ class LaporanBusController extends Controller
     {
         $busList = Bus::orderBy('nama_bus')->get();
 
-        // Pastikan select dan join dengan nama tabel yang sesuai di Model
         $query = Transaksi_keluar::select('transaksi_keluar.*')
             ->join('bus', 'transaksi_keluar.bus_id', '=', 'bus.id')
             ->with('bus', 'details')
-            // REVISI PENTING: Gunakan plat_nomor sebagai pengurutan utama agar tidak terselip
-            ->orderBy('bus.plat_nomor', 'asc') 
-            // Baru setelah plat dikelompokkan, urutkan berdasarkan waktu di dalam masing-masing plat
-            ->orderBy('transaksi_keluar.tanggal', 'desc'); 
+            ->orderBy('bus.plat_nomor', 'asc')
+            ->orderBy('transaksi_keluar.tanggal', 'desc');
 
         if ($request->filled('bus_id')) {
             $query->where('transaksi_keluar.bus_id', $request->bus_id);
@@ -45,9 +41,46 @@ class LaporanBusController extends Controller
             }
         }
 
+        // ============================================
+        // REVISI: FILTER LAPORAN BUS
+        // ============================================
+        $tipe = $request->input('tipe', 'semua');
+        $subTipePaket = $request->input('sub_tipe_paket', 'semua');
+        $subTipeBarang = $request->input('sub_tipe_barang', 'semua');
+
+        if ($tipe === 'paket_service') {
+            $query->whereHas('details', function ($q) {
+                $q->where('tipe', 'paket_service');
+            });
+        } elseif ($tipe === 'barang_biasa') {
+            $query->whereHas('details', function ($q) {
+                $q->whereIn('tipe', ['per_item', 'biaya_pengerjaan']);
+            });
+        }
+
+        if ($subTipePaket === 'paket_reguler') {
+            $query->whereHas('details.paketService', function ($q) {
+                $q->where('kategori', 'paket_reguler');
+            });
+        } elseif ($subTipePaket === 'paket_oli') {
+            $query->whereHas('details.paketService', function ($q) {
+                $q->where('kategori', 'paket_oli');
+            });
+        }
+
+        if ($subTipeBarang === 'pembelian_toko') {
+            $query->whereHas('details.barang', function ($q) {
+                $q->where('jenis_pembelian', 'pembelian_toko');
+            });
+        } elseif ($subTipeBarang === 'pembelian_langsung') {
+            $query->whereHas('details.barang', function ($q) {
+                $q->where('jenis_pembelian', 'pembelian_langsung');
+            });
+        }
+
         $transaksis = $query->get();
 
-        return view('laporan-bus.index', compact('transaksis', 'busList'));
+        return view('laporan-bus.index', compact('transaksis', 'busList', 'tipe', 'subTipePaket', 'subTipeBarang'));
     }
 
     public function show(Request $request, $busId)
@@ -77,7 +110,6 @@ class LaporanBusController extends Controller
 
         $transaksis = $query->get();
 
-        // Kelompokkan per bulan-tahun
         $grouped = $transaksis->groupBy(function ($t) {
             return \Carbon\Carbon::parse($t->tanggal)->format('Y-m');
         })->sortKeysDesc();
@@ -87,10 +119,11 @@ class LaporanBusController extends Controller
 
     public function exportPdf(Request $request)
     {
-        $busList = Bus::orderBy('nama_bus')->get();
-
-        $query = Transaksi_keluar::with('bus', 'details')
-                                  ->orderBy('tanggal', 'desc');
+        $query = Transaksi_keluar::select('transaksi_keluar.*')
+                                  ->join('bus', 'transaksi_keluar.bus_id', '=', 'bus.id')
+                                  ->with('bus', 'details')
+                                  ->orderBy('bus.plat_nomor', 'asc')
+                                  ->orderBy('transaksi_keluar.tanggal', 'desc');
 
         if ($request->filled('bus_id')) {
             $query->where('bus_id', $request->bus_id);
@@ -102,6 +135,43 @@ class LaporanBusController extends Controller
 
         if ($request->filled('tahun')) {
             $query->whereYear('tanggal', $request->tahun);
+        }
+
+        // ============================================
+        // REVISI: FILTER LAPORAN BUS
+        // ============================================
+        $tipe = $request->input('tipe', 'semua');
+        $subTipePaket = $request->input('sub_tipe_paket', 'semua');
+        $subTipeBarang = $request->input('sub_tipe_barang', 'semua');
+
+        if ($tipe === 'paket_service') {
+            $query->whereHas('details', function ($q) {
+                $q->where('tipe', 'paket_service');
+            });
+        } elseif ($tipe === 'barang_biasa') {
+            $query->whereHas('details', function ($q) {
+                $q->whereIn('tipe', ['per_item', 'biaya_pengerjaan']);
+            });
+        }
+
+        if ($subTipePaket === 'paket_reguler') {
+            $query->whereHas('details.paketService', function ($q) {
+                $q->where('kategori', 'paket_reguler');
+            });
+        } elseif ($subTipePaket === 'paket_oli') {
+            $query->whereHas('details.paketService', function ($q) {
+                $q->where('kategori', 'paket_oli');
+            });
+        }
+
+        if ($subTipeBarang === 'pembelian_toko') {
+            $query->whereHas('details.barang', function ($q) {
+                $q->where('jenis_pembelian', 'pembelian_toko');
+            });
+        } elseif ($subTipeBarang === 'pembelian_langsung') {
+            $query->whereHas('details.barang', function ($q) {
+                $q->where('jenis_pembelian', 'pembelian_langsung');
+            });
         }
 
         $transaksis = $query->get();

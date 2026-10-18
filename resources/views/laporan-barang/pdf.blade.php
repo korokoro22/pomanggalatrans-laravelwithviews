@@ -49,7 +49,8 @@
                 <th width="4%">No</th>
                 <th width="10%">Tanggal</th>
                 <th width="17%">Nama Barang</th>
-                <th width="10%">Kode Barang</th>
+                {{-- REVISI: JENIS PEMBELIAN --}}
+                <th width="12%">Jenis Pembelian</th>
                 <th width="12%">Tipe</th>
                 <th width="8%">Qty</th>
                 <th width="12%">Subtotal</th>
@@ -62,7 +63,16 @@
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td class="text-center">{{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y H:i') : '-' }}</td>
                 <td>{{ $item->nama_barang }}</td>
-                <td>{{ $item->kode_barang }}</td>
+                {{-- REVISI: JENIS PEMBELIAN --}}
+                <td>
+                    @if($item->jenis_pembelian === 'pembelian_langsung')
+                        Pembelian Langsung
+                    @elseif($item->jenis_pembelian === 'pembelian_toko')
+                        Pembelian Toko
+                    @else
+                        -
+                    @endif
+                </td>
                 <td class="text-center">
                     @if ($item->tipe === 'masuk')
                         <span class="badge-masuk">{{ $item->tipe_label }}</span>

@@ -17,6 +17,7 @@ class Transaksi_keluar_detail extends Model
         'paket_service_id', // tambahan
         'tipe',             // tambahan
         'nama_item',
+        'keterangan',       // FIX: tambahkan agar keterangan paket/biaya pengerjaan tersimpan
         'qty',
         'satuan',
         'harga_satuan',
@@ -52,5 +53,13 @@ class Transaksi_keluar_detail extends Model
             ->first();
 
         return optional($latestDetail?->barangMasuk)->tanggal_masuk;
+    }
+
+    // ============================================
+    // TAMBAHAN: Relasi ke batch yang diambil
+    // ============================================
+    public function batchDiambil()
+    {
+        return $this->hasMany(TransaksiKeluarDetailBatch::class, 'transaksi_keluar_detail_id');
     }
 }

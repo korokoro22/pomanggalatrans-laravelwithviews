@@ -15,6 +15,7 @@ class Paket_service extends Model
         'bus_id',
         'nama_paket',
         'harga',
+        'kategori', // REVISI:KATEGORI PAKET SERVICE
     ];
 
     // PaketService milik satu bus

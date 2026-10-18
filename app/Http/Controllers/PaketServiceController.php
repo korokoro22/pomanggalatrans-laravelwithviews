@@ -75,30 +75,36 @@ class PaketServiceController extends Controller {
     public function store(Request $request)
     {
         $request->validate([
-            'bus_id'              => 'required|exists:bus,id',
+            'bus_id'              => 'required|numeric|min:0', // REVISI:SEMUA BUS
             'nama_paket'          => 'required|string',
             'harga'               => 'required|numeric|min:0',
-            'items'               => 'required|array|min:1',
-            'items.*.barang_id'   => 'required|exists:barang,id',
-            'items.*.qty'         => 'required|integer|min:1',
+            'kategori'            => 'nullable|in:paket_oli,paket_reguler', // REVISI:KATEGORI PAKET SERVICE
+            // REVISI: PAKET NON-ITEM — items tidak wajib diisi
+            'items'               => 'nullable|array',
+            'items.*.barang_id'   => 'nullable|exists:barang,id',
+            'items.*.qty'         => 'nullable|numeric|min:0.01',
         ]);
 
         DB::transaction(function () use ($request) {
 
             // Simpan paket service
+            // REVISI:SEMUA BUS — bus_id 0 diubah menjadi null
             $paketService = Paket_service::create([
-                'bus_id'     => $request->bus_id,
+                'bus_id'     => $request->bus_id ?: null,
                 'nama_paket' => $request->nama_paket,
                 'harga'      => $request->harga,
+                'kategori'   => $request->kategori ?? 'paket_reguler', // REVISI:KATEGORI PAKET SERVICE
             ]);
 
-            // Simpan item paket service
-            foreach ($request->items as $item) {
-                Paket_service_item::create([
-                    'paket_service_id' => $paketService->id,
-                    'barang_id'        => $item['barang_id'],
-                    'qty'              => $item['qty'],
-                ]);
+            // Simpan item paket service (bisa kosong)
+            if (!empty($request->items)) {
+                foreach ($request->items as $item) {
+                    Paket_service_item::create([
+                        'paket_service_id' => $paketService->id,
+                        'barang_id'        => $item['barang_id'],
+                        'qty'              => $item['qty'],
+                    ]);
+                }
             }
         });
 
@@ -107,38 +113,40 @@ class PaketServiceController extends Controller {
     }
 
     public function edit($id)
-{
-    $paketService = Paket_service::with('paketServiceItem.barang')->findOrFail($id);
-    $buses        = Bus::orderBy('nama_bus')->get();
-    
-    $barangs = Barang::whereIn('kategori', ['oli_mesin', 'filter_solar'])
-                    ->orderBy('nama_barang')
-                    ->get()
-                    ->map(fn($b) => [
-                        'id'             => $b->id,
-                        'kode_barang'    => $b->kode_barang,
-                        'nama_barang'    => $b->nama_barang,
-                        'foto'           => $b->foto ? asset('storage/' . $b->foto) : null,
-                        'harga_jual'     => $b->harga_jual,
-                        'satuan'         => $b->satuan,
-                        'stok_saat_ini'  => $b->stok_saat_ini,
-                        'gudang'         => $b->gudang, // <-- Tambahan field gudang
-                        'kategori_label' => $b->kategori == 'oli_mesin' ? 'Oli Mesin' : 'Filter Solar'
-                    ])
-                    ->keyBy('id');
+    {
+        $paketService = Paket_service::with('paketServiceItem.barang')->findOrFail($id);
+        $buses        = Bus::orderBy('nama_bus')->get();
 
-    return view('paket-service.edit', compact('paketService', 'buses', 'barangs'));
-}
+        // Samakan dengan create() — semua barang tanpa batasan kategori
+        $barangs = Barang::orderBy('nama_barang')
+                        ->get()
+                        ->map(fn($b) => [
+                            'id'             => $b->id,
+                            'kode_barang'    => $b->kode_barang,
+                            'nama_barang'    => $b->nama_barang,
+                            'foto'           => $b->foto ? asset('storage/' . $b->foto) : null,
+                            'harga_jual'     => $b->harga_jual,
+                            'satuan'         => $b->satuan,
+                            'stok_saat_ini'  => $b->stok_saat_ini,
+                            'gudang'         => $b->gudang,
+                            'kategori_label' => ucwords(str_replace('_', ' ', $b->kategori))
+                        ])
+                        ->keyBy('id');
+
+        return view('paket-service.edit', compact('paketService', 'buses', 'barangs'));
+    }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'bus_id'              => 'required|exists:bus,id',
+            'bus_id'              => 'required|numeric|min:0', // REVISI:SEMUA BUS
             'nama_paket'          => 'required|string',
             'harga'               => 'required|numeric|min:0',
-            'items'               => 'required|array|min:1',
-            'items.*.barang_id'   => 'required|exists:barang,id',
-            'items.*.qty'         => 'required|integer|min:1',
+            'kategori'            => 'nullable|in:paket_oli,paket_reguler', // REVISI:KATEGORI PAKET SERVICE
+            // REVISI: PAKET NON-ITEM — items tidak wajib diisi
+            'items'               => 'nullable|array',
+            'items.*.barang_id'   => 'nullable|exists:barang,id',
+            'items.*.qty'         => 'nullable|numeric|min:0.01',
         ]);
 
         DB::transaction(function () use ($request, $id) {
@@ -146,21 +154,25 @@ class PaketServiceController extends Controller {
             $paketService = Paket_service::findOrFail($id);
 
             // Update paket service
+            // REVISI:SEMUA BUS — bus_id 0 diubah menjadi null
             $paketService->update([
-                'bus_id'     => $request->bus_id,
+                'bus_id'     => $request->bus_id ?: null,
                 'nama_paket' => $request->nama_paket,
                 'harga'      => $request->harga,
+                'kategori'   => $request->kategori ?? 'paket_reguler', // REVISI:KATEGORI PAKET SERVICE
             ]);
 
-            // Hapus item lama lalu insert baru
+            // Hapus item lama lalu insert baru (bisa kosong)
             $paketService->paketServiceItem()->delete();
 
-            foreach ($request->items as $item) {
-                Paket_service_item::create([
-                    'paket_service_id' => $paketService->id,
-                    'barang_id'        => $item['barang_id'],
-                    'qty'              => $item['qty'],
-                ]);
+            if (!empty($request->items)) {
+                foreach ($request->items as $item) {
+                    Paket_service_item::create([
+                        'paket_service_id' => $paketService->id,
+                        'barang_id'        => $item['barang_id'],
+                        'qty'              => $item['qty'],
+                    ]);
+                }
             }
         });
 

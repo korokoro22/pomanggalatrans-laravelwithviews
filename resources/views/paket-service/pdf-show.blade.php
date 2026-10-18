@@ -30,11 +30,11 @@
     <table class="info-table">
         <tr>
             <td>Nama Bus</td>
-            <td>: {{ $paketService->bus->nama_bus }}</td>
+            <td>: {{ $paketService->bus_id === null ? 'Semua Bus' : $paketService->bus->nama_bus }}</td>
         </tr>
         <tr>
             <td>Plat Nomor</td>
-            <td>: {{ $paketService->bus->plat_nomor }}</td>
+            <td>: {{ $paketService->bus_id === null ? '-' : $paketService->bus->plat_nomor }}</td>
         </tr>
         <tr>
             <td>Nama Paket</td>

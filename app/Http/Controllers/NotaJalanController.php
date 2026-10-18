@@ -153,7 +153,7 @@ class NotaJalanController extends Controller
             'tanggal'                => 'required|date',
             'no_invoice'             => 'required|string|max:255',
             'supplier'               => 'required|string|max:255',
-            'bukti_nota'             => 'nullable|image|max:2048',
+            'bukti_nota'             => 'nullable|image',
             'total'                  => 'required|integer|min:0',
 
             'items'                  => 'required|array|min:1',
@@ -250,7 +250,7 @@ class NotaJalanController extends Controller
             'tanggal'                => 'required|date',
             'no_invoice'             => 'required|string|max:255',
             'supplier'               => 'required|string|max:255',
-            'bukti_nota'             => 'nullable|image|max:2048',
+            'bukti_nota'             => 'nullable|image',
             // REVISI: Ubah integer menjadi numeric agar aman jika ada nilai .00 dari DB
             'total'                  => 'required|numeric|min:0', 
 

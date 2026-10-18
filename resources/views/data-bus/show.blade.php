@@ -18,10 +18,10 @@
 <x-adminlte-card title="Informasi Bus" theme="info" icon="fas fa-bus" style="text-transform: uppercase;">
 
     <table class="table table-borderless">
-        <tr>
-            <td width="30%"><strong>Nama Bus</strong></td>
-            <td>: {{ $bus->nama_bus }}</td>
-        </tr>
+        <!--<tr>-->
+        <!--    <td width="30%"><strong>Nama Bus</strong></td>-->
+        <!--    <td>: {{ $bus->nama_bus }}</td>-->
+        <!--</tr>-->
         <tr>
             <td><strong>Plat Nomor</strong></td>
             <td>: {{ $bus->plat_nomor }}</td>

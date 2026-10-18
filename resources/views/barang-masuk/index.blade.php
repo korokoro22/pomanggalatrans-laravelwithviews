@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Barang Masuk')
+@section('title', 'Nota Masuk')
 
 @section('content_header')
-    <h1 style="text-transform: uppercase;">Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Nota Masuk</h1>
 @stop
 
 @section('content')
@@ -25,7 +25,7 @@
 
 
 {{-- FILTER SECTION --}}
-<x-adminlte-card title="Filter Barang Masuk" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
+<x-adminlte-card title="Filter Nota Masuk" theme="light" icon="fas fa-filter" style="text-transform: uppercase;">
 
     <form action="{{ route('barang-masuk.index') }}" method="GET">
 
@@ -113,6 +113,29 @@
                 </select>
             </div>
 
+            {{-- REVISI: FILTER JENIS MASUK --}}
+            <div class="col-md-3">
+                <label>Jenis Masuk</label>
+                <select name="jenis_masuk" class="form-control" style="text-transform: uppercase;">
+                    <option value="">-- Semua Jenis --</option>
+                    <option value="nota" {{ request('jenis_masuk') == 'nota' ? 'selected' : '' }}>Nota</option>
+                    <option value="stok_awal" {{ request('jenis_masuk') == 'stok_awal' ? 'selected' : '' }}>Stok Lama</option>
+                    <option value="barang_bekas" {{ request('jenis_masuk') == 'barang_bekas' ? 'selected' : '' }}>Barang Bekas</option>
+                </select>
+            </div>
+
+            {{-- ============================================ --}}
+            {{-- REVISI: JENIS PEMBELIAN --}}
+            {{-- ============================================ --}}
+            <div class="col-md-3">
+                <label>Jenis Pembelian</label>
+                <select name="jenis_pembelian" class="form-control" style="text-transform: uppercase;">
+                    <option value="">-- Semua Jenis --</option>
+                    <option value="pembelian_toko" {{ request('jenis_pembelian') == 'pembelian_toko' ? 'selected' : '' }}>Pembelian Toko</option>
+                    <option value="pembelian_langsung" {{ request('jenis_pembelian') == 'pembelian_langsung' ? 'selected' : '' }}>Pembelian Langsung</option>
+                </select>
+            </div>
+
         </div>
 
         <div class="mt-3">
@@ -139,19 +162,22 @@
 {{-- <x-adminlte-card>hai</x-adminlte-card> --}}
 
 {{-- TABLE SECTION --}}
-<x-adminlte-card title="Log Barang Masuk" theme="success" icon="fas fa-arrow-down" style="text-transform: uppercase;">
+<x-adminlte-card title="Log Nota Masuk" theme="success" icon="fas fa-arrow-down" style="text-transform: uppercase;">
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="text-center">
                 <tr>
-                    <th width="5%">No</th>
-                    <th>Tanggal Masuk</th>
-                    <th>No Invoice</th>
-                    <th>Kategori</th>
-                    <th>Supplier</th>
-                    <th>Bukti Nota</th>
-                    <th>Penerima</th>
-                    <th>Item Barang</th>
+                    <th width="4%">No</th>
+                    <th width="10%">Tanggal Masuk</th>
+                    <th width="9%">Jenis Masuk</th>
+                    <th width="9%">No Invoice</th>
+                    <th width="9%">Kategori</th>
+                    <th width="10%">Supplier</th>
+                    {{-- REVISI: JENIS PEMBELIAN --}}
+                    <th width="10%">Jenis Pembelian</th>
+                    <th width="7%">Bukti Nota</th>
+                    <th width="9%">Penerima</th>
+                    <th width="18%">Item Barang</th>
                     <th width="15%">Aksi</th>
                 </tr>
             </thead>
@@ -162,7 +188,16 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
-                    <td>{{ $barangMasuk->no_invoice }}</td>
+                    <td class="text-center">
+                        @if(($barangMasuk->jenis_masuk ?? 'nota') === 'stok_awal')
+                            <span class="badge badge-warning">Stok Lama</span>
+                        @elseif(($barangMasuk->jenis_masuk ?? 'nota') === 'barang_bekas')
+                            <span class="badge badge-secondary"> Barang Bekas</span>
+                        @else
+                            <span class="badge badge-primary">Nota</span>
+                        @endif
+                    </td>
+                    <td>{{ $barangMasuk->no_invoice ?? '-' }}</td>
                     <td class="text-center">
                         @if($barangMasuk->kategori_nota === 'nota_jalan')
                             <span class="badge badge-warning">Nota Jalan</span>
@@ -170,7 +205,17 @@
                             <span class="badge badge-primary">Nota Bengkel</span>
                         @endif
                     </td>
-                    <td>{{ $barangMasuk->supplier }}</td>
+                    <td>{{ $barangMasuk->supplier ?? '-' }}</td>
+                    {{-- REVISI: JENIS PEMBELIAN --}}
+                    <td class="text-center">
+                        @if($barangMasuk->jenis_pembelian === 'pembelian_langsung')
+                            <span class="badge badge-success">Pembelian Langsung</span>
+                        @elseif($barangMasuk->jenis_pembelian === 'pembelian_toko')
+                            <span class="badge badge-primary">Pembelian Toko</span>
+                        @else
+                            <span class="badge badge-secondary">-</span>
+                        @endif
+                    </td>
                     <td>
                         @if ($barangMasuk->bukti_nota)
                             <img src="{{ asset('storage/' . $barangMasuk->bukti_nota) }}"
@@ -182,10 +227,10 @@
                             <span class="text-muted">-</span>
                         @endif
                     </td>
-                    <td>{{ $barangMasuk->penerima }}</td>
-                    <td>
+                    <td>{{ $barangMasuk->penerima ?? '-' }}</td>
+                    <td style="max-width: 220px; white-space: normal; word-break: break-word;">
                         @forelse ($barangMasuk->details as $detail)
-                            <span class="badge badge-info">{{ $detail->nama_barang }}</span>
+                            <span class="badge badge-info" style="white-space: normal;">{{ $detail->nama_barang }}</span>
                         @empty
                             <span class="text-muted">-</span>
                         @endforelse
@@ -237,7 +282,7 @@
 
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center">Belum ada data barang masuk</td>
+                    <td colspan="11" class="text-center">Belum ada data barang masuk</td>
                 </tr>
                 @endforelse
 

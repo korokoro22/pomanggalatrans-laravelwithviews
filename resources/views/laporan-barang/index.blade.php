@@ -92,6 +92,18 @@
                 </div>
             </div>
 
+            {{-- REVISI: JENIS PEMBELIAN --}}
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Jenis Pembelian</label>
+                    <select name="jenis_pembelian" class="form-control">
+                        <option value="">-- Semua Jenis --</option>
+                        <option value="pembelian_toko" {{ ($jenisPembelian ?? '') === 'pembelian_toko' ? 'selected' : '' }}>Pembelian Toko</option>
+                        <option value="pembelian_langsung" {{ ($jenisPembelian ?? '') === 'pembelian_langsung' ? 'selected' : '' }}>Pembelian Langsung</option>
+                    </select>
+                </div>
+            </div>
+
         </div>
 
         <div class="mt-3">
@@ -158,7 +170,8 @@
                     <th width="5%">No</th>
                     <th>Tanggal</th>
                     <th>Nama Barang</th>
-                    <th>Kode Barang</th>
+                    {{-- REVISI: JENIS PEMBELIAN --}}
+                    <th>Jenis Pembelian</th>
                     <th>Tipe</th>
                     <th>Qty</th>
                     <th>Subtotal</th>
@@ -173,7 +186,16 @@
                         {{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y H:i') : '-' }}
                     </td>
                     <td>{{ $item->nama_barang }}</td>
-                    <td>{{ $item->kode_barang }}</td>
+                    {{-- REVISI: JENIS PEMBELIAN --}}
+                    <td>
+                        @if($item->jenis_pembelian === 'pembelian_langsung')
+                            Pembelian Langsung
+                        @elseif($item->jenis_pembelian === 'pembelian_toko')
+                            Pembelian Toko
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td class="text-center">
                         @if ($item->tipe === 'masuk')
                             <span class="badge badge-success">{{ $item->tipe_label }}</span>

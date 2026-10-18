@@ -41,10 +41,21 @@
                     <td><strong>Nama Barang</strong></td>
                     <td>: {{ $barang->nama_barang }}</td>
                 </tr>
+                
+                <tr>
+                    <td><strong>Kondisi Barang</strong></td>
+                    <td >: 
+                        @if($barang->kondisi === 'bekas')
+                            <span class="badge badge-secondary"> Bekas</span>
+                        @else
+                            <span class="badge badge-success"> Baru</span>
+                        @endif
+                    </td>
+                </tr>
+                
                 {{-- <tr>
                     <td><strong>Kategori</strong></td>
-                    <td>:
-                        @if ($barang->kategori == 'oli_mesin')
+                    <td>: @if ($barang->kategori == 'oli_mesin')
                             <span class="badge badge-warning">Oli Mesin</span>
                         @elseif ($barang->kategori == 'filter_solar')
                             <span class="badge badge-info">Filter Solar</span>
@@ -167,7 +178,7 @@
 
 </div>
 
-<a href="{{ route('master-barang.by-nama', $barang->nama_barang) }}" class="btn btn-secondary mb-3">
+<a href="{{ route('master-barang.by-nama', $encoded_nama) }}" class="btn btn-secondary mb-3">
     <i class="fas fa-arrow-left"></i>
     Kembali
 </a>

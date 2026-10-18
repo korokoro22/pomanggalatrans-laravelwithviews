@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Detail Barang Masuk')
+@section('title', 'Detail Nota Masuk')
 
 @section('content_header')
-    <h1 style="text-transform: uppercase;">Detail Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Detail Nota Masuk</h1>
 @stop
 
 @section('content')
@@ -19,27 +19,49 @@
 
 {{-- INFORMASI NOTA --}}
 <x-adminlte-card title="Informasi Nota" theme="success" icon="fas fa-file-invoice" style="text-transform: uppercase;">
+
+    <div class="mb-3">
+        @if(($barangMasuk->jenis_masuk ?? 'nota') === 'stok_awal')
+            <span class="badge badge-warning p-2" style="font-size: 13px;">
+                <i class="fas fa-box-open"></i> Stok Lama (Tanpa Nota)
+            </span>
+        @elseif(($barangMasuk->jenis_masuk ?? 'nota') === 'barang_bekas')
+            <span class="badge badge-secondary p-2" style="font-size: 13px;">
+                <i class="fas fa-recycle"></i> Barang Bekas (Dari Bus)
+            </span>
+        @else
+            <span class="badge badge-primary p-2" style="font-size: 13px;">
+                <i class="fas fa-file-invoice"></i> Dari Nota
+            </span>
+        @endif
+    </div>
+
     <div class="row">
 
         <div class="col-md-6">
             <table class="table table-borderless">
+                @if(($barangMasuk->jenis_masuk ?? 'nota') !== 'stok_awal')
                 <tr>
                     <td width="40%"><strong>No. Invoice</strong></td>
                     <td>: {{ $barangMasuk->no_invoice }}</td>
                 </tr>
+                @endif
                 <tr>
-                    <td><strong>Tanggal Masuk</strong></td>
+                    <td width="40%"><strong>Tanggal Masuk</strong></td>
                     <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
                 </tr>
+                @if(($barangMasuk->jenis_masuk ?? 'nota') !== 'stok_awal')
                 <tr>
                     <td><strong>Supplier</strong></td>
                     <td>: {{ $barangMasuk->supplier }}</td>
                 </tr>
+                @endif
             </table>
         </div>
 
         <div class="col-md-6">
             <table class="table table-borderless">
+                @if(($barangMasuk->jenis_masuk ?? 'nota') !== 'stok_awal')
                 <tr>
                     <td width="40%"><strong>Penerima</strong></td>
                     <td>: {{ $barangMasuk->penerima }}</td>
@@ -68,6 +90,13 @@
                         @endif
                     </td>
                 </tr>
+                @else
+                <tr>
+                    <td width="40%" class="text-muted" colspan="2">
+                        Data ini dicatat sebagai stok lama di gudang, tanpa nota/invoice resmi.
+                    </td>
+                </tr>
+                @endif
             </table>
         </div>
 

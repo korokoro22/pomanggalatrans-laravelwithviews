@@ -2,7 +2,7 @@
 <html style="text-transform: uppercase;">
 <head>
     <meta charset="utf-8">
-    <title>Nota {{ $barangMasuk->no_invoice }}</title>
+    <title>Nota {{ $barangMasuk->no_invoice ?? 'Stok Lama' }}</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
         h3 { text-align: center; margin-bottom: 5px; }
@@ -17,6 +17,9 @@
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .divider { border-top: 1px solid #ddd; margin: 10px 0; }
+        .badge { padding: 2px 8px; border-radius: 3px; font-size: 11px; color: white; }
+        .badge-warning { background-color: #ffc107; color: #212529; }
+        .badge-primary { background-color: #007bff; }
     </style>
 </head>
 <body>
@@ -26,31 +29,53 @@
 
     <div class="divider"></div>
 
-    <table class="info-table">
-        <tr>
-            <td>No. Invoice</td>
-            <td>: {{ $barangMasuk->no_invoice }}</td>
-            <td>Tanggal Masuk</td>
-            <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
-        </tr>
-        <tr>
-            <td>Supplier</td>
-            <td>: {{ $barangMasuk->supplier }}</td>
-            <td>Penerima</td>
-            <td>: {{ $barangMasuk->penerima }}</td>
-        </tr>
-        <tr>
-            <td>Kategori Nota</td>
-            <td colspan="3">
-                :
-                @if($barangMasuk->kategori_nota == 'nota_jalan')
-                    Nota Jalan
-                @else
-                    Nota Bengkel
-                @endif
-            </td>
-        </tr>
-    </table>
+    <p>
+        @if(($barangMasuk->jenis_masuk ?? 'nota') == 'stok_awal')
+            <span class="badge badge-warning">Stok Lama (Tanpa Nota)</span>
+        @else
+            <span class="badge badge-primary">Dari Nota</span>
+        @endif
+    </p>
+
+    @if(($barangMasuk->jenis_masuk ?? 'nota') == 'stok_awal')
+        <table class="info-table">
+            <tr>
+                <td>Tanggal Masuk</td>
+                <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="color:#666;">
+                    Data ini dicatat sebagai stok lama di gudang, tanpa nota/invoice resmi.
+                </td>
+            </tr>
+        </table>
+    @else
+        <table class="info-table">
+            <tr>
+                <td>No. Invoice</td>
+                <td>: {{ $barangMasuk->no_invoice }}</td>
+                <td>Tanggal Masuk</td>
+                <td>: {{ \Carbon\Carbon::parse($barangMasuk->tanggal_masuk)->format('d-m-Y H:i') }}</td>
+            </tr>
+            <tr>
+                <td>Supplier</td>
+                <td>: {{ $barangMasuk->supplier }}</td>
+                <td>Penerima</td>
+                <td>: {{ $barangMasuk->penerima }}</td>
+            </tr>
+            <tr>
+                <td>Kategori Nota</td>
+                <td colspan="3">
+                    :
+                    @if($barangMasuk->kategori_nota == 'nota_jalan')
+                        Nota Jalan
+                    @else
+                        Nota Bengkel
+                    @endif
+                </td>
+            </tr>
+        </table>
+    @endif
 
     <div class="divider"></div>
 

@@ -29,15 +29,11 @@
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $barangMasukHariIni }}"
-            text="BARANG MASUK HARI INI"
+            text="NOTA MASUK HARI INI"
             icon="fas fa-arrow-down"
             theme="info"/>
     </div>
-
-</div>
-
-<div class="row">
-
+    
     <div class="col-lg-4 col-6">
         <x-adminlte-small-box
             title="{{ $barangKeluarHariIni }}"

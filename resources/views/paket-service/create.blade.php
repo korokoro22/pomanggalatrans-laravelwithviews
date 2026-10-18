@@ -63,6 +63,12 @@
     .select2-selection__arrow {
         height: 38px !important;
     }
+    .info-harga-jual {
+        display: block;
+        margin-top: 4px;
+        font-weight: bold;
+        color: #17a2b8;
+    }
 </style>
 @stop
 
@@ -86,6 +92,8 @@
                             class="form-control @error('bus_id') is-invalid @enderror"
                             required>
                         <option value="">-- Pilih Bus --</option>
+                        {{-- REVISI:SEMUA BUS --}}
+                        <option value="0" {{ old('bus_id') == '0' ? 'selected' : '' }}>Semua Bus</option>
                         @foreach ($buses as $bus)
                             <option value="{{ $bus->id }}" {{ old('bus_id') == $bus->id ? 'selected' : '' }}>
                                 {{ $bus->nama_bus }} - {{ $bus->plat_nomor }}
@@ -115,28 +123,66 @@
             </div>
         </div>
 
+        {{-- REVISI:KATEGORI PAKET SERVICE --}}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Kategori Paket</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="kategori" id="kategori-reguler" value="paket_reguler" {{ old('kategori', 'paket_reguler') == 'paket_reguler' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="kategori-reguler">Paket Reguler</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="kategori" id="kategori-oli" value="paket_oli" {{ old('kategori') == 'paket_oli' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="kategori-oli">Paket Oli</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <label>Harga</label>
-                    <input type="number"
-                    style="text-transform: uppercase;"
-                           name="harga"
-                           class="form-control @error('harga') is-invalid @enderror"
-                           placeholder="Masukkan harga paket"
-                           value="{{ old('harga') }}"
-                           required>
-                    @error('harga')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Rp</span>
+                        </div>
+                        <input type="hidden"
+                               name="harga"
+                               class="input-harga-value"
+                               value="{{ old('harga') }}">
+                        <input type="text"
+                               class="form-control input-harga input-rupiah @error('harga') is-invalid @enderror"
+                               placeholder="Masukkan harga paket"
+                               inputmode="numeric"
+                               autocomplete="off"
+                               style="text-transform: uppercase;"
+                               value="{{ old('harga') ? number_format(old('harga'), 0, '', '.') : '' }}"
+                               required>
+                        @error('harga')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>
 
         <hr>
 
-        <h5><i class="fas fa-boxes"></i> Item Barang dalam Paket</h5>
-        <small class="text-muted">Barang yang stoknya akan berkurang otomatis ketika paket ini dipilih</small>
+        {{-- REVISI: PAKET NON-ITEM --}}
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="paket-tanpa-item" name="paket_tanpa_item" value="1" {{ old('paket_tanpa_item') ? 'checked' : '' }}>
+            <label class="form-check-label font-weight-bold" for="paket-tanpa-item">
+                Paket ini hanya mencatat harga saja (tanpa mengurangi stok barang)
+            </label>
+            <small class="text-muted d-block">Centang ini jika paket service hanya untuk data bus, tanpa pemakaian barang.</small>
+        </div>
+
+        <h5 id="judul-item-paket"><i class="fas fa-boxes"></i> Item Barang dalam Paket</h5>
+        <small class="text-muted" id="subjudul-item-paket">Barang yang stoknya akan berkurang otomatis ketika paket ini dipilih</small>
 
         <div class="mt-3" id="item-container">
             <div class="row item-row mb-2">
@@ -149,13 +195,15 @@
                             </option>
                         @endforeach
                     </select>
+                    <small class="text-muted info-harga-jual" style="display:none;"></small>
                 </div>
                 <div class="col-md-3">
-                    <input type="number"
+                    <input type="text"
                            name="items[0][qty]"
-                           class="form-control"
-                           placeholder="Qty"
-                           min="1"
+                           class="form-control input-desimal"
+                           placeholder="Contoh: 2 atau 13,5"
+                           inputmode="decimal"
+                           autocomplete="off"
                            style="text-transform: uppercase;"
                            required>
                 </div>
@@ -193,6 +241,56 @@
     const barangs = @json($barangs);
     let itemIndex = 1;
 
+    // ========== Format Rupiah ==========
+    function formatRupiah(angka) {
+        angka = angka.toString().replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function unformatRupiah(str) {
+        return str ? str.toString().replace(/\./g, '') : '';
+    }
+
+    // ========== Auto-format input Harga Paket + sinkron ke hidden ==========
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-rupiah')) return;
+
+        const cursorPos = e.target.selectionStart;
+        const oldLength = e.target.value.length;
+
+        e.target.value = formatRupiah(e.target.value);
+
+        const newLength = e.target.value.length;
+        const diff = newLength - oldLength;
+        const newPos = Math.max(0, cursorPos + diff);
+        e.target.setSelectionRange(newPos, newPos);
+
+        if (e.target.classList.contains('input-harga')) {
+            const container = e.target.closest('.input-group');
+            const hidden = container.querySelector('.input-harga-value');
+            if (hidden) hidden.value = unformatRupiah(e.target.value);
+        }
+    });
+
+    // ========== Helper Desimal (koma sebagai pemisah desimal, untuk qty) ==========
+    function parseDesimal(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(',', '.')) || 0;
+    }
+
+    // Batasi input desimal: hanya digit dan satu koma
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-desimal')) return;
+
+        let value = e.target.value.replace(/[^0-9,]/g, '');
+        const parts = value.split(',');
+        if (parts.length > 2) {
+            value = parts[0] + ',' + parts.slice(1).join('');
+        }
+        e.target.value = value;
+    });
+
     function initSelect2Barang(row) {
     const select = $(row).find('.select-barang');
 
@@ -215,7 +313,7 @@
                 ? `Stok: ${b.stok_saat_ini} ${b.satuan}`
                 : 'Stok Habis';
 
-            const harga = Number(b.harga_jual).toLocaleString('id-ID');
+            const harga = formatRupiah(Math.round(parseFloat(b.harga_jual)));
 
             let gudangText = b.gudang ? b.gudang.replace(/_/g, ' ') : '-';
             gudangText = gudangText.replace(/\b\w/g, l => l.toUpperCase());
@@ -244,6 +342,22 @@
             return `${b.nama_barang} (${b.kode_barang}) - ${b.kategori_label}`;
         }
     });
+
+    // Tampilkan info harga jual saat barang dipilih
+    select.on('change', function () {
+        const r = $(this).closest('.item-row')[0];
+        const infoHarga = r.querySelector('.info-harga-jual');
+        const b = barangs[$(this).val()] || barangs[parseInt($(this).val())];
+
+        if (b) {
+            const hargaFormatted = formatRupiah(Math.round(parseFloat(b.harga_jual)));
+            infoHarga.textContent = `Harga Jual: Rp ${hargaFormatted} / pcs`;
+            infoHarga.style.display = 'block';
+        } else {
+            infoHarga.textContent = '';
+            infoHarga.style.display = 'none';
+        }
+    });
 }
 
     $(document).ready(function () {
@@ -264,9 +378,10 @@
                         <option value="">-- Pilih Barang --</option>
                         ${barangOptionsHtml}
                     </select>
+                    <small class="text-muted info-harga-jual" style="display:none;"></small>
                 </div>
                 <div class="col-md-3">
-                    <input type="number" name="items[${itemIndex}][qty]" class="form-control" placeholder="Qty" min="1" required>
+                    <input type="text" name="items[${itemIndex}][qty]" class="form-control input-desimal" placeholder="Contoh: 2 atau 13,5" inputmode="decimal" autocomplete="off" required>
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-danger btn-remove-item">
@@ -298,6 +413,39 @@
             btn.disabled = rows.length === 1;
         });
     }
+
+    // ============================================
+    // REVISI: PAKET NON-ITEM — toggle section item berdasarkan checkbox
+    // ============================================
+    const checkboxTanpaItem = document.getElementById('paket-tanpa-item');
+    const itemContainer = document.getElementById('item-container');
+    const btnAddItem = document.getElementById('btn-add-item');
+    const judulItem = document.getElementById('judul-item-paket');
+    const subjudulItem = document.getElementById('subjudul-item-paket');
+
+    function toggleItemSection() {
+        const tanpaItem = checkboxTanpaItem.checked;
+        itemContainer.style.display = tanpaItem ? 'none' : '';
+        btnAddItem.style.display = tanpaItem ? 'none' : '';
+        judulItem.style.display = tanpaItem ? 'none' : '';
+        subjudulItem.style.display = tanpaItem ? 'none' : '';
+
+        // Disable semua input item jika tanpa item, agar tidak terkirim ke server
+        itemContainer.querySelectorAll('input, select, button').forEach(el => {
+            el.disabled = tanpaItem;
+        });
+    }
+
+    checkboxTanpaItem.addEventListener('change', toggleItemSection);
+    toggleItemSection(); // init saat load
+
+    // ========== Pengaman terakhir sebelum submit ==========
+    document.querySelector('form').addEventListener('submit', function () {
+        // Konversi input desimal (koma -> titik) supaya diterima backend sebagai numeric
+        document.querySelectorAll('.input-desimal').forEach(function (input) {
+            input.value = input.value.replace(',', '.');
+        });
+    });
 </script>
 @stop
 @stop

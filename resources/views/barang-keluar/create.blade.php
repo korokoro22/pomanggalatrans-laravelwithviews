@@ -74,7 +74,7 @@
 
 @if(session('error'))
     <div class="alert alert-danger" style="text-transform: uppercase;">
-        <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+        <i class="fas fa-exclamation-triangle"></i> Error Detail: {{ session('error') }}
     </div>
 @endif
 
@@ -194,7 +194,7 @@
                                            class="form-control input-satuan"
                                            placeholder="Otomatis terisi"
                                            style="text-transform: uppercase;"
-                                           readonly>
+                                           >
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -212,18 +212,19 @@
                                             inputmode="numeric"
                                             autocomplete="off"
                                             >
-                                    </div>
+                                                                            </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Qty</label>
-                                    <input type="number"
+                                    <input type="text"
                                            name="items[0][qty]"
-                                           class="form-control input-qty"
-                                           placeholder="Masukkan qty"
-                                           style="text-transform: uppercase;"
-                                           min="1">
+                                           class="form-control input-qty input-desimal"
+                                           placeholder="Contoh: 2 atau 13,5"
+                                           inputmode="decimal"
+                                           autocomplete="off"
+                                           style="text-transform: uppercase;">
                                 </div>
                             </div>
                         </div>
@@ -274,13 +275,15 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Rp</span>
                                         </div>
+                                        {{-- FIX: hidden input agar harga paket yang diubah ikut terkirim ke controller --}}
+                                        <input type="hidden" name="items[0][harga_paket]" class="input-harga-paket-value">
                                         <input type="text"
                                            class="form-control input-harga-paket input-rupiah"
                                            placeholder="Otomatis terisi"
                                            style="text-transform: uppercase;"
                                            inputmode="numeric"
                                            autocomplete="off"
-                                           readonly>
+                                           >
                                     </div>
                                     
                                 </div>
@@ -309,7 +312,15 @@
                     </div>
 
                     {{-- Section Biaya Pengerjaan --}}
-                    <div class="section-biaya-pengerjaan" style="display:none">
+                    {{-- REVISI:TAMBAH OLI — Keterangan opsional --}}
+                    <div class="col-md-12 mt-2">
+                        <div class="form-group">
+                            <label>Keterangan <small class="text-muted">(opsional)</small></label>
+                            <input type="text" name="items[0][keterangan_paket]" class="form-control" placeholder="Contoh: Oli 2 liter" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+
+                <div class="section-biaya-pengerjaan" style="display:none">
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="form-group">
@@ -528,6 +539,24 @@
         return str ? str.toString().replace(/\./g, '') : '';
     }
 
+    // ========== Helper Desimal (koma sebagai pemisah desimal, untuk qty) ==========
+    function parseDesimal(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(',', '.')) || 0;
+    }
+
+    // Batasi input desimal: hanya digit dan satu koma
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-desimal')) return;
+
+        let value = e.target.value.replace(/[^0-9,]/g, '');
+        const parts = value.split(',');
+        if (parts.length > 2) {
+            value = parts[0] + ',' + parts.slice(1).join('');
+        }
+        e.target.value = value;
+    });
+
     document.addEventListener('input', function (e) {
         if (!e.target.classList.contains('input-rupiah') || e.target.readOnly) return;
 
@@ -550,7 +579,7 @@
 
             const row = e.target.closest('.item-row');
             if (row) {
-                const qty      = parseInt(row.querySelector('.input-qty')?.value) || 0;
+                const qty      = parseDesimal(row.querySelector('.input-qty')?.value);
                 const harga    = parseFloat(rawValue) || 0;
                 const subtotal = qty * harga;
                 row.querySelector('.section-per-item .input-subtotal').value       = formatRupiah(subtotal);
@@ -635,7 +664,6 @@
             }
         });
 
-        // ========== FIX #1: pakai hargaBersih (bukan b.harga_jual mentah) ==========
         select.on('change', function () {
             const barangId = $(this).val();
             const b = barangs[parseInt(barangId)] || barangs[barangId];
@@ -753,13 +781,13 @@
                                             inputmode="numeric"
                                             autocomplete="off"
                                             >
-                                    </div>
+                                                                            </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Qty</label>
-                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" min="1" style="text-transform: uppercase;">
+                                <input type="text" name="items[${index}][qty]" class="form-control input-qty input-desimal" placeholder="Contoh: 2 atau 13,5" inputmode="decimal" autocomplete="off" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -804,13 +832,15 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Rp</span>
                                         </div>
+                                        {{-- FIX: hidden input agar harga paket yang diubah ikut terkirim ke controller --}}
+                                        <input type="hidden" name="items[${index}][harga_paket]" class="input-harga-paket-value">
                                         <input type="text"
                                            class="form-control input-harga-paket input-rupiah"
                                            placeholder="Otomatis terisi"
                                            style="text-transform: uppercase;"
                                            inputmode="numeric"
                                            autocomplete="off"
-                                           readonly>
+                                           >
                                     </div>
                             </div>
                         </div>
@@ -835,6 +865,15 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- REVISI:TAMBAH OLI — Keterangan opsional --}}
+                {{-- FIX: gunakan ${index}, sebelumnya hardcode items[0] sehingga bentrok dengan baris pertama --}}
+                    <div class="col-md-12 mt-2">
+                        <div class="form-group">
+                            <label>Keterangan <small class="text-muted">(opsional)</small></label>
+                            <input type="text" name="items[${index}][keterangan_paket]" class="form-control" placeholder="Contoh: Oli 2 liter" style="text-transform: uppercase;">
+                        </div>
+                    </div>
 
                 <div class="section-biaya-pengerjaan" style="display:none">
                     <div class="row">
@@ -917,14 +956,27 @@
             } else {
                 sectionItem.style.display = 'block';
             }
+
+            // FIX: reset juga harga paket (visible + hidden) saat ganti tipe
+            const hargaPaketEl     = row.querySelector('.input-harga-paket');
+            const hargaPaketHidden = row.querySelector('.input-harga-paket-value');
+            if (hargaPaketEl) hargaPaketEl.value = '';
+            if (hargaPaketHidden) hargaPaketHidden.value = '';
+            const selPaket = row.querySelector('.select-paket');
+            if (selPaket) selPaket.value = '';
+
             resetSubtotal(row);
         }
 
-        // ========== FIX #2: sudah benar, tetap pertahankan ==========
         if (e.target.classList.contains('select-paket')) {
             const hargaMentah = e.target.selectedOptions[0]?.dataset.harga || 0;
-            const hargaBersih = Math.round(parseFloat(hargaMentah));
-            row.querySelector('.input-harga-paket').value = formatRupiah(hargaBersih);
+            const hargaBersih = Math.round(parseFloat(hargaMentah)) || 0;
+            row.querySelector('.input-harga-paket').value = hargaBersih ? formatRupiah(hargaBersih) : '';
+
+            // FIX: isi hidden harga_paket dengan harga default paket (bisa diubah manual setelahnya)
+            const hiddenHarga = row.querySelector('.input-harga-paket-value');
+            if (hiddenHarga) hiddenHarga.value = hargaBersih;
+
             row.querySelector('.section-paket-service .input-subtotal').value       = formatRupiah(hargaBersih);
             row.querySelector('.section-paket-service .input-subtotal-value').value = hargaBersih;
             hitungTotal();
@@ -936,11 +988,23 @@
         if (!row) return;
 
         if (e.target.classList.contains('input-qty')) {
-            const qty      = parseInt(row.querySelector('.input-qty').value) || 0;
+            const qty      = parseDesimal(row.querySelector('.input-qty').value);
             const harga    = parseFloat(unformatRupiah(row.querySelector('.input-harga-satuan').value)) || 0;
             const subtotal = qty * harga;
             row.querySelector('.section-per-item .input-subtotal').value       = formatRupiah(subtotal);
             row.querySelector('.section-per-item .input-subtotal-value').value = subtotal;
+            hitungTotal();
+        }
+
+        // REVISI:TAMBAH OLI — Saat harga paket berubah, subtotal + hidden harga_paket ikut berubah
+        if (e.target.classList.contains('input-harga-paket')) {
+            const harga = parseFloat(unformatRupiah(e.target.value)) || 0;
+            const hiddenHarga = row.querySelector('.input-harga-paket-value');
+            if (hiddenHarga) hiddenHarga.value = harga;
+            const subtotalEl = row.querySelector('.section-paket-service .input-subtotal');
+            const subtotalHiddenEl = row.querySelector('.section-paket-service .input-subtotal-value');
+            if (subtotalEl) subtotalEl.value = formatRupiah(harga);
+            if (subtotalHiddenEl) subtotalHiddenEl.value = harga;
             hitungTotal();
         }
     });
@@ -1067,7 +1131,6 @@
         }
     });
 
-    // ========== FIX #3: pakai hargaScanBersih (bukan scannedBarang.harga_jual mentah) ==========
     document.getElementById('btn-tambah-ke-form').addEventListener('click', function () {
         if (!scannedBarang) return;
 
@@ -1112,6 +1175,11 @@
         hitungTotal();
         document.querySelectorAll('.item-row').forEach(function (row) {
             updateSubtotalFinal(row);
+        });
+
+        // Konversi input desimal (koma -> titik) supaya diterima backend sebagai numeric
+        document.querySelectorAll('.input-desimal').forEach(function (input) {
+            input.value = input.value.replace(',', '.');
         });
     });
 </script>

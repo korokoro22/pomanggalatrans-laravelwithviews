@@ -1,9 +1,9 @@
-    @extends('adminlte::page')
+   @extends('adminlte::page')
 
-    @section('title', 'Detail Transaksi Keluar')
+    @section('title', 'Detail Barang Keluar')
 
     @section('content_header')
-        <h1 style="text-transform: uppercase;">Detail Transaksi Keluar</h1>
+        <h1 style="text-transform: uppercase;">Detail Barang Keluar</h1>
     @stop
 
     @section('content')
@@ -17,8 +17,8 @@
         </a>
     </div>
 
-    {{-- INFO TRANSAKSI --}}
-    <x-adminlte-card title="Informasi Transaksi" theme="danger" icon="fas fa-file-invoice" style="text-transform: uppercase;">
+    {{-- INFO BARANG KELUAR --}}
+    <x-adminlte-card title="Informasi Barang Keluar" theme="danger" icon="fas fa-file-invoice" style="text-transform: uppercase;">
         <div class="row">
 
             <div class="col-md-6">
@@ -59,7 +59,7 @@
     </x-adminlte-card>
 
     {{-- DETAIL ITEM --}}
-    <x-adminlte-card title="Detail Item Transaksi" theme="danger" icon="fas fa-boxes" style="text-transform: uppercase;">
+    <x-adminlte-card title="Detail Item Barang Keluar" theme="danger" icon="fas fa-boxes" style="text-transform: uppercase;">
 
     <table class="table table-bordered table-striped">
         <thead class="text-center">
@@ -116,6 +116,9 @@
                 </td>
                 <td>
                     {{ $detail->nama_item }}
+                    @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->kondisi === 'bekas')
+                        <span class="text-muted">(Bekas)</span>
+                    @endif
                     @if($detail->tipe === 'paket_service' && $detail->paketService)
                         <br>
                         <small class="text-muted">
@@ -130,6 +133,7 @@
                         <small class="text-muted">{{ $detail->keterangan }}</small>
                     @endif
                 </td>
+                
                 <td class="text-center">{{ $detail->qty }}</td>
                 <td class="text-center">{{ $detail->satuan ?? '-' }}</td>
                 <td class="text-right">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>

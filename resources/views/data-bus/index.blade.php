@@ -38,13 +38,13 @@
         <div class="row">
 
             <div class="col-md-6">
-                <label>Nama Bus</label>
+                <label>Nama driver</label>
                 <input type="text"
-                       name="nama_bus"
+                       name="nama_driver"
                        class="form-control"
                        style="text-transform: uppercase;"
-                       placeholder="Cari nama bus..."
-                       value="{{ request('nama_bus') }}">
+                       placeholder="Cari nama driver..."
+                       value="{{ request('nama_driver') }}">
             </div>
 
             <div class="col-md-6">
@@ -79,7 +79,7 @@
             <thead class="text-center">
                 <tr>
                     <th width="5%">No</th>
-                    <th>Nama Bus</th>
+                    <!--<th>Nama Bus</th>-->
                     <th>Plat Nomor</th>
                     <th>Rute / Trayek</th>
                     <th>Nama Driver</th>
@@ -92,7 +92,7 @@
                 @forelse ($buses as $index => $bus)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $bus->nama_bus }}</td>
+                    <!--<td>{{ $bus->nama_bus }}</td>-->
                     <td>{{ $bus->plat_nomor }}</td>
                     <td>{{ $bus->rute_trayek ?? '-' }}</td>
                     <td>{{ $bus->nama_driver }}</td>

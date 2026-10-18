@@ -24,15 +24,25 @@
     <table class="table table-borderless">
         <tr>
             <td width="30%"><strong>Nama Bus</strong></td>
-            <td>: {{ $paketService->bus->nama_bus }}</td>
+            <td>: {{ $paketService->bus_id === null ? 'Semua Bus' : $paketService->bus->nama_bus }}</td>
         </tr>
         <tr>
             <td><strong>Plat Nomor</strong></td>
-            <td>: {{ $paketService->bus->plat_nomor }}</td>
+            <td>: {{ $paketService->bus_id === null ? '-' : $paketService->bus->plat_nomor }}</td>
         </tr>
         <tr>
             <td><strong>Nama Paket</strong></td>
             <td>: {{ $paketService->nama_paket }}</td>
+
+            {{-- REVISI:KATEGORI PAKET SERVICE --}}
+            <tr>
+                <th>Kategori</th>
+                <td>: {{ $paketService->kategori === 'paket_oli' ? 'Paket Oli' : 'Paket Reguler' }}</td>
+            </tr>
+            {{-- REVISI: PAKET NON-ITEM --}}
+            @if($paketService->paketServiceItem->isEmpty())
+                <tr><td colspan="2" class="text-warning font-weight-bold">Paket ini tidak menggunakan barang — hanya mencatat harga saja.</td></tr>
+            @endif
         </tr>
         <tr>
             <td><strong>Harga</strong></td>

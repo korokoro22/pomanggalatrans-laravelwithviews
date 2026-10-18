@@ -38,6 +38,16 @@
                     </select>
                 </div>
             </div>
+            
+            <div class="col-md-4">
+                <label>Nama Barang</label>
+                <input type="text"
+                       name="nama_item"
+                       class="form-control"
+                       style="text-transform: uppercase;"
+                       placeholder="Cari nama barang..."
+                       value="{{ request('nama_item') }}">
+            </div>
 
             <div class="col-md-3">
                 <div class="form-group">
@@ -106,10 +116,10 @@
             <tr>
                 <th width="5%">No</th>
                 <th>Bus</th>
-                <th>Driver</th>
                 <th>Item Transaksi</th>
                 <th>Total</th>
                 <th>Tanggal</th>
+                <th>Keterangan</th>
                 <th width="140">Aksi</th>
             </tr>
         </thead>
@@ -119,14 +129,16 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration + ($transaksiKeluars->currentPage() - 1) * $transaksiKeluars->perPage() }}</td>
                 <td>
-                    {{ $transaksi->bus->nama_bus ?? '-' }}<br>
-                    <small class="text-muted">{{ $transaksi->bus->plat_nomor ?? '' }}</small>
+                    {{ $transaksi->bus->plat_nomor ?? '-' }}
                 </td>
-                <td>{{ $transaksi->bus->nama_driver ?? '-' }}</td>
                 <td>
                     @foreach($transaksi->details as $detail)
                         <span class="badge badge-light border text-dark">
                             {{ $detail->nama_item }}
+                            @if($detail->tipe === 'per_item' && $detail->barang && $detail->barang->kondisi === 'bekas')
+                                <span class="text-muted">(Bekas)</span>
+                            @endif
+                            : <span class="text-info">{{ $detail->qty }} {{ $detail->satuan }}</span>
                         </span>
                     @endforeach
                 </td>
@@ -135,6 +147,23 @@
                 </td>
                 <td class="text-center">
                     {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}
+                </td>
+                <td>
+                    @php
+                        // Ambil keterangan yang terisi, lewati yang sama persis dengan nama item
+                        // (tipe biaya pengerjaan menyimpan keterangan sebagai nama_item juga)
+                        $keteranganList = $transaksi->details
+                            ->filter(fn($d) => filled($d->keterangan) && $d->keterangan !== $d->nama_item);
+                    @endphp
+                    @forelse($keteranganList as $detail)
+                        <div>
+                            <small>
+                                <strong>{{ $detail->nama_item }}:</strong> {{ $detail->keterangan }}
+                            </small>
+                        </div>
+                    @empty
+                        <span class="text-muted">-</span>
+                    @endforelse
                 </td>
                 <td class="text-center">
                     <div class="d-flex flex-column" style="row-gap: 8px;">

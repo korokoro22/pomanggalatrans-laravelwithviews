@@ -95,6 +95,43 @@
             </div>
 
         </div>
+
+        {{-- REVISI: FILTER LAPORAN BUS --}}
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Tipe</label>
+                    <select name="tipe" class="form-control">
+                        <option value="semua" {{ ($tipe ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua</option>
+                        <option value="paket_service" {{ ($tipe ?? '') === 'paket_service' ? 'selected' : '' }}>Paket Service</option>
+                        <option value="barang_biasa" {{ ($tipe ?? '') === 'barang_biasa' ? 'selected' : '' }}>Barang Biasa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Sub-tipe Paket</label>
+                    <select name="sub_tipe_paket" class="form-control">
+                        <option value="semua" {{ ($subTipePaket ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua</option>
+                        <option value="paket_reguler" {{ ($subTipePaket ?? '') === 'paket_reguler' ? 'selected' : '' }}>Paket Reguler</option>
+                        <option value="paket_oli" {{ ($subTipePaket ?? '') === 'paket_oli' ? 'selected' : '' }}>Paket Oli</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Sub-tipe Barang</label>
+                    <select name="sub_tipe_barang" class="form-control">
+                        <option value="semua" {{ ($subTipeBarang ?? 'semua') === 'semua' ? 'selected' : '' }}>Semua</option>
+                        <option value="pembelian_toko" {{ ($subTipeBarang ?? '') === 'pembelian_toko' ? 'selected' : '' }}>Pembelian Toko</option>
+                        <option value="pembelian_langsung" {{ ($subTipeBarang ?? '') === 'pembelian_langsung' ? 'selected' : '' }}>Pembelian Langsung</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="mt-2">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-search"></i> FILTER
@@ -116,7 +153,7 @@
                 <th>Nama Bus</th>
                 <th>Plat Nomor</th>
                 <th>Driver</th>
-                <th>Item Transaksi</th>
+                <th width="18%">Item Transaksi</th>
                 <th>Total</th>
                 <th width="12%">Aksi</th>
             </tr>
@@ -175,17 +212,18 @@
 {{-- TABLE --}}
 <x-adminlte-card title="Daftar Pengeluaran Bus" theme="danger" icon="fas fa-bus" style="text-transform: uppercase;">
 
-    <table class="table table-bordered table-striped" style="text-transform: uppercase;">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" style="text-transform: uppercase;">
         <thead class="text-center">
             <tr>
                 <th width="5%">No</th>
                 <th>Tanggal</th>
                 <th>Kategori Nota</th> {{-- KOLOM BARU --}}
-                <th>Nama Bus</th>
                 <th>Plat Nomor</th>
                 <th>Driver</th>
-                <th>Item Transaksi</th>
+                <th width="18%">Item Transaksi</th>
                 <th>Total</th>
+                <th>Keterangan</th>
                 <th width="12%">Aksi</th>
             </tr>
         </thead>
@@ -199,7 +237,6 @@
                         {{ $transaksi->kategori === 'normal' ? 'Nota Bengkel' : str_replace('_', ' ', $transaksi->kategori) }}
                     </span>
                 </td>
-                <td>{{ $transaksi->bus->nama_bus }}</td>
                 <td>{{ $transaksi->bus->plat_nomor }}</td>
                 <td>{{ $transaksi->bus->nama_driver }}</td>
                 <td>
@@ -211,6 +248,23 @@
                 </td>
                 <td class="text-right">
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
+                </td>
+                <td>
+                    @php
+                        // Ambil keterangan yang terisi, lewati yang sama persis dengan nama item
+                        // (tipe biaya pengerjaan menyimpan keterangan sebagai nama_item juga)
+                        $keteranganList = $transaksi->details
+                            ->filter(fn($d) => filled($d->keterangan) && $d->keterangan !== $d->nama_item);
+                    @endphp
+                    @forelse($keteranganList as $detail)
+                        <div>
+                            <small>
+                                <strong>{{ $detail->nama_item }}:</strong> {{ $detail->keterangan }}
+                            </small>
+                        </div>
+                    @empty
+                        <span class="text-muted">-</span>
+                    @endforelse
                 </td>
                 <td class="text-center">
                     <div class="d-flex flex-column" style="row-gap: 8px;">
@@ -233,14 +287,15 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="7" class="text-right"><strong>Total Keseluruhan</strong></td>
+                <td colspan="6" class="text-right"><strong>Total Keseluruhan</strong></td>
                 <td class="text-right">
                     <strong>Rp {{ number_format($transaksis->sum('total_transaksi'), 0, ',', '.') }}</strong>
                 </td>
-                <td></td>
+                <td colspan="2"></td>
             </tr>
         </tfoot>
     </table>
+    </div>
 
 </x-adminlte-card>
 

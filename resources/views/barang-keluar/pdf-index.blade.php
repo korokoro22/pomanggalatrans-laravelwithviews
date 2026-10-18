@@ -25,10 +25,10 @@
             <tr>
                 <th width="4%">No</th>
                 <th width="10%">Tanggal</th>
-                <th width="18%">Bus</th>
-                <th width="14%">Driver</th>
+                <th width="12%">Bus</th>
                 <th>Item Transaksi</th>
                 <th width="14%">Total</th>
+                <th width="22%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -39,10 +39,8 @@
                     {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d-m-Y H:i') }}
                 </td>
                 <td>
-                    {{ $transaksi->bus->nama_bus ?? '-' }}<br>
-                    <small>{{ $transaksi->bus->plat_nomor ?? '' }}</small>
+                    {{ $transaksi->bus->plat_nomor ?? '-' }}
                 </td>
-                <td>{{ $transaksi->bus->nama_driver ?? '-' }}</td>
                 <td>
                     @foreach($transaksi->details as $detail)
                         - {{ $detail->nama_item }}
@@ -72,6 +70,19 @@
                 <td class="text-right">
                     Rp {{ number_format($transaksi->total_transaksi, 0, ',', '.') }}
                 </td>
+                <td>
+                    @php
+                        // Ambil keterangan yang terisi, lewati yang sama persis dengan nama item
+                        // (tipe biaya pengerjaan menyimpan keterangan sebagai nama_item juga)
+                        $keteranganList = $transaksi->details
+                            ->filter(fn($d) => filled($d->keterangan) && $d->keterangan !== $d->nama_item);
+                    @endphp
+                    @forelse($keteranganList as $detail)
+                        <small><strong>{{ $detail->nama_item }}:</strong> {{ $detail->keterangan }}</small><br>
+                    @empty
+                        -
+                    @endforelse
+                </td>
             </tr>
             @empty
             <tr>
@@ -81,12 +92,13 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="5" class="text-right"><strong>Total Keseluruhan</strong></td>
+                <td colspan="4" class="text-right"><strong>Total Keseluruhan</strong></td>
                 <td class="text-right">
                     <strong>
                         Rp {{ number_format($transaksiKeluars->sum('total_transaksi'), 0, ',', '.') }}
                     </strong>
                 </td>
+                <td></td>
             </tr>
         </tfoot>
     </table>

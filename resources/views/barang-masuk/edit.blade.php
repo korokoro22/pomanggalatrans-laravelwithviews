@@ -1,12 +1,12 @@
 @extends('adminlte::page')
 
-@section('title', 'Edit Barang Masuk')
+@section('title', 'Edit Nota Masuk')
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 <style>
     .select2-container { width: 100% !important; }
-    
+
     /* CSS Dropdown Detail Barang (Untuk item yang baru ditambahkan) */
     .select2-barang-option { display: flex; align-items: center; gap: 12px; padding: 6px 4px; }
     .select2-barang-foto { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
@@ -35,14 +35,47 @@
 @stop
 
 @section('content_header')
-    <h1 style="text-transform: uppercase;">Edit Barang Masuk</h1>
+    <h1 style="text-transform: uppercase;">Edit Nota Masuk</h1>
 @stop
 
 @section('content')
 
+@if ($errors->any())
+    <div class="alert alert-danger" style="text-transform: uppercase;">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Terjadi kesalahan:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <form action="{{ route('barang-masuk.update', $barangMasuk->id) }}" method="POST" enctype="multipart/form-data" style="text-transform: uppercase;">
 @csrf
 @method('PUT')
+
+{{-- INFO JENIS INPUT (Read-only, tidak bisa diubah saat edit) --}}
+<input type="hidden" name="jenis_masuk" id="jenis_masuk_field" value="{{ $barangMasuk->jenis_masuk ?? 'nota' }}">
+
+@if(config('features.input_stok_lama'))
+<div class="mb-3">
+    @if(($barangMasuk->jenis_masuk ?? 'nota') === 'stok_awal')
+        <span class="badge badge-warning p-2" style="text-transform: uppercase; font-size: 13px;">
+            <i class="fas fa-box-open"></i> Stok Lama (Tanpa Nota)
+        </span>
+    @elseif(($barangMasuk->jenis_masuk ?? 'nota') === 'barang_bekas')
+        <span class="badge badge-secondary p-2" style="text-transform: uppercase; font-size: 13px;">
+            <i class="fas fa-bus"></i> Barang Bekas (dari Bus)
+        </span>
+    @else
+        <span class="badge badge-primary p-2" style="text-transform: uppercase; font-size: 13px;">
+            <i class="fas fa-file-invoice"></i> Dari Nota
+        </span>
+    @endif
+    <small class="text-muted d-block mt-1" style="text-transform: none;">Jenis input tidak dapat diubah setelah data disimpan.</small>
+</div>
+@endif
 
 {{-- HEADER NOTA --}}
 <x-adminlte-card title="Informasi Nota" theme="warning" icon="fas fa-file-invoice" style="text-transform: uppercase;">
@@ -55,34 +88,34 @@
                 @error('tanggal_masuk') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 field-nota">
             <div class="form-group">
                 <label>No. Invoice</label>
-                <input type="text" name="no_invoice" class="form-control @error('no_invoice') is-invalid @enderror" placeholder="Masukkan nomor invoice" value="{{ old('no_invoice', $barangMasuk->no_invoice) }}" style="text-transform: uppercase;" required>
+                <input type="text" name="no_invoice" class="form-control @error('no_invoice') is-invalid @enderror" placeholder="Masukkan nomor invoice" value="{{ old('no_invoice', $barangMasuk->no_invoice) }}" style="text-transform: uppercase;">
                 @error('no_invoice') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 field-nota">
             <div class="form-group">
                 <label>Supplier</label>
-                <input type="text" name="supplier" class="form-control @error('supplier') is-invalid @enderror" placeholder="Masukkan nama supplier" value="{{ old('supplier', $barangMasuk->supplier) }}" style="text-transform: uppercase;" required>
+                <input type="text" name="supplier" class="form-control @error('supplier') is-invalid @enderror" placeholder="Masukkan nama supplier" value="{{ old('supplier', $barangMasuk->supplier) }}" style="text-transform: uppercase;">
                 @error('supplier') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 field-nota">
             <div class="form-group">
                 <label>Penerima</label>
-                <input type="text" name="penerima" class="form-control @error('penerima') is-invalid @enderror" placeholder="Masukkan nama penerima" value="{{ old('penerima', $barangMasuk->penerima) }}" style="text-transform: uppercase;" required>
+                <input type="text" name="penerima" class="form-control @error('penerima') is-invalid @enderror" placeholder="Masukkan nama penerima" value="{{ old('penerima', $barangMasuk->penerima) }}" style="text-transform: uppercase;">
                 @error('penerima') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 field-nota">
             <div class="form-group">
                 <label>Bukti Nota</label>
                 @if ($barangMasuk->bukti_nota)
@@ -96,6 +129,65 @@
             </div>
         </div>
     </div>
+
+    {{-- REVISI: JENIS PEMBELIAN --}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>Jenis Pembelian</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jenis_pembelian" id="jenis-pembelian-toko" value="pembelian_toko" {{ old('jenis_pembelian', $barangMasuk->jenis_pembelian ?? 'pembelian_toko') == 'pembelian_toko' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenis-pembelian-toko">Pembelian Toko</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="jenis_pembelian" id="jenis-pembelian-langsung" value="pembelian_langsung" {{ old('jenis_pembelian', $barangMasuk->jenis_pembelian) == 'pembelian_langsung' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenis-pembelian-langsung">Pembelian Langsung</label>
+                    </div>
+                </div>
+                @error('jenis_pembelian') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+            </div>
+        </div>
+    </div>
+
+    {{-- FIELD KHUSUS BARANG BEKAS (dari Bus) — hanya dirender kalau data ini memang barang bekas --}}
+    @if(($barangMasuk->jenis_masuk ?? 'nota') === 'barang_bekas')
+    <div class="row field-bekas">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Bus Asal</label>
+                <select name="bus_id"
+                        id="bus_id"
+                        class="form-control select-bus @error('bus_id') is-invalid @enderror"
+                        style="text-transform: uppercase;">
+                    <option value="">-- Pilih Bus Asal --</option>
+                    @foreach($busList ?? [] as $bus)
+                        <option value="{{ $bus->id }}" {{ old('bus_id', $barangMasuk->bus_id) == $bus->id ? 'selected' : '' }}>
+                            {{ $bus->nama_bus }} - {{ $bus->plat_nomor }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('bus_id')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Keterangan</label>
+                <textarea name="keterangan"
+                          class="form-control @error('keterangan') is-invalid @enderror"
+                          rows="3"
+                          maxlength="500"
+                          placeholder="Contoh: dilepas saat servis, kondisi masih layak pakai"
+                          style="text-transform: uppercase;">{{ old('keterangan', $barangMasuk->keterangan) }}</textarea>
+                @error('keterangan')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+    </div>
+    @endif
 
 </x-adminlte-card>
 
@@ -132,15 +224,13 @@
                             <label>Kategori</label>
                             <select name="items[{{ $index }}][kategori]" class="form-control select-kategori" required style="text-transform: uppercase;">
                                 <option value="">-- Pilih / Ketik Kategori --</option>
-                                
-                                {{-- Looping Kategori Dinamis dari Database --}}
+
                                 @foreach($kategoriList as $kat)
                                     <option value="{{ $kat }}" {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == $kat ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $kat)) }}
                                     </option>
                                 @endforeach
-                                
-                                {{-- Opsi Default Tambahan --}}
+
                                 <option value="item_bebas" {{ old('items.' . $index . '.kategori', $detail->barang->kategori ?? '') == 'item_bebas' ? 'selected' : '' }}>
                                     Item Bebas
                                 </option>
@@ -151,7 +241,6 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        {{-- Nama Barang Readonly (Tidak bisa diedit dan tidak ada radio button) --}}
                         <div class="form-group">
                             <label>Nama Barang</label>
                             <input type="text"
@@ -195,7 +284,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input type="number" name="items[{{ $index }}][qty]" class="form-control" placeholder="Contoh: 2" min="1" value="{{ old('items.' . $index . '.qty', $detail->qty) }}" style="text-transform: uppercase;" required>
+                            <input type="text" name="items[{{ $index }}][qty]" class="form-control input-desimal" placeholder="Contoh: 2 atau 13,5" inputmode="decimal" autocomplete="off" value="{{ old('items.' . $index . '.qty', rtrim(rtrim(number_format($detail->qty, 2, ',', ''), '0'), ',')) }}" style="text-transform: uppercase;" required>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -207,7 +296,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Total (Pcs)</label>
-                            <input type="number" name="items[{{ $index }}][qty_satuan]" class="form-control" placeholder="Contoh: 24" min="1" value="{{ old('items.' . $index . '.qty_satuan', $detail->qty_satuan) }}" style="text-transform: uppercase;" required>
+                            <input type="text" name="items[{{ $index }}][qty_satuan]" class="form-control input-desimal" placeholder="Contoh: 24 atau 13,5" inputmode="decimal" autocomplete="off" value="{{ old('items.' . $index . '.qty_satuan', rtrim(rtrim(number_format($detail->qty_satuan, 2, ',', ''), '0'), ',')) }}" style="text-transform: uppercase;" required>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -331,7 +420,7 @@
     function showPreview(event, src) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         const overlay = document.getElementById('image-preview-overlay');
         const img = document.getElementById('image-preview-src');
         img.src = src;
@@ -354,6 +443,24 @@
     function unformatRupiah(str) {
         return str ? str.toString().replace(/\./g, '') : '';
     }
+
+    // ========== Helper Desimal (koma sebagai pemisah desimal, untuk qty & qty_satuan) ==========
+    function parseDesimal(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(',', '.')) || 0;
+    }
+
+    // Batasi input desimal: hanya digit dan satu koma
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-desimal')) return;
+
+        let value = e.target.value.replace(/[^0-9,]/g, '');
+        const parts = value.split(',');
+        if (parts.length > 2) {
+            value = parts[0] + ',' + parts.slice(1).join('');
+        }
+        e.target.value = value;
+    });
 
     // ========== Auto-format tampilan + sinkron ke hidden pasangannya (real-time) ==========
     document.addEventListener('input', function (e) {
@@ -380,7 +487,6 @@
             if (row) hitungSubtotalItem(row);
         }
 
-        // Sinkron subtotal item lama yang diedit manual (bukan hasil buildItemRow, yang itu readonly)
         if (e.target.classList.contains('input-subtotal') && !e.target.readOnly) {
             const container = e.target.closest('.input-group');
             const hidden = container.querySelector('.input-subtotal-value');
@@ -388,7 +494,6 @@
             hitungTotalKeseluruhan();
         }
 
-        // Sinkron Total Keseluruhan kalau diedit manual
         if (e.target.classList.contains('input-total')) {
             const container = e.target.closest('.input-group');
             const hidden = container.querySelector('.input-total-value');
@@ -396,13 +501,30 @@
         }
     });
 
+    // ========== Toggle Jenis Masuk — read-only, ambil dari hidden input ==========
+    // - nota          : field nota tampil
+    // - stok_awal     : field nota disembunyikan
+    // - barang_bekas  : field nota disembunyikan (Bus Asal + Keterangan sudah dirender oleh Blade)
+    function toggleFieldNota() {
+        const jenisMasukInput = document.getElementById('jenis_masuk_field');
+        const jenisMasuk = jenisMasukInput ? jenisMasukInput.value : 'nota';
+        const fieldsNota = document.querySelectorAll('.field-nota');
+
+        fieldsNota.forEach(function (field) {
+            if (jenisMasuk === 'stok_awal' || jenisMasuk === 'barang_bekas') {
+                field.style.display = 'none';
+            } else {
+                field.style.display = '';
+            }
+        });
+    }
+
     // ========== Build Template Baris Baru ==========
     function buildItemRow(index) {
         const barangOptions = Object.values(barangs).map(b =>
             `<option value="${b.id}">${b.nama_barang} ${b.kode_barang}</option>`
         ).join('');
 
-        // Generate Kategori Dinamis
         const kategoriOptions = kategoriList.map(kat => {
             let label = kat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             return `<option value="${kat}">${label}</option>`;
@@ -498,7 +620,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Contoh: 2" min="1" required style="text-transform: uppercase;">
+                            <input type="text" name="items[${index}][qty]" class="form-control input-qty input-desimal" placeholder="Contoh: 2 atau 13,5" inputmode="decimal" autocomplete="off" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -510,7 +632,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Total (Pcs)</label>
-                            <input type="number" name="items[${index}][qty_satuan]" class="form-control input-qty-satuan" placeholder="Contoh: 24" min="1" required style="text-transform: uppercase;">
+                            <input type="text" name="items[${index}][qty_satuan]" class="form-control input-qty-satuan input-desimal" placeholder="Contoh: 24 atau 13,5" inputmode="decimal" autocomplete="off" required style="text-transform: uppercase;">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -607,7 +729,6 @@
             }
         });
 
-        // Trigger saat barang dipilih (Autofill Kode, Satuan, Harga Jual)
         select.on('change', function () {
             const b = barangs[$(this).val()];
             const r = $(this).closest('.item-row')[0];
@@ -617,13 +738,13 @@
             const inputHargaJual = r.querySelector('.input-harga-jual');
             const inputHargaJualValue = r.querySelector('.input-harga-jual-value');
             const inputKodeBarang = r.querySelector('.input-kode-barang');
-            
+
             if (b) {
                 if(info) info.style.display = 'inline';
                 if(optLabel) optLabel.style.display = 'inline';
-                
+
                 if(inputSatuan) inputSatuan.value = b.satuan;
-                if(inputKodeBarang) inputKodeBarang.value = b.kode_barang; // Set default kode_barang item lama
+                if(inputKodeBarang) inputKodeBarang.value = b.kode_barang;
                 if(inputHargaJualValue) {
                     const hargaBersih = Math.round(parseFloat(b.harga_jual));
                     inputHargaJualValue.value = hargaBersih;
@@ -632,7 +753,7 @@
             } else {
                 if(info) info.style.display = 'none';
                 if(optLabel) optLabel.style.display = 'none';
-                
+
                 if(inputSatuan) inputSatuan.value = '';
                 if(inputKodeBarang) inputKodeBarang.value = '-';
                 if(inputHargaJualValue) {
@@ -651,7 +772,7 @@
         if (!selectKat.length) return;
 
         selectKat.select2({
-            tags: true, // Memungkinkan mengetik kategori baru
+            tags: true,
             dropdownParent: $(row),
             placeholder: '-- Pilih / Ketik Kategori --',
             allowClear: true,
@@ -659,15 +780,28 @@
         });
     }
 
-    // Panggil saat document ready untuk baris yang sudah ada
+    // ========== Select2 untuk dropdown "Bus Asal" (hanya ada kalau jenis = barang_bekas) ==========
+    function initSelect2Bus() {
+        const selectBus = $('#bus_id');
+        if (!selectBus.length) return;
+
+        selectBus.select2({
+            placeholder: '-- Pilih Bus Asal --',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
     $(document).ready(function () {
         document.querySelectorAll('.item-row').forEach(row => {
             initSelect2Barang(row);
             initSelect2Kategori(row);
         });
+        initSelect2Bus();
+        toggleFieldNota();
     });
 
-    // ========== Logic Toggle Jenis Radio ==========
+    // ========== Logic Toggle Jenis Radio (per item) ==========
     document.getElementById('item-container').addEventListener('change', function (e) {
         if (e.target.classList.contains('jenis-radio')) {
             const row = e.target.closest('.item-row');
@@ -679,11 +813,10 @@
                 sectionBaru.style.display     = 'none';
                 sectionExisting.style.display = 'block';
             } else {
-                // Saat kembali ke "Barang Baru", reset kode barang ke "-"
                 sectionBaru.style.display     = 'block';
                 sectionExisting.style.display = 'none';
                 if(inputKodeBarang) inputKodeBarang.value = '-';
-                
+
                 const select = row.querySelector('.select-barang');
                 if(select) $(select).val('').trigger('change.select2');
 
@@ -703,7 +836,7 @@
         const rows = document.querySelectorAll('.item-row');
         const newRow = rows[rows.length - 1];
         initSelect2Barang(newRow);
-        initSelect2Kategori(newRow); // Inisiasi kategori di baris baru
+        initSelect2Kategori(newRow);
     });
 
     document.getElementById('item-container').addEventListener('click', function (e) {
@@ -725,7 +858,7 @@
     // ========== Perhitungan Hibrida (Dukung Item Lama & Baru) ==========
     function hitungSubtotalItem(row) {
         const qtySatuanInput = row.querySelector('input[name$="[qty_satuan]"]');
-        const qtySatuan = parseFloat(qtySatuanInput?.value) || 0;
+        const qtySatuan = parseDesimal(qtySatuanInput?.value);
 
         let hargaJual = 0;
         const hargaHidden = row.querySelector('.input-harga-jual-value');
@@ -741,8 +874,6 @@
         const subtotalHidden = row.querySelector('.input-subtotal-value');
         const subtotalVisible = row.querySelector('.input-subtotal');
 
-        // Selalu sinkron subtotal (item lama maupun baru) saat qty_satuan atau harga_jual berubah,
-        // sama seperti perilaku aslinya. User tetap bisa mengetik ulang manual setelahnya jika perlu.
         if (subtotalHidden && subtotalVisible) {
             subtotalHidden.value = subtotal;
             subtotalVisible.value = formatRupiah(subtotal);
@@ -766,13 +897,24 @@
         if (totalVisible) totalVisible.value = formatRupiah(total);
     }
 
-    // Tangkap perubahan input QTY & Harga Jual Format Rupiah
     document.getElementById('item-container').addEventListener('input', function (e) {
         if (e.target.matches('input[name$="[qty_satuan]"]') ||
             e.target.matches('.input-harga-jual')) {
             const row = e.target.closest('.item-row');
             hitungSubtotalItem(row);
         }
+    });
+
+    // ========== Pengaman terakhir sebelum submit ==========
+    document.querySelector('form').addEventListener('submit', function () {
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            hitungSubtotalItem(row);
+        });
+
+        // Konversi input desimal (koma -> titik) supaya diterima backend sebagai numeric
+        document.querySelectorAll('.input-desimal').forEach(function (input) {
+            input.value = input.value.replace(',', '.');
+        });
     });
 
 </script>

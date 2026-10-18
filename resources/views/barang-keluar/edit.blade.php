@@ -2,7 +2,7 @@
 
 @extends('adminlte::page')
 
-@section('title', 'Edit Transaksi Keluar')
+@section('title', 'Edit Barang Keluar')
 
 @section('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
@@ -69,18 +69,18 @@
 @stop
 
 @section('content_header')
-    <h1 style="text-transform: uppercase;">Edit Transaksi Keluar</h1>
+    <h1 style="text-transform: uppercase;">Edit Barang Keluar</h1>
 @stop
 
 @section('content')
 
 @if(session('error'))
     <div class="alert alert-danger" style="text-transform: uppercase;">
-        <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+        <i class="fas fa-exclamation-triangle"></i> Error Detail: {{ session('error') }}
     </div>
 @endif
 
-<x-adminlte-card title="Form Edit Transaksi Keluar" theme="danger" icon="fas fa-edit" style="text-transform: uppercase;">
+<x-adminlte-card title="Form Edit Barang Keluar" theme="danger" icon="fas fa-edit" style="text-transform: uppercase;">
 
     <form action="{{ route('barang-keluar.update', $transaksi->id) }}" method="POST">
         @csrf
@@ -115,8 +115,8 @@
 
         <hr>
 
-        <h5><i class="fas fa-list"></i> Item Transaksi</h5>
-        <small class="text-muted">Edit item transaksi</small>
+        <h5><i class="fas fa-list"></i> Item Barang Keluar</h5>
+        <small class="text-muted">Edit item Barang Keluar</small>
 
         <div class="mt-3" id="item-container">
 
@@ -124,37 +124,8 @@
             <div class="card card-outline card-secondary mb-3 item-row">
                 <div class="card-body">
 
-                    {{-- Tipe --}}
-                    {{-- <div class="row mb-2">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Tipe Item</label>
-                                
-                                <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input tipe-radio"
-                                               type="radio"
-                                               name="items[{{ $index }}][tipe]"
-                                               value="per_item"
-                                               {{ $detail->tipe === 'per_item' ? 'checked' : '' }}>
-                                        <label class="form-check-label">Per Item</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input tipe-radio"
-                                               type="radio"
-                                               name="items[{{ $index }}][tipe]"
-                                               value="paket_service"
-                                               {{ $detail->tipe === 'paket_service' ? 'checked' : '' }}>
-                                        <label class="form-check-label">Paket Service</label>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
-
                     {{-- Tipe (fixed, tidak bisa diubah untuk item yang sudah ada) --}}
-                    <input type="hidden" name="items[{{ $index }}][tipe]" value="{{ $detail->tipe }}">
+                    <input type="hidden" name="items[{{ $index }}][tipe]" class="tipe-hidden" value="{{ $detail->tipe }}">
                     <div class="mb-2">
                         <label class="d-block mb-1">Tipe Item</label>
                         <span class="badge badge-{{ $detail->tipe === 'paket_service' ? 'primary' : 'secondary' }} p-2" style="text-transform: uppercase;">
@@ -174,7 +145,7 @@
                                             class="form-control select-paket" style="text-transform: uppercase;">
                                         <option value="">-- Pilih Paket Service --</option>
                                         @if($detail->tipe === 'paket_service' && $detail->paketService)
-                                            <option value="{{ $detail->paketService->id }}" selected>
+                                            <option value="{{ $detail->paketService->id }}" data-harga="{{ $detail->paketService->harga }}" selected>
                                                 {{ $detail->paketService->nama_paket }} — Rp {{ number_format($detail->paketService->harga, 0, ',', '.') }}
                                             </option>
                                         @endif
@@ -187,20 +158,34 @@
                                     <label>Harga Paket</label>
                                     <input type="number"
                                            class="form-control input-harga-paket"
-                                           value="{{ $detail->tipe === 'paket_service' ? $detail->harga_satuan : '' }}"
+                                           value="{{ $detail->tipe === 'paket_service' ? round($detail->harga_satuan) : '' }}"
+                                           min="0"
                                            style="text-transform: uppercase;"
-                                           readonly>
+                                           >
+                                    {{-- REVISI:TAMBAH OLI — Hidden input untuk kirim harga ke backend --}}
+                                    <input type="hidden" name="items[{{ $index }}][harga_paket]" class="input-harga-paket-value" value="{{ $detail->tipe === 'paket_service' ? round($detail->harga_satuan) : '' }}">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Subtotal</label>
-                                    <input type="hidden" name="items[{{ $index }}][subtotal]" class="input-subtotal-value" value="{{ $detail->tipe === 'paket_service' ? $detail->subtotal : '' }}">
+                                    <input type="hidden" class="input-subtotal-value" value="{{ $detail->tipe === 'paket_service' ? round($detail->subtotal) : '' }}">
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            style="text-transform: uppercase;"
-                                           value="{{ $detail->tipe === 'paket_service' ? $detail->subtotal : '' }}"
+                                           value="{{ $detail->tipe === 'paket_service' ? round($detail->subtotal) : '' }}"
+                                           readonly
                                            >
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- REVISI:TAMBAH OLI — Keterangan opsional --}}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Keterangan <small class="text-muted">(opsional)</small></label>
+                                    <input type="text" name="items[{{ $index }}][keterangan_paket]" class="form-control" placeholder="Contoh: Oli 2 liter" style="text-transform: uppercase;" value="{{ $detail->tipe === 'paket_service' ? $detail->keterangan : '' }}">
                                 </div>
                             </div>
                         </div>
@@ -230,7 +215,7 @@
                                            value="{{ $detail->satuan }}"
                                            placeholder="Otomatis terisi"
                                            style="text-transform: uppercase;"
-                                           readonly>
+                                           >
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -248,13 +233,14 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Qty</label>
-                                    <input type="number"
+                                    <input type="text"
                                            name="items[{{ $index }}][qty]"
-                                           class="form-control input-qty"
-                                           value="{{ $detail->qty }}"
-                                           placeholder="Masukkan qty"
-                                           style="text-transform: uppercase;"
-                                           min="1">
+                                           class="form-control input-qty input-desimal"
+                                           value="{{ rtrim(rtrim(number_format($detail->qty, 2, ',', ''), '0'), ',') }}"
+                                           placeholder="Contoh: 2 atau 13,5"
+                                           inputmode="decimal"
+                                           autocomplete="off"
+                                           style="text-transform: uppercase;">
                                 </div>
                             </div>
                         </div>
@@ -262,7 +248,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Subtotal</label>
-                                    <input type="hidden" name="items[{{ $index }}][subtotal]" class="input-subtotal-value" value="{{ $detail->tipe === 'per_item' ? $detail->subtotal : '' }}">
+                                    <input type="hidden" class="input-subtotal-value" value="{{ $detail->tipe === 'per_item' ? $detail->subtotal : '' }}">
                                     <input type="number"
                                            class="form-control input-subtotal"
                                            value="{{ $detail->tipe === 'per_item' ? $detail->subtotal : '' }}"
@@ -328,7 +314,6 @@
 
     // ========== Fungsi Preview Gambar ==========
     function showPreview(event, src) {
-        // Mencegah select2 menganggap ini sebagai klik item (mencegah dropdown tertutup)
         event.preventDefault();
         event.stopPropagation();
         
@@ -342,6 +327,31 @@
         const overlay = document.getElementById('image-preview-overlay');
         overlay.style.display = 'none';
         document.getElementById('image-preview-src').src = '';
+    }
+
+    // ========== Helper Desimal (koma sebagai pemisah desimal, untuk qty) ==========
+    function parseDesimal(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(',', '.')) || 0;
+    }
+
+    // Batasi input desimal: hanya digit dan satu koma
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('input-desimal')) return;
+
+        let value = e.target.value.replace(/[^0-9,]/g, '');
+        const parts = value.split(',');
+        if (parts.length > 2) {
+            value = parts[0] + ',' + parts.slice(1).join('');
+        }
+        e.target.value = value;
+    });
+
+    // Ambil tipe item: baris baru pakai radio, baris lama pakai hidden input
+    function getTipe(row) {
+        return row.querySelector('.tipe-radio:checked')?.value
+            || row.querySelector('.tipe-hidden')?.value
+            || 'per_item';
     }
 
     let paketList = [];
@@ -377,7 +387,6 @@
 
             const harga = Number(b.harga_jual).toLocaleString('id-ID');
             
-            // Format text gudang (gudang_utama -> Gudang Utama)
             let gudangText = b.gudang ? b.gudang.replace(/_/g, ' ') : '-';
             gudangText = gudangText.replace(/\b\w/g, l => l.toUpperCase());
 
@@ -518,7 +527,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Satuan</label>
-                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
+                                <input type="text" name="items[${index}][satuan]" class="form-control input-satuan" placeholder="Otomatis terisi" style="text-transform: uppercase;" >
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -530,7 +539,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Qty</label>
-                                <input type="number" name="items[${index}][qty]" class="form-control input-qty" placeholder="Masukkan qty" style="text-transform: uppercase;" min="1">
+                                <input type="text" name="items[${index}][qty]" class="form-control input-qty input-desimal" placeholder="Contoh: 2 atau 13,5" inputmode="decimal" autocomplete="off" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -538,7 +547,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Subtotal</label>
-                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
+                                <input type="hidden" class="input-subtotal-value">
                                 <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;">
                             </div>
                         </div>
@@ -560,14 +569,24 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Harga Paket</label>
-                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
+                                <input type="number" class="form-control input-harga-paket" placeholder="Otomatis terisi" min="0" style="text-transform: uppercase;" >
+                                {{-- FIX: hidden input agar harga paket yang diubah ikut terkirim ke controller --}}
+                                <input type="hidden" name="items[${index}][harga_paket]" class="input-harga-paket-value">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Subtotal</label>
-                                <input type="hidden" name="items[${index}][subtotal]" class="input-subtotal-value">
+                                <input type="hidden" class="input-subtotal-value">
                                 <input type="number" class="form-control input-subtotal" placeholder="Otomatis terisi" style="text-transform: uppercase;" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Keterangan <small class="text-muted">(opsional)</small></label>
+                                <input type="text" name="items[${index}][keterangan_paket]" class="form-control" placeholder="Contoh: Oli 2 liter" style="text-transform: uppercase;">
                             </div>
                         </div>
                     </div>
@@ -595,29 +614,57 @@
                 sectionPaket.style.display = 'none';
                 sectionItem.style.display  = 'block';
             }
+
+            // FIX: reset juga harga paket (visible + hidden) saat ganti tipe
+            const hargaPaketEl     = row.querySelector('.input-harga-paket');
+            const hargaPaketHidden = row.querySelector('.input-harga-paket-value');
+            if (hargaPaketEl) hargaPaketEl.value = '';
+            if (hargaPaketHidden) hargaPaketHidden.value = '';
+            const selPaket = row.querySelector('.select-paket');
+            if (selPaket) selPaket.value = '';
+
             resetSubtotal(row);
         }
 
         if (e.target.classList.contains('select-paket')) {
-            const harga = e.target.selectedOptions[0]?.dataset.harga || 0;
+            const harga = Math.round(parseFloat(e.target.selectedOptions[0]?.dataset.harga || 0)) || 0;
             row.querySelector('.input-harga-paket').value = harga;
+
+            // FIX: hidden harga_paket ikut diisi dengan harga default paket (bisa diubah manual setelahnya)
+            const hiddenHarga = row.querySelector('.input-harga-paket-value');
+            if (hiddenHarga) hiddenHarga.value = harga;
+
             row.querySelector('.section-paket-service .input-subtotal').value       = harga;
             row.querySelector('.section-paket-service .input-subtotal-value').value = harga;
             hitungTotal();
         }
     });
 
-    // Event: input qty & harga satuan
+    // Event: input qty, harga satuan & harga paket
     document.getElementById('item-container').addEventListener('input', function (e) {
         const row = e.target.closest('.item-row');
         if (!row) return;
 
         if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-harga-satuan')) {
-            const qty      = parseInt(row.querySelector('.input-qty').value) || 0;
+            const qty      = parseDesimal(row.querySelector('.input-qty').value);
             const harga    = parseFloat(row.querySelector('.input-harga-satuan').value) || 0;
             const subtotal = qty * harga;
             row.querySelector('.section-per-item .input-subtotal').value       = subtotal;
             row.querySelector('.section-per-item .input-subtotal-value').value = subtotal;
+            hitungTotal();
+        }
+
+        // REVISI:TAMBAH OLI — Saat harga paket berubah, hidden harga_paket & subtotal ikut berubah
+        // FIX: sebelumnya memanggil unformatRupiah() yang tidak ada di file ini (ReferenceError).
+        // Input bertipe number, jadi cukup parseFloat.
+        if (e.target.classList.contains('input-harga-paket')) {
+            const harga = parseFloat(e.target.value) || 0;
+            const hiddenHarga = row.querySelector('.input-harga-paket-value');
+            if (hiddenHarga) hiddenHarga.value = harga;
+            const subtotalEl = row.querySelector('.section-paket-service .input-subtotal');
+            const subtotalHiddenEl = row.querySelector('.section-paket-service .input-subtotal-value');
+            if (subtotalEl) subtotalEl.value = harga;
+            if (subtotalHiddenEl) subtotalHiddenEl.value = harga;
             hitungTotal();
         }
     });
@@ -644,7 +691,8 @@
     function hitungTotal() {
         let total = 0;
         document.querySelectorAll('.item-row').forEach(row => {
-            const tipe = row.querySelector('.tipe-radio:checked')?.value;
+            // FIX: baris lama tidak punya radio, tipe dibaca lewat getTipe() (radio atau hidden)
+            const tipe = getTipe(row);
             if (tipe === 'paket_service') {
                 total += parseFloat(row.querySelector('.section-paket-service .input-subtotal')?.value) || 0;
             } else {
@@ -668,6 +716,14 @@
             row.querySelector('.btn-remove-item').disabled = rows.length === 1;
         });
     }
+
+    // ========== Pengaman terakhir sebelum submit ==========
+    document.querySelector('form').addEventListener('submit', function () {
+        // Konversi input desimal (koma -> titik) supaya diterima backend sebagai numeric
+        document.querySelectorAll('.input-desimal').forEach(function (input) {
+            input.value = input.value.replace(',', '.');
+        });
+    });
 </script>
 @stop
 @stop

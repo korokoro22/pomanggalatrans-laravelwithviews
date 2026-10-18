@@ -8,7 +8,7 @@
 
 @section('content')
 
-@if (session('success'))
+@if (session('success'))    
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
         <button type="button" class="close" data-dismiss="alert">
@@ -48,6 +48,15 @@
                        placeholder="Cari nama barang..."
                        value="{{ request('nama_barang') }}">
             </div>
+            
+            <!--<div class="col-md-3">-->
+            <!--    <label>Kondisi</label>-->
+            <!--    <select name="kondisi" class="form-control" style="text-transform: uppercase;">-->
+            <!--        <option value="">-- Semua Kondisi --</option>-->
+            <!--        <option value="baru"  {{ request('kondisi') == 'baru'  ? 'selected' : '' }}>Baru</option>-->
+            <!--        <option value="bekas" {{ request('kondisi') == 'bekas' ? 'selected' : '' }}>Bekas</option>-->
+            <!--    </select>-->
+            <!--</div>-->
 
             {{-- <div class="col-md-3">
                 <label>Gudang</label>
@@ -130,11 +139,12 @@
         {{-- <th>Kode Barang</th>
         <th>Foto</th> --}}
         <th>Nama Barang</th>
+        <!--<th>Kondisi</th>-->
         {{-- <th>Gudang</th> --}}
         <th>Jumlah Batch</th>
         <th>Total Stok</th>
-        <th>Rentang Harga</th>
-        <th>Tanggal Masuk Terakhir</th>
+        <!--<th>Rentang Harga</th>-->
+        <!--<th>Tanggal Masuk Terakhir</th>-->
         <th width="10%">Aksi</th>
     </tr>
 </thead>
@@ -158,6 +168,13 @@
             @endif
         </td> --}}
         <td>{{ $item->nama_barang }}</td>
+        <!--<td class="text-center">-->
+        <!--    @if(($sample->kondisi ?? 'baru') === 'bekas')-->
+        <!--        <span class="badge badge-secondary"><i class="fas fa-recycle"></i> Bekas</span>-->
+        <!--    @else-->
+        <!--        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Baru</span>-->
+        <!--    @endif-->
+        <!--</td>-->
         {{-- <td class="text-center">
             @php
                 $labelGudang = match($sample->gudang ?? null) {
@@ -177,21 +194,32 @@
                 {{ number_format($item->total_stok) }} Pcs
             </span>
             @if ($item->total_stok <= 5)
-                <span class="badge badge-danger">Menipis</span>
+                @if ($item->total_stok > 0)
+                    <span class="badge badge-danger">Menipis</span>
+                @else
+                    <span class="badge badge-danger">Habis</span>
+                @endif
+                
             @endif
         </td>
-        <td class="text-right">
-            @if ($item->harga_terendah == $item->harga_tertinggi)
-                Rp {{ number_format($item->harga_terendah, 0, ',', '.') }}
-            @else
-                Rp {{ number_format($item->harga_terendah, 0, ',', '.') }} - Rp {{ number_format($item->harga_tertinggi, 0, ',', '.') }}
-            @endif
-        </td>
+        <!--<td class="text-right">-->
+        <!--    @if ($item->harga_terendah == $item->harga_tertinggi)-->
+        <!--        Rp {{ number_format($item->harga_terendah, 0, ',', '.') }}-->
+        <!--    @else-->
+        <!--        Rp {{ number_format($item->harga_terendah, 0, ',', '.') }} - Rp {{ number_format($item->harga_tertinggi, 0, ',', '.') }}-->
+        <!--    @endif-->
+        <!--</td>-->
+        <!--<td class="text-center">-->
+        <!--    {{ \Carbon\Carbon::parse($item->tanggal_masuk_terakhir)->format('d-m-Y H:i') }}-->
+        <!--</td>-->
+        <!--<td class="text-center">-->
+        <!--    <a href="{{ route('master-barang.by-nama', $item->nama_barang) }}"-->
+        <!--       class="btn btn-info btn-sm">-->
+        <!--        Detail-->
+        <!--    </a>-->
+        <!--</td>-->
         <td class="text-center">
-            {{ \Carbon\Carbon::parse($item->tanggal_masuk_terakhir)->format('d-m-Y H:i') }}
-        </td>
-        <td class="text-center">
-            <a href="{{ route('master-barang.by-nama', $item->nama_barang) }}"
+            <a href="{{ route('master-barang.by-nama', $item->encoded_nama) }}"
                class="btn btn-info btn-sm">
                 Detail
             </a>

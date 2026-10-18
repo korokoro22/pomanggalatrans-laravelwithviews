@@ -35,8 +35,8 @@
             @forelse ($paketServices as $index => $paket)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $paket->bus->nama_bus }}</td>
-                <td>{{ $paket->bus->plat_nomor }}</td>
+                <td>{{ $paket->bus_id === null ? 'Semua Bus' : $paket->bus->nama_bus }}</td>
+                <td>{{ $paket->bus_id === null ? '-' : $paket->bus->plat_nomor }}</td>
                 <td>{{ $paket->nama_paket }}</td>
                 <td class="text-right">Rp {{ number_format($paket->harga, 0, ',', '.') }}</td>
                 <td>

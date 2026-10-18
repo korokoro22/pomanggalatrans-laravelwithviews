@@ -12,18 +12,25 @@ class Barang_masuk extends Model
     protected $table = 'barang_masuk';
 
     protected $fillable = [
+        'jenis_masuk',
         'no_invoice',
-        'tanggal_masuk',
         'kategori_nota',
+        'jenis_pembelian', // REVISI: JENIS PEMBELIAN
+        'tanggal_masuk',
         'supplier',
         'bukti_nota',
         'penerima',
-        'tanggal_masuk',
+        'bus_id',
+        'keterangan',
     ];
 
-    // BarangMasuk punya banyak detail item
     public function details()
     {
         return $this->hasMany(Barang_masuk_detail::class, 'barang_masuk_id');
+    }
+
+    public function bus()
+    {
+        return $this->belongsTo(Bus::class, 'bus_id');
     }
 }
